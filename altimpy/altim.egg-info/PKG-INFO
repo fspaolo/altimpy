@@ -1,0 +1,19 @@
+Metadata-Version: 1.0
+Name: altim
+Version: 0.1
+Summary: Set of tools for processing satelllite altimetry data
+Home-page: UNKNOWN
+Author: Fernando Paolo
+Author-email: fspaolo@gmail.com
+License: MIT
+Description: Set of tools for processing satellite altimetry data
+        ====================================================
+        
+        Description coming soon...
+        
+        
+        Release notes
+        =============
+        
+Keywords: satellite data,altimetry,time series,IDR,WDR
+Platform: UNKNOWN

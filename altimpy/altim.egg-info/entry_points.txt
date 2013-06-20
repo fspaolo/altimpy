@@ -1,0 +1,3 @@
+[console_scripts]
+altim = altim:main
+

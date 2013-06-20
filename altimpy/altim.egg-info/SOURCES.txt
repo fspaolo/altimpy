@@ -1,0 +1,7 @@
+setup.py
+altim/altim.egg-info/PKG-INFO
+altim/altim.egg-info/SOURCES.txt
+altim/altim.egg-info/dependency_links.txt
+altim/altim.egg-info/entry_points.txt
+altim/altim.egg-info/not-zip-safe
+altim/altim.egg-info/top_level.txt
