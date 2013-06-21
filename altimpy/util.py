@@ -11,6 +11,7 @@ import numpy as np
 import scipy as sp
 import tables as tb
 import datetime as dt
+from scipy import spatial
 
 
 class CircularList(list):
@@ -299,7 +300,7 @@ def find_nearest2(x, y, points):
     
     Finds the indices of nearest coords in the 2d x/y arrays 
     to the given list of points. It searches the nearest-neighbours 
-    in a k-d tree.
+    using a k-d tree.
 
     Parameters
     ----------
@@ -316,7 +317,7 @@ def find_nearest2(x, y, points):
     """
     shape = x.shape
     xy = np.column_stack([y.ravel(), x.ravel()]) # (m,n) -> (mxn,2)
-    kdtree = sp.spatial.cKDTree(xy)    # construct k-d tree
+    kdtree = spatial.cKDTree(xy)          # construct k-d tree
     dist, indices = kdtree.query(points)  # search points in k-d tree
     indices = np.unravel_index(indices, shape)
     return indices
