@@ -265,8 +265,8 @@ def first_non_null2(arr):
         return None
 
 
-def find_nearest(arr, val, return_value=False):
-    """Find index or value of array entry "nearest" to val.
+def find_nearest(arr, val):
+    """Find index of array entry "nearest" to val.
     
     Parameters
     ----------
@@ -274,15 +274,14 @@ def find_nearest(arr, val, return_value=False):
         The array to search in (nd).
     val : scalar or array_like
         Value(s) to find.
-    return_value : bool, optional
-        To return the actual value instead of index.
+
     Returns
     -------
-    output : scalar or tuple of ndarray 
-        The index (tuple) or value of nearest entry found. 
+    out : tuple
+        The index (tuple) of nearest entry found. 
         If `val` is a list of values then a tuple of ndarray
-        with the indices of each value is return, or a list
-        with the nearest values if `return_value` is True.
+        with the indices of each value is return.
+
     """
     shape = arr.shape
     if np.ndim(val) == 0:                 # scalar
@@ -292,8 +291,35 @@ def find_nearest(arr, val, return_value=False):
         for v in val:
             idx.append((np.abs(arr-v)).argmin())
     idx = np.unravel_index(idx, shape)
-    if return_value: 
-        return arr[idx]
-    else:
-        return idx
+    return idx
+
+
+def find_nearest2(x, y, points):
+    """Find nearest x/y coords of given points.
+    
+    Finds the indices of nearest coords in the 2d x/y arrays 
+    to the given list of points. It searches the nearest-neighbours 
+    in a k-d tree.
+
+    Parameters
+    ----------
+    x, y : 2d arrays (m,n)
+        Arrays containing the spatial coordinates.
+    points : 2d array_like (k,2)
+        List of points to find, e.g., list of tuples.
+
+    Returns
+    -------
+    out : tuple
+        The indices (tuple of ndarray) of the nearest entries found. 
+
+    """
+    shape = x.shape
+    xy = np.column_stack([y.ravel(), x.ravel()]) # (m,n) -> (mxn,2)
+    kdtree = sp.spatial.cKDTree(xy)    # construct k-d tree
+    dist, indices = kdtree.query(points)  # search points in k-d tree
+    indices = np.unravel_index(indices, shape)
+    return indices
+
+
 
