@@ -160,9 +160,7 @@ def get_size(arr):
 
 
 def can_be_loaded(data, max_size=512):
-    """
-    Check if a PyTables Array can be loaded in memory.
-    """
+    """Check if a PyTables Array can be loaded in memory."""
     if get_size(data) > max_size:
         msg = 'data is larger than %d MB, not loading in-memory!' \
             % max_size
@@ -172,9 +170,7 @@ def can_be_loaded(data, max_size=512):
 
 
 def need_to_save(data, max_size=128):
-    """
-    Check when data in memory need to be flushed on disk.
-    """
+    """Check when data in memory need to be flushed to disk."""
     data = np.asarray(data)
     if get_size(data) > max_size:
         return True
@@ -183,8 +179,9 @@ def need_to_save(data, max_size=128):
 
 
 def get_season(year, month, return_month=2):
-    """
-    Apply `_get_season()` to a scalar or sequence. See `_get_season()`.
+    """Apply `_get_season()` to a scalar or sequence. 
+    
+    See function `_get_season()`.
     """
     if not np.iterable(year) or not np.iterable(month):
         year = np.asarray([year])
@@ -194,7 +191,8 @@ def get_season(year, month, return_month=2):
 
 
 def _get_season(year, month, return_month=2):
-    """
+    """Return year/month for a season block.
+    
     Returns the first, second or third month of the 3-month 
     season-block, and update the `year` when needed.
 
@@ -224,9 +222,7 @@ def _get_season(year, month, return_month=2):
 
 
 def get_box(region, npts=None):
-    """
-    Generate a box given the region coords: (L,R,T,B).
-    """
+    """Generate a box given the region coords: (L,R,T,B)."""
     west, east, south, north = region
     if npts:
         n = int(npts/4.)
@@ -259,6 +255,7 @@ def first_non_null(arr):
 
 
 def first_non_null2(arr):
+    """Return index of first non-null element."""
     ind, = np.where(~np.isnan(arr))
     if len(ind) > 0:
         return ind[0]
@@ -272,7 +269,7 @@ def find_nearest(arr, val):
     Parameters
     ----------
     arr : array_like
-        The array to search in (nd).
+        The array to search in (nd). No need to be sorted.
     val : scalar or array_like
         Value(s) to find.
 
@@ -284,21 +281,19 @@ def find_nearest(arr, val):
         with the indices of each value is return.
 
     """
-    shape = arr.shape
-    if np.ndim(val) == 0:                 # scalar
-        idx = (np.abs(arr-val)).argmin()  # index of flat array
-    else:
-        idx = []
-        for v in val:
-            idx.append((np.abs(arr-v)).argmin())
-    idx = np.unravel_index(idx, shape)
+    if np.ndim(val) == 0:  # scalar
+        val = np.array([val]) 
+    idx = []
+    for v in val:
+        idx.append((np.abs(arr-v)).argmin())
+    idx = np.unravel_index(idx, arr.shape)
     return idx
 
 
 def find_nearest2(x, y, points):
     """Find nearest x/y coords of given points.
     
-    Finds the indices of nearest coords in the 2d x/y arrays 
+    Finds the indices of nearest coords in the 2d x and y arrays 
     to the given list of points. It searches the nearest-neighbours 
     using a k-d tree.
 
@@ -315,12 +310,8 @@ def find_nearest2(x, y, points):
         The indices (tuple of ndarray) of the nearest entries found. 
 
     """
-    shape = x.shape
-    xy = np.column_stack([y.ravel(), x.ravel()]) # (m,n) -> (mxn,2)
+    xy = np.column_stack([x.ravel(), y.ravel()]) # 2x(m,n) -> (mxn,2)
     kdtree = spatial.cKDTree(xy)          # construct k-d tree
     dist, indices = kdtree.query(points)  # search points in k-d tree
-    indices = np.unravel_index(indices, shape)
+    indices = np.unravel_index(indices, x.shape)
     return indices
-
-
-

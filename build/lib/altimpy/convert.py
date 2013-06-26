@@ -6,11 +6,12 @@ import tables as tb
 import datetime as dt
 import pandas as pd
 
+from constants import *
+
 ### time conversion functions
 
 class SecsToDateTime(object):
-    """
-    Converts `seconds since epoch` to `datetime` (i.e., year, month, day).
+    """Converts seconds since epoch to datetime (i.e., year, month, day).
 
     secs : 1D array, decimal seconds.
     since_year : int, ref_epoch = <since_year>-Jan-1 00:00:00 is assumed.
@@ -71,21 +72,28 @@ class SecsToDateTime(object):
             d.minute, d.second) for d in self._dates])
 
 
-def lon_180_360(lon, region):
+def lon_180_360(lon, region=None, inverse=False):
+    """Convert lon from 180 to 360 (or vice-verse). 
+    
+    Converts according `region` if given, otherwise converts
+    from 180 to 360 if `inverse` is `False` or from 360 to 180 
+    if `inverse` is True.
     """
-    Convert lon from 180 to 360 (or vice-verse) according to `region`.
-    """
-    l, r, b, t = region
-    if l < 0:
-        lon[lon>180] -= 360  # 360 -> 180
-    elif r > 180:
-        lon[lon<0] += 360    # 180 -> 360
+    if region:
+        l, r, b, t = region
+        if l < 0:
+            lon[lon>180] -= 360  # 360 -> 180
+        elif r > 180:
+            lon[lon<0] += 360    # 180 -> 360
+    elif inverse:
+        lon[lon>180] -= 360
+    else:
+        lon[lon<0] += 360
     return lon
 
 
 def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
-    """
-    Convert from 'lon/lat' to polar stereographic 'x/y'.
+    """Convert from 'lon/lat' to polar stereographic 'x/y'.
  
     This function converts from geodetic latitude and longitude to
     polar stereographic 'x/y' coordinates for the polar regions. The 
@@ -96,7 +104,7 @@ def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
     
     Parameters
     ----------
-    lon, lat : array_like (rank-1 or 2) or float 
+    lon, lat : array_like (1d or 2d) or float 
         Geodetic longitude and latitude (degrees, -/+180 or 0/360 and -/+90).
     slat : float
         Standard latitude (e.g., 71 S), see Notes.
@@ -105,11 +113,11 @@ def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
     hemi : string
         Hemisphere: 'n' or 's' (not case-sensitive).
     units : string
-        Polar Stereographic x,y units: 'm' or 'km' (not case-sensitive).
+        Polar Stereographic x/y units: 'm' or 'km' (not case-sensitive).
     
     Returns
     -------
-    x, y : ndarray (rank-1 or 2) or float
+    x, y : ndarray (1d or 2d) or float
         Polar stereographic x and y coordinates (in 'm' or 'km').
 
     Notes
@@ -124,8 +132,9 @@ def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
     SLON provides a "vertical" coordinate for plotting and for 
     rectangle orientation. E.g., for Arctic sea ice, NSIDC use 
     SLON=45 in order to make a grid that is optimized for where 
-    sea ice occurs. CATS2008a has SLON=-70 (AP roughly up), so 
-    that the grid can be long enough to include South Georgia.
+    sea ice occurs. Ex: CATS2008a has SLON=-70 (AP roughly up), 
+    so that the grid can be long enough to include South Georgia.
+    Other examples are:
 
     MOA Image Map (the GeoTIFF): SLAT=-71, SLON=0
     MOA mask grid (from Laurie): SLAT=-71, SLON=-70
@@ -221,7 +230,7 @@ def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
  
 def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
     """
-    Convert from polar stereographic 'x,y' to 'lon,lat'.
+    Convert from polar stereographic 'x/y' to 'lon/lat'.
  
     This subroutine converts from Polar Stereographic 'x,y' coordinates 
     to geodetic longitude and latitude for the polar regions. The 
@@ -232,7 +241,7 @@ def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
  
     Parameters
     ----------
-    x, y : array_like (rank-1 or 2) or float
+    x, y : array_like (1d or 2d) or float
         Polar stereographic x and y coordinates (in 'm' or 'km').
     slat : float
         Standard latitude (e.g., 71 S), see Notes.
@@ -241,16 +250,16 @@ def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
     hemi : string
         Hemisphere: 'n' or 's' (not case-sensitive).
     units : string
-        Polar Stereographic x,y units: 'm' or 'km' (not case-sensitive).
+        Polar Stereographic x/y units: 'm' or 'km' (not case-sensitive).
  
     Returns
     -------
-    lon, lat : ndarray (rank-1 or 2) or float
+    lon, lat : ndarray (1d or 2d) or float
         Geodetic longitude and latitude (degrees, 0/360 and -/+90).
  
     Notes
     -----
-    SLAT is is the "true" latitude in the plane projection 
+    SLAT is the "true" latitude in the plane projection 
     (the map), so there is no deformation over this latitude; 
     e.g., using the same SLON but changing SLAT from 70 to 71 
     degrees, will move things in polar stereo. The goal is to 
@@ -371,21 +380,21 @@ def sec2dt(secs, since_year=1985):
     return [dt_ref + dt.timedelta(seconds=s) for s in secs]
 
 
-def year2dt(year):
-    """
-    Convert decimal year to `datetime` object.
-    year : float [array], decimal years.
+def yr2dt(year):
+    """Convert decimal year to `datetime` object.
+
+    year : float array_like, decimal years.
     """
     if not np.iterable(year):
         year = np.asarray([year])
-    ym = np.asarray([year2ym(y) for y in year])
+    ym = np.asarray([yr2ym(y) for y in year])
     dt = np.asarray([pd.datetime(y, m, 15) for y, m in ym])
     return dt
 
 
 def num2dt(times):
-    """
-    Convert a numeric representation of time to datetime.
+    """Convert a numeric representation of time to datetime.
+
     times : int/float array_like representing YYYYMMDD.
     """
     return np.asarray([pd.datetime.strptime(str(int(t)), '%Y%m%d') for t in times])
@@ -399,19 +408,19 @@ def ym2dt(year, month):
     return [dt.datetime(y, m, 15) for y, m in zip(year, month)]
 
 
-# NOT SURE THIS FUNC IS OK. REVIEW THE ALGORITHM!
-def num2year(iyear):
+# NOT SURE THIS FUNC IS OK. NEED TO REVIEW THE ALGORITHM!
+def num2yr(iyear):
     """Integer representation of year to decimal year."""
     if not np.iterable(iyear):
         iyear = np.asarray([iyear])
     iyear = np.asarray([int(y) for y in iyear])
     fyear = lambda y, m, d: y + (m - 1)/12. + d/365.25
-    ymd = [int2ymd(iy) for iy in iyear]
+    ymd = [num2ymd(iy) for iy in iyear]
     return [fyear(y,m,d) for y,m,d in ymd]
 
 
-# NOT SURE THIS FUNC IS OK. REVIEW THE ALGORITHM!
-def ym2year(year, month):
+# NOT SURE THIS FUNC IS OK. NEED TO REVIEW THE ALGORITHM!
+def ym2yr(year, month):
     """Year, month -> decimal year."""
     year = np.asarray(year)
     month = np.asarray(month)
@@ -419,7 +428,7 @@ def ym2year(year, month):
     return fyear 
 
 
-def year2ym(fyear):
+def yr2ym(fyear):
     """Decimal year -> year, month."""
     fy, y  = np.modf(fyear)
     m, y = int(np.ceil(fy*12)), int(y)
@@ -433,11 +442,11 @@ def num2ymd(iyear):
     return (int(y), int(m), int(d*100))
 
 
-def year2num(year, day=15):
-    """Decimal year to integer representation -> YYYMMDD."""
+def yr2num(year, day=15):
+    """Decimal year to integer representation (YYYMMDD)."""
     if not np.iterable(year):
         year = np.asarray([year])
-    ym = [year2ym(y) for y in year]
+    ym = [yr2ym(y) for y in year]
     return [int(y*10000 + m*100 + day) for y,m in ym]
 
 

@@ -17,6 +17,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import matplotlib.cm as cm
 
+from constants import *
+
 ### Visualization utilities
 
 def create_colormap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True, 
@@ -156,9 +158,9 @@ colormap_lib = {
 ### Map projection utilities
 
 def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90):
-    """
-    Reads a GeoTIFF image and returns the respective 2D array.
-    ==>it assumes polar stereographic proj<==
+    """Reads a GeoTIFF image and returns the respective 2D array.
+
+    (it assumes polar stereographic proj)
 
     Return
     ------
@@ -214,13 +216,11 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90):
 
 
 def align_data_with_fig(x, y, data, res=10):
-    """
-    Align map grid with figure frame. 
+    """Align map grid with figure frame. 
     
     Map proj origin (x0,y0) is at the center of the grid 
     (polar stereo) and y-dim increases up, figure origin is at 
     llcorner (cartesian) and y-dim increases down. 
-
     """
     x = np.asarray(x)
     y = np.asarray(y)
@@ -230,7 +230,13 @@ def align_data_with_fig(x, y, data, res=10):
     return [x, y, data]
 
 
-def plot_moa_subregion(m, moafile, res=10):
+def plot_moa_subreg(m, moafile, res=10):
+    """Plot MOA image subregion defined by projection `m`.
+    
+    m : Basemap projection
+    moafile : GeoTiff file of MOA image
+    res : resolution, step size to be plotted
+    """
     bbox_sub = (m.llcrnrlon, m.llcrnrlat, m.urcrnrlon, m.urcrnrlat) 
     # real proj coords (stere)
     x, y, data, bbox_moa = get_gtif(moafile, lat_ts=-71)          
@@ -284,29 +290,42 @@ def make_proj_stere(bbox, lat_ts=-71, lon_0=0, lat_0=-90):
     return m
 
 
-def plot_grid_proj(m, lon, lat, grid, cell=None, shift=True, contourf=False, **kw):
-    """
-    Plot a 2D rectangular grid on a given map projection `m`.
+def plot_grid_proj(m, lon, lat, grid, shift=True, masked=True, 
+                   contourf=False, **kw):
+    """Plot a rectangular grid on a given map projection.
 
-    m : Basemap projection
-    lon, lat : 1D arrays of grid coordinates
-    grid : 2D array (the grid)
+    Parameters
+    ----------
+    m : Basemap object
+        The projection.
+    lon, lat : 1d or 2d ndarray
+        The grid coordinates.
+    grid : 2d ndarray
+        The grid to plot.
+    shift : bool, optional
+        Shift the grid by half cell-size due to `pcolormesh()`.
+    masked : bool, optional
+        Mask NaN values, i.e., plot only valid entries.
+    contourf : bool, optional
+        Plot interpolated field instead of grid.
+
+    Returns
+    -------
+    out : Basemap object
+        The provided map projection object.
     """
-    if shift:
-        # shift the grid due to `pcolormesh()`
-        lon -= (lon[1] - lon[0])/2.
-        lat -= (lat[1] - lat[0])/2.
-    lon, lat = np.meshgrid(lon, lat)
-    xx, yy = m(lon, lat)
-    grid = np.ma.masked_invalid(grid)
+    if np.ndim(lon) == 1:
+        lon, lat = np.meshgrid(lon, lat)
+    #if shift:
+    #    lon -= (lon[1] - lon[0])/2.
+    #    lat -= (lat[1] - lat[0])/2.
+    xx, yy = m(lon, lat)    # map into proj and fig coords.
+    if masked:
+        grid = np.ma.masked_invalid(grid)
     if contourf:
         m.contourf(xx, yy, grid, 25, **kw)
     else:
         m.pcolormesh(xx, yy, grid, **kw)
-    if cell is not None:
-        lon, lat = util.box(cell)
-        x, y = m(lon, lat)
-        m.plot(x, y, 'k', linewidth=2)
     return m
 
 
@@ -369,9 +388,7 @@ def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75,
 
 
 def colormap(*args, **kwargs):
-    """
-    Matplotlib enhanced colormap. See `create_colormap` for details.
-    """
+    """Matplotlib enhanced colormap. See `create_colormap` for details."""
     from matplotlib.colors import LinearSegmentedColormap
     v, r, g, b, a = create_colormap(*args, **kwargs)
     n = 2001
@@ -385,9 +402,7 @@ def colormap(*args, **kwargs):
 def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None, 
              ticklabels=None, boxcolor='k', boxalpha=1.0, 
              boxwidth=0.2, **kwargs):
-    """
-    Matplotlib enhanced colorbar.
-    """
+    """Matplotlib enhanced colorbar."""
     if rect is None:
         rect = 0.25, 0.04, 0.5, 0.02
     axis = clim[0], clim[1], 0, 1
@@ -586,8 +601,7 @@ def contour(*args, **kwargs):
 
 
 def add_inner_title(ax, title='', loc=1, size=None, **kwargs):
-    """
-    Add title inside the figure. Same locations as `label`.
+    """Add title inside the figure. Same locations as `label`.
 
     Example
     -------
@@ -608,9 +622,7 @@ def add_inner_title(ax, title='', loc=1, size=None, **kwargs):
 
 
 def hinton(W, max_weight=None, ax=None):
-    """
-    Draws a Hinton diagram for visualizing a weight matrix.
-    """
+    """Draws a Hinton diagram for visualizing a weight matrix."""
     from matplotlib.patches import Rectangle
     from matplotlib.ticker import NullLocator
     W = W.T
@@ -636,8 +648,7 @@ def hinton(W, max_weight=None, ax=None):
 
 
 def plot_matrix(mat, title='', loc=1, plot=None, **kw):
-    """
-    Plot the representation of a matrix: matshow, hinton or spy.
+    """Plot the representation of a matrix: matshow, hinton or spy.
 
     plot : can be 'matshow', 'hinton' or 'spy'. If `None` (default) 
     plots matshow and hinton diagrams.
