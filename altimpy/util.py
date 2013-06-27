@@ -315,3 +315,6 @@ def find_nearest2(x, y, points):
     dist, indices = kdtree.query(points)  # search points in k-d tree
     indices = np.unravel_index(indices, x.shape)
     return indices
+
+
+def reference_ts(y, ref_to='first'...
