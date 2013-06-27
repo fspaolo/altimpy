@@ -5,6 +5,7 @@ import scipy as sp
 import tables as tb
 import datetime as dt
 import pandas as pd
+import netCDF4 as nc
 
 from constants import *
 
@@ -104,7 +105,7 @@ def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
     
     Parameters
     ----------
-    lon, lat : array_like (1d or 2d) or float 
+    lon, lat : array-like (1d or 2d) or float 
         Geodetic longitude and latitude (degrees, -/+180 or 0/360 and -/+90).
     slat : float
         Standard latitude (e.g., 71 S), see Notes.
@@ -241,7 +242,7 @@ def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
  
     Parameters
     ----------
-    x, y : array_like (1d or 2d) or float
+    x, y : array-like (1d or 2d) or float
         Polar stereographic x and y coordinates (in 'm' or 'km').
     slat : float
         Standard latitude (e.g., 71 S), see Notes.
@@ -371,56 +372,56 @@ def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
 
 ### time conversion function
 
-def sec2dt(secs, since_year=1985):
-    """
-    Convert seconds since_year to datetime objects.
+def sec2date(secs, since_year=1985):
+    """Convert seconds since_year to datetime objects.
+
     secs : float [array], decimal seconds.
     """
     dt_ref = dt.datetime(since_year, 1, 1, 0, 0)
-    return [dt_ref + dt.timedelta(seconds=s) for s in secs]
+    return np.asarray([dt_ref + dt.timedelta(seconds=s) for s in secs])
 
 
-def yr2dt(year):
+def year2date(year):
     """Convert decimal year to `datetime` object.
 
-    year : float array_like, decimal years.
+    year : float array-like, decimal years.
     """
     if not np.iterable(year):
         year = np.asarray([year])
-    ym = np.asarray([yr2ym(y) for y in year])
+    ym = np.asarray([year2ym(y) for y in year])
     dt = np.asarray([pd.datetime(y, m, 15) for y, m in ym])
     return dt
 
 
-def num2dt(times):
+def num2date(times):
     """Convert a numeric representation of time to datetime.
 
-    times : int/float array_like representing YYYYMMDD.
+    times : int/float array-like representing YYYYMMDD.
     """
     return np.asarray([pd.datetime.strptime(str(int(t)), '%Y%m%d') for t in times])
 
 
-def ym2dt(year, month):
+def ym2date(year, month):
+    """Convert year and month to `datetime` object.
+
+    year, month : int array-like.
     """
-    Convert year and month to `datetime` object.
-    year, month : int arrays.
-    """
-    return [dt.datetime(y, m, 15) for y, m in zip(year, month)]
+    return np.asarray([dt.datetime(y, m, 15) for y, m in zip(year, month)])
 
 
 # NOT SURE THIS FUNC IS OK. NEED TO REVIEW THE ALGORITHM!
-def num2yr(iyear):
-    """Integer representation of year to decimal year."""
+def num2year(iyear):
+    """Numeric representation of date to decimal year."""
     if not np.iterable(iyear):
         iyear = np.asarray([iyear])
     iyear = np.asarray([int(y) for y in iyear])
     fyear = lambda y, m, d: y + (m - 1)/12. + d/365.25
     ymd = [num2ymd(iy) for iy in iyear]
-    return [fyear(y,m,d) for y,m,d in ymd]
+    return np.asarray([fyear(y,m,d) for y,m,d in ymd])
 
 
 # NOT SURE THIS FUNC IS OK. NEED TO REVIEW THE ALGORITHM!
-def ym2yr(year, month):
+def ym2year(year, month):
     """Year, month -> decimal year."""
     year = np.asarray(year)
     month = np.asarray(month)
@@ -428,7 +429,7 @@ def ym2yr(year, month):
     return fyear 
 
 
-def yr2ym(fyear):
+def year2ym(fyear):
     """Decimal year -> year, month."""
     fy, y  = np.modf(fyear)
     m, y = int(np.ceil(fy*12)), int(y)
@@ -442,11 +443,47 @@ def num2ymd(iyear):
     return (int(y), int(m), int(d*100))
 
 
-def yr2num(year, day=15):
+def year2num(year, day=15):
     """Decimal year to integer representation (YYYMMDD)."""
     if not np.iterable(year):
         year = np.asarray([year])
-    ym = [yr2ym(y) for y in year]
-    return [int(y*10000 + m*100 + day) for y,m in ym]
+    ym = [year2ym(y) for y in year]
+    return np.asarray([int(y*10000 + m*100 + day) for y,m in ym])
+
+
+### file format conversion
+
+
+class NetCDF(object):
+    """Quick and dirty way to save ndarrays to NetCDF4.
+    
+    Example
+    -------
+    arr = numpy.arange(100).reshape(10,10)
+    f = NetCDF(fname)
+    f.create_var('name_var', ('name_dim1', 'name_dim2',), arr)
+    f.close()
+    """
+    def __init__(self, fname):
+        self.f = nc.Dataset(fname, 'w', format='NETCDF4')
+
+    def create_var(self, varname, dimnames, arr):
+        shape = list(arr.shape)
+        if len(shape) > 2:  
+            shape[2:] = None    # unlimited dimensions for dim > 2
+        for n, dname in zip(shape, dimnames):
+            # if dim doesn't exit, create it
+            if not self.f.dimensions.has_key(dname):
+                self.f.createDimension(dname, n)
+            # if var doesn't exit, create it
+            if not self.f.variables.has_key(varname):
+                var = self.f.createVariable(varname, 'f8', dimnames)
+                var[:] = arr[:]
+
+    def close(self):
+        self.f.close()
+
+
+
 
 

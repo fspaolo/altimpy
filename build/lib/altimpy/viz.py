@@ -298,7 +298,7 @@ def plot_grid_proj(m, lon, lat, grid, shift=True, masked=True,
     ----------
     m : Basemap object
         The projection.
-    lon, lat : 1d or 2d ndarray
+    lon, lat : ndarray (1d or 2d)
         The grid coordinates.
     grid : 2d ndarray
         The grid to plot.
@@ -319,7 +319,8 @@ def plot_grid_proj(m, lon, lat, grid, shift=True, masked=True,
     #if shift:
     #    lon -= (lon[1] - lon[0])/2.
     #    lat -= (lat[1] - lat[0])/2.
-    xx, yy = m(lon, lat)    # map into proj and fig coords.
+    # map lon/lat into proj and fig coords.
+    xx, yy = m(lon, lat)    
     if masked:
         grid = np.ma.masked_invalid(grid)
     if contourf:
