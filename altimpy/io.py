@@ -36,9 +36,7 @@ def close_files():
 
 
 def add_cols_to_tbl(fname, tname, cols):
-    """
-    Add columns to an existing table.
-    """
+    """Add columns to an existing table."""
     # Open it again in append mode
     f = tb.openFile(fname, "a")
     table = f.getNode(tname) 
