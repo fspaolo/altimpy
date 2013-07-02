@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import matplotlib.cm as cm
 
-from constants import *
+from const import *
 
 ### Visualization utilities
 

@@ -7,7 +7,7 @@ import datetime as dt
 import pandas as pd
 import netCDF4 as nc
 
-from constants import *
+from const import *
 
 ### time conversion functions
 
