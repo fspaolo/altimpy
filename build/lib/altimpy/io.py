@@ -146,6 +146,7 @@ class NetCDF(object):
     >>> f.close()
     """
     def __init__(self, fname):
+        self.filename = fname
         self.file = nc.Dataset(fname, 'w', format='NETCDF4')
 
     def create_var(self, varname, dimnames, arr):
