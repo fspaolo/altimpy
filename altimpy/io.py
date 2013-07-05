@@ -146,28 +146,28 @@ class NetCDF(object):
     >>> f.close()
     """
     def __init__(self, fname):
-        self.f = nc.Dataset(fname, 'w', format='NETCDF4')
+        self.file = nc.Dataset(fname, 'w', format='NETCDF4')
 
     def create_var(self, varname, dimnames, arr):
         shape = list(arr.shape)
         if len(shape) > 2:  
             # unlimited lenght for first dim (z or t)
             shape[0] = 0
-        if len(dimnames) == 1:
+        if np.ndim(dimnames) < 1:
             # transform shape from () to (1,)
-            dimnames = (dimnames[0],)
+            dimnames = (dimnames,)
         for n, dname in zip(shape, dimnames):
             # create dim if doesn't exit
-            if not self.f.dimensions.has_key(dname):
-                self.f.createDimension(dname, n)
+            if not self.file.dimensions.has_key(dname):
+                self.file.createDimension(dname, n)
                 print 'created dimension: %s (n=%d)' % (dname, n)
         # create var if doesn't exist 
-        if not self.f.variables.has_key(varname):
-            var = self.f.createVariable(varname, 'f8', dimnames)
+        if not self.file.variables.has_key(varname):
+            var = self.file.createVariable(varname, 'f8', dimnames)
             var[:] = arr[:]
             print 'created variable:', varname, dimnames
 
     def close(self):
-        self.f.close()
+        self.file.close()
 
 
