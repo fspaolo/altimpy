@@ -10,7 +10,6 @@ import scipy as sp
 import tables as tb
 import datetime as dt
 import pandas as pd
-import netCDF4 as nc
 
 from const import *
 

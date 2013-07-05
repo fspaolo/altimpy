@@ -1,9 +1,15 @@
+"""
+Module with input/output functions.
+
+"""
+
 import os
 import re
 import numpy as np
 import scipy as sp
 import tables as tb
 import datetime as dt
+import netCDF4 as nc
 
 
 # definition of Table structures for HDF5 files
