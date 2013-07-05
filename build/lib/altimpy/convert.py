@@ -1,3 +1,8 @@
+"""
+Module with conversion functions.
+
+"""
+
 import os
 import re
 import numpy as np
@@ -7,7 +12,7 @@ import datetime as dt
 import pandas as pd
 import netCDF4 as nc
 
-from constants import *
+from const import *
 
 ### time conversion functions
 
@@ -449,47 +454,3 @@ def year2num(year, day=15):
         year = np.asarray([year])
     ym = [year2ym(y) for y in year]
     return np.asarray([int(y*10000 + m*100 + day) for y,m in ym])
-
-
-### file format conversion
-
-
-class NetCDF(object):
-    """Quick and dirty way to save ndarrays to NetCDF4.
-    
-    Example
-    -------
-    >>> import numpy
-    >>> arr = numpy.arange(100).reshape(10,10)
-    >>> f = NetCDF('file.nc')
-    >>> f.create_var('name_var', ('name_dim1', 'name_dim2',), arr)
-    created dimension: name_dim1 (n=10)
-    created dimension: name_dim2 (n=10)
-    created variable: name_var ('name_dim1', 'name_dim2')
-    >>> f.close()
-    """
-    def __init__(self, fname):
-        self.f = nc.Dataset(fname, 'w', format='NETCDF4')
-
-    def create_var(self, varname, dimnames, arr):
-        shape = list(arr.shape)
-        if len(shape) > 2:  
-            shape[0] = 0    # unlimited lenght for first dim
-        for n, dname in zip(shape, dimnames):
-            # create dim if doesn't exit
-            if not self.f.dimensions.has_key(dname):
-                self.f.createDimension(dname, n)
-                print 'created dimension: %s (n=%d)' % (dname, n)
-        # create var if doesn't exist 
-        if not self.f.variables.has_key(varname):
-            var = self.f.createVariable(varname, 'f8', dimnames)
-            var[:] = arr[:]
-            print 'created variable:', varname, dimnames
-
-    def close(self):
-        self.f.close()
-
-
-
-
-
