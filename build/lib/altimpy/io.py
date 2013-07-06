@@ -150,13 +150,11 @@ class NetCDF(object):
         self.file = nc.Dataset(fname, 'w', format='NETCDF4')
 
     def create_var(self, varname, dimnames, arr):
+        dimnames = np.atleast_1d(dimnames)
         shape = list(arr.shape)
         if len(shape) > 2:  
             # unlimited lenght for first dim (z or t)
             shape[0] = 0
-        if np.ndim(dimnames) < 1:
-            # transform shape from () to (1,)
-            dimnames = (dimnames,)
         for n, dname in zip(shape, dimnames):
             # create dim if doesn't exit
             if not self.file.dimensions.has_key(dname):

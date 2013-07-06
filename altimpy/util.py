@@ -280,6 +280,10 @@ def find_nearest(arr, val):
         If `val` is a list of values then a tuple of ndarray
         with the indices of each value is return.
 
+    See also
+    --------
+    find_neares2
+
     """
     if np.ndim(val) == 0:  # scalar
         val = np.array([val]) 
@@ -308,6 +312,10 @@ def find_nearest2(x, y, points):
     -------
     out : tuple
         The indices (tuple of ndarray) of the nearest entries found. 
+
+    See also
+    --------
+    find_nearest
 
     """
     xy = np.column_stack([x.ravel(), y.ravel()]) # 2x(m,n) -> (mxn,2)
