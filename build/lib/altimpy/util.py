@@ -282,7 +282,7 @@ def find_nearest(arr, val):
 
     See also
     --------
-    find_neares2
+    find_nearest2
 
     """
     if np.ndim(val) == 0:  # scalar
