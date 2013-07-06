@@ -1,6 +1,6 @@
 
-Set of tools for processing satellite altimetry data
-====================================================
+AltimPy - Set of tools for processing satellite altimetry data
+==============================================================
 
 A Python package with high-level functions for constructing time 
 series of satellite altimetric measurements (surface elevation and
