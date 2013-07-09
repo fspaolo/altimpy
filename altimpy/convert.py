@@ -78,7 +78,7 @@ class SecsToDateTime(object):
 
 
 def lon_180_360(lon, region=None, inverse=False):
-    """Convert lon from 180 to 360 (or vice-verse). 
+    """Convert lon from 180 to 360 (or vice-versa). 
     
     Converts according `region` if given, otherwise converts
     from 180 to 360 if `inverse` is `False` or from 360 to 180 
@@ -433,9 +433,9 @@ def ym2year(year, month):
     return fyear 
 
 
-def year2ym(fyear):
+def year2ymd(yearfrac):
     """Decimal year -> year, month."""
-    fy, y  = np.modf(fyear)
+    frac, year  = np.modf(yearfrac)
     m, y = int(np.ceil(fy*12)), int(y)
     if (m == 0): m = 1
     return [y, m]
