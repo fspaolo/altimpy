@@ -272,7 +272,7 @@ def make_proj_stere(bbox, lat_ts=-71, lon_0=0, lat_0=-90):
     """
     # Ellipsoid: http://nsidc.org/data/polar_stereo/ps_grids.html
     a = RE
-    b = a*np.sqrt(1.0 - ec2) 
+    b = a*np.sqrt(1.0 - E2) 
     m = Basemap(
         projection='stere', 
         lat_ts=lat_ts,         
