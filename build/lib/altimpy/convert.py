@@ -1,20 +1,43 @@
 """
 Module with conversion functions.
 
+time vs datetime modules
+------------------------
+The time module was intended to match the functionality of the C
+standard library time.h kit, and named accordingly. The datetime
+module came much later.
+
+The time module is actually more used for file dates and times. 
+That would explain the epoch and 1970 boundaries as there are not 
+much files before the pre-PC era to keep timestamps for. The 
+functions in this module do not handle dates and times before the 
+epoch or far in the future
+
+The datetime module is more suited to general data processing than 
+the time module.
+
+Tips on using python datetime module
+------------------------------------
+http://www.enricozini.org/2009/debian/using-python-datetime/
+
 """
 
 import os
 import re
+import time
+import datetime as dt
+import calendar as cal
 import numpy as np
 import scipy as sp
 import tables as tb
-import datetime as dt
 import pandas as pd
 
 from const import *
 
+
 ### time conversion functions
 
+# DEPRECATED?
 class SecsToDateTime(object):
     """Converts seconds since epoch to datetime (i.e., year, month, day).
 
@@ -25,10 +48,10 @@ class SecsToDateTime(object):
     Notes
     -----
     1. Matlab uses as time reference the year 0000, and Python 
-       `datetime` uses the year 0001.
-    2. utc85 (or ESA-time) is seconds since 1985-1-1 00:00:00,
-       ICESat-time is seconds since 2000-1-1 12:00:00,
-       secs00 is seconds since 2000-1-1 00:00:00.
+       datetime uses the year 0001.
+    2. utc85 (or ESA-time) is seconds since 1985-1-1 00:00:00 UTC,
+       ICESat-time is seconds since 2000-1-1 12:00:00 UTC,
+       secs00 is seconds since 2000-1-1 00:00:00 UTC.
 
     """
     def __init__(self, secs=0, since_year=1985, since_epoch=None):
@@ -78,7 +101,7 @@ class SecsToDateTime(object):
 
 
 def lon_180_360(lon, region=None, inverse=False):
-    """Convert lon from 180 to 360 (or vice-verse). 
+    """Convert lon -/+180 -> 0/360 (or vice-versa). 
     
     Converts according `region` if given, otherwise converts
     from 180 to 360 if `inverse` is `False` or from 360 to 180 
@@ -98,7 +121,7 @@ def lon_180_360(lon, region=None, inverse=False):
 
 
 def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
-    """Convert from 'lon/lat' to polar stereographic 'x/y'.
+    """Convert lon/lat (spherical) -> x/y (polar stereographic).
  
     This function converts from geodetic latitude and longitude to
     polar stereographic 'x/y' coordinates for the polar regions. The 
@@ -185,15 +208,15 @@ def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
     print 'standard lat:', slat
     print 'standard lon:', slon
     print 'hemisphere:', hemi
-    print 'units of x,y:', units
-    print "converting lon,lat -> x,y ..."
+    print 'units of x/y:', units
+    print "converting lon/lat -> x/y ..."
 
-    # if sequence convert to ndarray double
+    # if sequence, convert to ndarray double
     if type(lon).__name__ in ['list', 'tuple']:
         lon = np.array(lon, 'f8') 
         lat = np.array(lat, 'f8')        
 
-    # if ndarray convert to double if it isn't
+    # if ndarray, convert to double if it isn't
     if type(lon).__name__ == 'ndarray' and lon.dtype != 'float64':
         lon = lon.astype(np.float64)
         lat = lat.astype(np.float64)
@@ -235,7 +258,7 @@ def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
  
 def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
     """
-    Convert from polar stereographic 'x/y' to 'lon/lat'.
+    Convert x/y (polar stereographic) -> lon/lat (spherical).
  
     This subroutine converts from Polar Stereographic 'x,y' coordinates 
     to geodetic longitude and latitude for the polar regions. The 
@@ -322,12 +345,12 @@ def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
     print 'units of x,y:', units
     print "converting 'x,y' -> 'lon,lat' ..."
 
-    # if sequence convert to ndarray
+    # if sequence, convert to ndarray
     if type(x).__name__ in ['list', 'tuple']:
         x = np.array(x, 'f8')
         y = np.array(y, 'f8')
     
-    # if ndarray convert to double if it isn't
+    # if ndarray, convert to double if it isn't
     if type(x).__name__ == 'ndarray' and x.dtype != 'float64':
         x = x.astype(np.float64)
         y = y.astype(np.float64)
@@ -376,33 +399,77 @@ def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
 
 ### time conversion function
 
-def sec2date(secs, since_year=1985):
-    """Convert seconds since_year to datetime objects.
+# OK
+def sec2date(secs, epoch=(1985, 1, 1, 0, 0, 0)):
+    """Convert seconds since epoch -> datetime objects.
 
-    secs : float [array], decimal seconds.
+    Parameters
+    ----------
+    secs : scalar or array-like
+        Seconds (can be fractions).
+    epoch : tuple, (year, month, day, hour, min, sec)
+        The reference time for the elapsed seconds.
+
     """
-    dt_ref = dt.datetime(since_year, 1, 1, 0, 0)
-    return np.asarray([dt_ref + dt.timedelta(seconds=s) for s in secs])
+    print 'elapsed seconds since', epoch, '-> date'
+    if not np.iterable(secs):
+        secs = np.asarray([secs], 'f8')
+    else:
+        secs = np.asarray(secs, 'f8')  # cast type for timedelta()
+    year, month, day, hour, minute, second = epoch
+    dt_epoch = dt.datetime(year, month, day, hour, minute, second)
+    dates = [dt_epoch + dt.timedelta(seconds=s) for s in secs]
+    return np.asarray(dates)
 
 
+# OK
 def year2date(year):
-    """Convert decimal year to `datetime` object.
+    """Convert decimal year -> datetime object.
 
-    year : float array-like, decimal years.
+    This method is probably accurate to within the second (or the 
+    hour if daylight savings or other strange regional things are 
+    in effect). It also works correctly during leap years.
+
+    Parameters
+    ----------
+    year : scalar or array-like
+        Decimal years.
+
+    Notes
+    -----
+    The function can handle dates between years 0001--9999.
+
+    See also
+    --------
+    date2year
+
     """
     if not np.iterable(year):
         year = np.asarray([year])
-    ym = np.asarray([year2ym(y) for y in year])
-    dt = np.asarray([pd.datetime(y, m, 15) for y, m in ym])
-    return dt
+    def y2d(yearfrac):
+        # returns seconds elapsed since 0001-01-01 00:00:00 local
+        secs = lambda date: (date - dt.datetime(1,1,1)).total_seconds()
+        frac, year = np.modf(yearfrac)
+        year = int(year)
+        start_of_this_year = dt.datetime(year=year, month=1, day=1)
+        start_of_next_year = dt.datetime(year=year+1, month=1, day=1)
+        year_duration = secs(start_of_next_year) - secs(start_of_this_year)
+        year_elapsed = frac * year_duration 
+        return start_of_this_year + dt.timedelta(seconds=year_elapsed)
+    return np.asarray([y2d(y) for y in year])
 
 
+# OK
 def num2date(times):
-    """Convert a numeric representation of time to datetime.
+    """Convert time as YYYYMMDD -> datetime.
 
-    times : int/float array-like representing YYYYMMDD.
+    times : array-like, 
+        Int or float representing time as YYYYMMDD.
+
     """
-    return np.asarray([pd.datetime.strptime(str(int(t)), '%Y%m%d') for t in times])
+    if not np.iterable(times):
+        times = np.asarray([times])
+    return np.asarray([dt.strptime(str(int(t)), '%Y%m%d') for t in times])
 
 
 def ym2date(year, month):
@@ -419,7 +486,7 @@ def num2year(iyear):
     if not np.iterable(iyear):
         iyear = np.asarray([iyear])
     iyear = np.asarray([int(y) for y in iyear])
-    fyear = lambda y, m, d: y + (m - 1)/12. + d/365.25
+    fyear = lambda y, m, d: y + (m - 1)/12. + d/YEAR_IN_DAYS
     ymd = [num2ymd(iy) for iy in iyear]
     return np.asarray([fyear(y,m,d) for y,m,d in ymd])
 
@@ -429,16 +496,28 @@ def ym2year(year, month):
     """Year, month -> decimal year."""
     year = np.asarray(year)
     month = np.asarray(month)
-    fyear = year + (month - 1)/12. + 15.22/365.25  # decimal years (month-centered)
+    fyear = year + (month - 1)/12. + 15.22/YEAR_IN_DAYS  # decimal years (month-centered)
     return fyear 
 
 
-def year2ym(fyear):
-    """Decimal year -> year, month."""
-    fy, y  = np.modf(fyear)
-    m, y = int(np.ceil(fy*12)), int(y)
-    if (m == 0): m = 1
-    return [y, m]
+def year2ymd(yearfrac):
+    """Converts decimal year to year, month, day.
+    
+    It uses the Julian Year and defines months as 12
+    equal-size blocks (will not necessarily coincide with 
+    the Gregorian Calendar).
+
+    The output is `year` and `months and days` *past* since 
+    `year`. So in this case `days` is not a calendar day.
+    """
+    frac, year = np.modf(yearfrac)
+    year = int(year)
+    frac, month = np.modf(frac*12)
+    month = int(month + 1)
+    frac, day = np.modf(frac*MONTH_IN_DAYS)
+    day = int(day)
+    if day < 30: day += 1  # avoids using day 31
+    return [year, month, day]
 
 
 def num2ymd(iyear):
@@ -448,8 +527,49 @@ def num2ymd(iyear):
 
 
 def year2num(year, day=15):
-    """Decimal year to integer representation (YYYMMDD)."""
+    """Decimal year -> number date representation: YYYMMDD."""
     if not np.iterable(year):
         year = np.asarray([year])
     ym = [year2ym(y) for y in year]
     return np.asarray([int(y*10000 + m*100 + day) for y,m in ym])
+
+
+# OK
+def date2year(date):
+    """Convert datetime object -> decimal year.
+
+    This method is probably accurate to within the second (or the 
+    hour if daylight savings or other strange regional things are 
+    in effect). It also works correctly during leap years.
+
+    Parameters
+    ----------
+    date : single or array-like datetime object(s)
+        The input date can be any time zone.
+
+    Notes
+    -----
+    Unlike the original function(1) using the `time` module, now the 
+    time is platform-independent, and the function can handle dates 
+    between years 0001--9999 (rather than 1900--2038).
+
+    (1) Modified from http://stackoverflow.com/questions/6451655/
+    python-how-to-convert-datetime-dates-to-decimal-years
+
+    See also
+    --------
+    year2date
+
+    """
+    if not np.iterable(date):
+        date = np.asarray([date])
+    def d2y(date):
+        # returns seconds elapsed since 0001-01-01 00:00:00 local
+        secs = lambda date: (date - dt.datetime(1,1,1)).total_seconds()
+        start_of_this_year = dt.datetime(year=date.year, month=1, day=1)
+        start_of_next_year = dt.datetime(year=date.year+1, month=1, day=1)
+        year_elapsed = secs(date) - secs(start_of_this_year)
+        year_duration = secs(start_of_next_year) - secs(start_of_this_year)
+        fraction = year_elapsed/year_duration
+        return date.year + fraction
+    return np.asarray([d2y(d) for d in date])
