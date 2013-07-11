@@ -26,7 +26,6 @@ import os
 import re
 import time
 import datetime as dt
-import calendar as cal
 import numpy as np
 import scipy as sp
 import tables as tb
@@ -469,7 +468,7 @@ def num2date(times):
     """
     if not np.iterable(times):
         times = np.asarray([times])
-    return np.asarray([dt.strptime(str(int(t)), '%Y%m%d') for t in times])
+    return np.asarray([dt.datetime.strptime(str(int(t)), '%Y%m%d') for t in times])
 
 
 def ym2date(year, month):
