@@ -38,7 +38,7 @@ from const import *
 
 # DEPRECATED?
 class SecsToDateTime(object):
-    """Converts seconds since epoch to datetime (i.e., year, month, day).
+    """Seconds since epoch -> datetime (year, month, day).
 
     secs : 1D array, decimal seconds.
     since_year : int, ref_epoch = <since_year>-Jan-1 00:00:00 is assumed.
@@ -100,7 +100,7 @@ class SecsToDateTime(object):
 
 
 def lon_180_360(lon, region=None, inverse=False):
-    """Convert lon -/+180 -> 0/360 (or vice-versa). 
+    """longitude -/+180 -> 0/360 (or vice-versa). 
     
     Converts according `region` if given, otherwise converts
     from 180 to 360 if `inverse` is `False` or from 360 to 180 
@@ -120,7 +120,7 @@ def lon_180_360(lon, region=None, inverse=False):
 
 
 def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
-    """Convert lon/lat (spherical) -> x/y (polar stereographic).
+    """ Spherical lon/lat -> Polar Steregraphic x/y.
  
     This function converts from geodetic latitude and longitude to
     polar stereographic 'x/y' coordinates for the polar regions. The 
@@ -256,8 +256,7 @@ def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
 
  
 def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
-    """
-    Convert x/y (polar stereographic) -> lon/lat (spherical).
+    """Polar Stereographic x/y -> Spherical lon/lat.
  
     This subroutine converts from Polar Stereographic 'x,y' coordinates 
     to geodetic longitude and latitude for the polar regions. The 
@@ -396,11 +395,13 @@ def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
     return [lon, lat]
 
 
-### time conversion function
+#--------------------------------------------
+#       time conversion function
+#--------------------------------------------
 
 # OK
 def sec2date(secs, epoch=(1985, 1, 1, 0, 0, 0)):
-    """Convert seconds since epoch -> datetime objects.
+    """Seconds since epoch -> datetime object.
 
     Parameters
     ----------
@@ -423,7 +424,7 @@ def sec2date(secs, epoch=(1985, 1, 1, 0, 0, 0)):
 
 # OK
 def year2date(year):
-    """Convert decimal year -> datetime object.
+    """Decimal year -> datetime object.
 
     This method is probably accurate to within the second (or the 
     hour if daylight savings or other strange regional things are 
@@ -459,26 +460,28 @@ def year2date(year):
 
 
 # OK
-def num2date(times):
-    """Convert time as YYYYMMDD -> datetime.
+def num2date(dnum):
+    """Date number as YYYYMMDD -> datetime object.
 
-    times : array-like, 
-        Int or float representing time as YYYYMMDD.
+    dnum : array-like, 
+        Int or float representing date as YYYYMMDD.
 
     """
-    if not np.iterable(times):
-        times = np.asarray([times])
-    return np.asarray([dt.datetime.strptime(str(int(t)), '%Y%m%d') for t in times])
+    if not np.iterable(dnum):
+        dnum = np.asarray([dnum])
+    dates = [dt.datetime.strptime(str(int(t)), '%Y%m%d') for t in dnum]
+    return np.asarray(dates)
 
 
 def ym2date(year, month):
-    """Convert year and month to `datetime` object.
+    """Year and month -> datetime object.
 
     year, month : int array-like.
     """
     return np.asarray([dt.datetime(y, m, 15) for y, m in zip(year, month)])
 
 
+# DEPRECATED
 # NOT SURE THIS FUNC IS OK. NEED TO REVIEW THE ALGORITHM!
 def num2year(iyear):
     """Numeric representation of date to decimal year."""
@@ -490,6 +493,7 @@ def num2year(iyear):
     return np.asarray([fyear(y,m,d) for y,m,d in ymd])
 
 
+# DEPRECATED
 # NOT SURE THIS FUNC IS OK. NEED TO REVIEW THE ALGORITHM!
 def ym2year(year, month):
     """Year, month -> decimal year."""
@@ -499,8 +503,9 @@ def ym2year(year, month):
     return fyear 
 
 
+# DEPRECATED
 def year2ymd(yearfrac):
-    """Converts decimal year to year, month, day.
+    """Decimal year -> year, month, day.
     
     It uses the Julian Year and defines months as 12
     equal-size blocks (will not necessarily coincide with 
@@ -519,23 +524,24 @@ def year2ymd(yearfrac):
     return [year, month, day]
 
 
+# DEPRECATED
 def num2ymd(iyear):
     f, y = np.modf(iyear/10000.)
     d, m = np.modf(f*100)
     return (int(y), int(m), int(d*100))
 
 
-def year2num(year, day=15):
-    """Decimal year -> number date representation: YYYMMDD."""
-    if not np.iterable(year):
-        year = np.asarray([year])
-    ym = [year2ym(y) for y in year]
-    return np.asarray([int(y*10000 + m*100 + day) for y,m in ym])
+# OK
+def year2num(year):
+    """Decimal year -> date number as YYYMMDD."""
+    date = year2date(year)
+    dnum = [int(''.join(d.date().isoformat().split('-'))) for d in date]
+    return np.asarray(dnum)
 
 
 # OK
 def date2year(date):
-    """Convert datetime object -> decimal year.
+    """Datetime object -> decimal year.
 
     This method is probably accurate to within the second (or the 
     hour if daylight savings or other strange regional things are 
