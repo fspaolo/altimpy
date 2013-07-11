@@ -406,7 +406,7 @@ def sec2date(secs, epoch=(1985, 1, 1, 0, 0, 0)):
     Parameters
     ----------
     secs : scalar or array-like
-        Seconds (can be fractions).
+        Seconds (it can be fractions).
     epoch : tuple, (year, month, day, hour, min, sec)
         The reference time for the elapsed seconds.
 
@@ -420,6 +420,98 @@ def sec2date(secs, epoch=(1985, 1, 1, 0, 0, 0)):
     dt_epoch = dt.datetime(year, month, day, hour, minute, second)
     dates = [dt_epoch + dt.timedelta(seconds=s) for s in secs]
     return np.asarray(dates)
+
+
+# OK
+def num2date(dnum):
+    """Date number as YYYYMMDD -> datetime object.
+
+    Parameters
+    ----------
+    dnum : scalar or array-like
+        Int or float representing date as YYYYMMDD.
+
+    See also
+    --------
+    date2num
+
+    """
+    if not np.iterable(dnum):
+        dnum = np.asarray([dnum])
+    dates = [dt.datetime.strptime(str(int(t)), '%Y%m%d') for t in dnum]
+    return np.asarray(dates)
+
+
+# OK
+def date2num(date):
+    """Datetime object -> date number as YYYYMMDD.
+    
+    Parameters
+    ----------
+    date : object or array-like
+        Datetime object(s).
+
+    See also
+    --------
+    num2date
+
+    """
+    if not np.iterable(date):
+        date = np.asarray([date])
+    date = [int(''.join(d.date().isoformat().split('-'))) for d in date]
+    return np.asarray(date)
+
+
+# DEPRECATED
+def ym2date(year, month):
+    """Year and month -> datetime object.
+
+    year, month : int array-like.
+    """
+    return np.asarray([dt.datetime(y, m, 15) for y, m in zip(year, month)])
+
+
+# DEPRECATED
+def year2ymd(yearfrac):
+    """Decimal year -> year, month, day.
+    
+    It uses the Julian Year and defines months as 12
+    equal-size blocks (will not necessarily coincide with 
+    the Gregorian Calendar).
+
+    The output is `year` and `months and days` *past* since 
+    `year`. So in this case `days` is not a calendar day.
+    """
+    frac, year = np.modf(yearfrac)
+    year = int(year)
+    frac, month = np.modf(frac*12)
+    month = int(month + 1)
+    frac, day = np.modf(frac*MONTH_IN_DAYS)
+    day = int(day)
+    if day < 30: day += 1  # avoids using day 31
+    return [year, month, day]
+
+
+# OK
+def year2num(year):
+    """Decimal year -> date number as YYYMMDD.
+    
+    See also
+    --------
+    num2year
+    """
+    return date2num(year2date(year))
+
+
+# OK
+def num2year(dnum):
+    """Date number as YYYYMMDD -> decimal year.
+    
+    See also
+    --------
+    year2num
+    """
+    return date2year(num2date(dnum))
 
 
 # OK
@@ -457,86 +549,6 @@ def year2date(year):
         year_elapsed = frac * year_duration 
         return start_of_this_year + dt.timedelta(seconds=year_elapsed)
     return np.asarray([y2d(y) for y in year])
-
-
-# OK
-def num2date(dnum):
-    """Date number as YYYYMMDD -> datetime object.
-
-    dnum : array-like, 
-        Int or float representing date as YYYYMMDD.
-
-    """
-    if not np.iterable(dnum):
-        dnum = np.asarray([dnum])
-    dates = [dt.datetime.strptime(str(int(t)), '%Y%m%d') for t in dnum]
-    return np.asarray(dates)
-
-
-def ym2date(year, month):
-    """Year and month -> datetime object.
-
-    year, month : int array-like.
-    """
-    return np.asarray([dt.datetime(y, m, 15) for y, m in zip(year, month)])
-
-
-# DEPRECATED
-# NOT SURE THIS FUNC IS OK. NEED TO REVIEW THE ALGORITHM!
-def num2year(iyear):
-    """Numeric representation of date to decimal year."""
-    if not np.iterable(iyear):
-        iyear = np.asarray([iyear])
-    iyear = np.asarray([int(y) for y in iyear])
-    fyear = lambda y, m, d: y + (m - 1)/12. + d/YEAR_IN_DAYS
-    ymd = [num2ymd(iy) for iy in iyear]
-    return np.asarray([fyear(y,m,d) for y,m,d in ymd])
-
-
-# DEPRECATED
-# NOT SURE THIS FUNC IS OK. NEED TO REVIEW THE ALGORITHM!
-def ym2year(year, month):
-    """Year, month -> decimal year."""
-    year = np.asarray(year)
-    month = np.asarray(month)
-    fyear = year + (month - 1)/12. + 15.22/YEAR_IN_DAYS  # decimal years (month-centered)
-    return fyear 
-
-
-# DEPRECATED
-def year2ymd(yearfrac):
-    """Decimal year -> year, month, day.
-    
-    It uses the Julian Year and defines months as 12
-    equal-size blocks (will not necessarily coincide with 
-    the Gregorian Calendar).
-
-    The output is `year` and `months and days` *past* since 
-    `year`. So in this case `days` is not a calendar day.
-    """
-    frac, year = np.modf(yearfrac)
-    year = int(year)
-    frac, month = np.modf(frac*12)
-    month = int(month + 1)
-    frac, day = np.modf(frac*MONTH_IN_DAYS)
-    day = int(day)
-    if day < 30: day += 1  # avoids using day 31
-    return [year, month, day]
-
-
-# DEPRECATED
-def num2ymd(iyear):
-    f, y = np.modf(iyear/10000.)
-    d, m = np.modf(f*100)
-    return (int(y), int(m), int(d*100))
-
-
-# OK
-def year2num(year):
-    """Decimal year -> date number as YYYMMDD."""
-    date = year2date(year)
-    dnum = [int(''.join(d.date().isoformat().split('-'))) for d in date]
-    return np.asarray(dnum)
 
 
 # OK
