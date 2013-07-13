@@ -8,8 +8,10 @@ import numpy as np
 PI = 3.1415926535897932384626433
 
 # Conversion from degrees to radians and vice-versa
-CDR = D2R= 180/PI
-CRD = R2D= PI/180
+CDR = 180/PI
+CRD = PI/180
+D2R = PI/180
+R2D = 180/PI
 
 # Eccentricity of the Earth (squared)
 E2 = 6.694379852*1e-3 
