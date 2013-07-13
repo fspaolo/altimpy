@@ -99,6 +99,11 @@ class SecsToDateTime(object):
             d.minute, d.second) for d in self._dates])
 
 
+#--------------------------------------------
+#       coordinates transformation
+#--------------------------------------------
+
+
 def lon_180_360(lon, region=None, inverse=False):
     """longitude -/+180 -> 0/360 (or vice-versa). 
     
@@ -393,6 +398,16 @@ def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
         #lon[lon<-180] += 360; lon[lon>180] -= 360                # keep lon to -/+180
     print 'done.'
     return [lon, lat]
+
+
+def sph2xyz(lon, lat, radius=1):
+    """Spherical lon/lat -> Cartesian x/y/z (3d)."""
+    lat *= D2R 
+    lon *= D2R
+    x = radius * np.cos(lat) * np.cos(lon)
+    y = radius * np.cos(lat) * np.sin(lon)
+    z = radius * np.sin(lat)
+    return [x, y, z]
 
 
 #--------------------------------------------

@@ -8,9 +8,9 @@ import numpy as np
 PI = 3.1415926535897932384626433
 
 # Conversion from degrees to radians and vice-versa
-CDR = 180/PI
+CDR = 180/PI    # to divide
 CRD = PI/180
-D2R = PI/180
+D2R = PI/180    # to multiply
 R2D = 180/PI
 
 # Eccentricity of the Earth (squared)
