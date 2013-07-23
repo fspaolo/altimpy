@@ -248,7 +248,7 @@ def get_box(region, npts=None):
 ntuples = lambda lst, n: zip(*[lst[i:]+lst[:i] for i in range(n)])
 
 
-# CHECK
+# NEED TO CHECK!
 def first_non_null(arr):
     """Return index of first non-null element."""
     return (i for i,elem in enumerate(arr) if ~np.isnan(elem)).next()
@@ -325,4 +325,21 @@ def find_nearest2(x, y, points):
     return indices
 
 
-# def reference_ts(y, ref_to='first'...
+def referenced(x, to='first'):
+    """Reference a series to its first (non-null) or mean values.
+    
+    Parameters
+    ----------
+    x : array-like
+        Series to be referenced.
+    to : str
+        References the series to its 'first' or 'mean'.
+    """
+    assert to in ['first', 'mean'], "`to` must be 'first' or 'mean'"
+    if type(x) is not np.ndarray:
+        x = np.asarray(x)
+    if to == 'first':
+        x -= x[first_non_null2(x)]
+    else:
+        x -= x[~np.isnan(x)].mean()
+    return x
