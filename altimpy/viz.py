@@ -601,7 +601,7 @@ def contour(*args, **kwargs):
     return pp
 
 
-def intitle(title='', loc=1, size=None, subplot=111, **kwargs):
+def intitle(title='', loc=1, size=None, **kwargs):
     """Add title inside the figure, same locations as 'label'.
 
     Example
