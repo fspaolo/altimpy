@@ -109,6 +109,8 @@ def linear_fit_robust(x, y, return_coef=False):
         return (x, y_fit.fittedvalues)
 
 
+# DEPRECATED
+# use directly 'numpy.polyfit' and 'numpy.polyval'
 def poly_fit(x, y, order=3, return_coef=False, npts=200):
     """
     Fit a polynomial of order `order` to data points `x,y`.

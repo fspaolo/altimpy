@@ -601,21 +601,22 @@ def contour(*args, **kwargs):
     return pp
 
 
-def add_inner_title(ax, title='', loc=1, size=None, **kwargs):
-    """Add title inside the figure. Same locations as `label`.
+def intitle(title='', loc=1, size=None, subplot=111, **kwargs):
+    """Add title inside the figure, same locations as 'label'.
 
     Example
     -------
-    fig = plt.figure()
-    ax = fig.add_subplot((111))
-    ax = add_inner_title(ax, 'title', 3)
+    plt.figure()
+    intitle('inner title', 3)
     """
     from matplotlib.offsetbox import AnchoredText
     from matplotlib.patheffects import withStroke
     if size is None:
         size = dict(size=plt.rcParams['legend.fontsize'])
     at = AnchoredText(title, loc=loc, prop=size, pad=0., 
-        borderpad=0.5, frameon=False, **kwargs)
+                      borderpad=0.5, frameon=False, **kwargs)
+    fig, axs = plt.gcf(), plt.gca()
+    ax = fig.add_subplot(axs.numRows, axs.numCols, fig.number)
     ax.add_artist(at)
     at.txt._text.set_path_effects([withStroke(foreground="w", linewidth=4)])
     at.patch.set_alpha(0.5)
