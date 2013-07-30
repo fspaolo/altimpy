@@ -601,7 +601,7 @@ def contour(*args, **kwargs):
     return pp
 
 
-def intitle(title='', loc=1, size=None, **kwargs):
+def intitle(title='', loc=1, size=None, ax=None, **kwargs):
     """Add title inside the figure, same locations as 'label'.
 
     Example
@@ -616,7 +616,8 @@ def intitle(title='', loc=1, size=None, **kwargs):
     at = AnchoredText(title, loc=loc, prop=size, pad=0., 
                       borderpad=0.5, frameon=False, **kwargs)
     fig, axs = plt.gcf(), plt.gca()
-    ax = fig.add_subplot(axs.numRows, axs.numCols, fig.number)
+    if ax is None:
+        ax = fig.add_subplot(axs.numRows, axs.numCols, fig.number)
     ax.add_artist(at)
     at.txt._text.set_path_effects([withStroke(foreground="w", linewidth=4)])
     at.patch.set_alpha(0.5)
