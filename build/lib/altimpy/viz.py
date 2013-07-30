@@ -604,24 +604,29 @@ def contour(*args, **kwargs):
 def intitle(title='', loc=1, size=None, ax=None, **kwargs):
     """Add title inside the figure, same locations as 'label'.
 
-    Example
-    -------
+    Examples
+    --------
+    # with pyplot
     plt.figure()
     intitle('inner title', 3)
+
+    # with pandas
+    ax = df.plot()
+    intitle('inner title', 3, ax=ax)
     """
     from matplotlib.offsetbox import AnchoredText
     from matplotlib.patheffects import withStroke
     if size is None:
         size = dict(size=plt.rcParams['legend.fontsize'])
+    if ax is None:
+        fig, axs = plt.gcf(), plt.gca()
+        ax = fig.add_subplot(axs.numRows, axs.numCols, fig.number)
     at = AnchoredText(title, loc=loc, prop=size, pad=0., 
                       borderpad=0.5, frameon=False, **kwargs)
-    fig, axs = plt.gcf(), plt.gca()
-    if ax is None:
-        ax = fig.add_subplot(axs.numRows, axs.numCols, fig.number)
     ax.add_artist(at)
     at.txt._text.set_path_effects([withStroke(foreground="w", linewidth=4)])
     at.patch.set_alpha(0.5)
-    return at
+    return ax
 
 
 def hinton(W, max_weight=None, ax=None):
@@ -687,6 +692,7 @@ def rcparams():
     plt.rcParams['font.family'] = 'arial'
     plt.rcParams['font.size'] = 16
     plt.rcParams['axes.labelsize'] = 20
+    plt.rcParams['legend.fontsize'] = 16
     plt.rcParams['xtick.major.size'] = 0
     plt.rcParams['ytick.major.size'] = 0
     plt.rcParams['xtick.labelsize'] = 18 

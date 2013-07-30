@@ -692,6 +692,7 @@ def rcparams():
     plt.rcParams['font.family'] = 'arial'
     plt.rcParams['font.size'] = 16
     plt.rcParams['axes.labelsize'] = 20
+    plt.rcParams['legend.fontsize'] = 16
     plt.rcParams['xtick.major.size'] = 0
     plt.rcParams['ytick.major.size'] = 0
     plt.rcParams['xtick.labelsize'] = 18 
