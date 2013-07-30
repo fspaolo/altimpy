@@ -617,7 +617,7 @@ def intitle(title='', loc=1, size=None, ax=None, **kwargs):
     from matplotlib.offsetbox import AnchoredText
     from matplotlib.patheffects import withStroke
     if size is None:
-        size = dict(size=plt.rcParams['legend.fontsize'])
+        size = dict(size=plt.rcParams['axes.labelsize'])
     if ax is None:
         fig, axs = plt.gcf(), plt.gca()
         ax = fig.add_subplot(axs.numRows, axs.numCols, fig.number)
