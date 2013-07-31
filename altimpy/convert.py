@@ -1,8 +1,8 @@
 """
 Module with conversion functions.
 
-time vs datetime modules
-------------------------
+Note on 'time' vs 'datetime' modules
+------------------------------------
 The time module was intended to match the functionality of the C
 standard library time.h kit, and named accordingly. The datetime
 module came much later.
@@ -401,7 +401,7 @@ def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
 
 
 def sph2xyz(lon, lat, radius=1):
-    """Spherical lon/lat -> Cartesian x/y/z (3d)."""
+    """Spherical lon/lat[/r] -> Cartesian x/y/z (3d)."""
     lat *= D2R 
     lon *= D2R
     x = radius * np.cos(lat) * np.cos(lon)
@@ -415,26 +415,49 @@ def sph2xyz(lon, lat, radius=1):
 #--------------------------------------------
 
 # OK
-def sec2date(secs, epoch=(1985, 1, 1, 0, 0, 0)):
+def sec2date(secs, since=(1985, 1, 1, 0, 0, 0)):
     """Seconds since epoch -> datetime object.
 
     Parameters
     ----------
     secs : scalar or array-like
-        Seconds (it can be fractions).
-    epoch : tuple, (year, month, day, hour, min, sec)
-        The reference time for the elapsed seconds.
+        [Decimal] Seconds.
+    since : tuple, (year, month, day, hour, min, sec)
+        The reference time for the elapsed seconds. If only (year, month, day) 
+        is provided, the following is assumed (year, month, day, 0, 0, 0).
+
+    See also
+    --------
+    sec2year
 
     """
-    print 'elapsed seconds since', epoch, '-> date'
+    assert len(since) in [3, 6], "'since' must be (y,m,d) or (y,m,d,h,m,s)"
+    print 'elapsed seconds since', since, '-> date'
     if not np.iterable(secs):
         secs = np.asarray([secs], 'f8')
     else:
         secs = np.asarray(secs, 'f8')  # cast type for timedelta()
-    year, month, day, hour, minute, second = epoch
+    if len(since) == 3:
+        since = list(since) + [0, 0, 0]
+    year, month, day, hour, minute, second = since
     dt_epoch = dt.datetime(year, month, day, hour, minute, second)
     dates = [dt_epoch + dt.timedelta(seconds=s) for s in secs]
     return np.asarray(dates)
+
+
+def sec2year(secs, since=(1985, 1, 1, 0, 0, 0)):
+    """Seconds since epoch -> decimal year.
+
+    Parameters
+    ----------
+    secs : scalar or array-like
+        [Decimal] Seconds.
+    since : tuple, (year, month, day, hour, min, sec)
+        The reference time for the elapsed seconds. If only (year, month, day) 
+        is provided, the following is assumed (year, month, day, 0, 0, 0).
+
+    """
+    return date2year(sec2date(secs, since=since))
 
 
 # OK
@@ -511,6 +534,11 @@ def year2ymd(yearfrac):
 def year2num(year):
     """Decimal year -> date number as YYYMMDD.
     
+    Parameters
+    ----------
+    year : scalar or array-like
+        Decimal years.
+
     See also
     --------
     num2year
@@ -522,6 +550,11 @@ def year2num(year):
 def num2year(dnum):
     """Date number as YYYYMMDD -> decimal year.
     
+    Parameters
+    ----------
+    dnum : scalar or array-like
+        Int or float representing date as YYYYMMDD.
+
     See also
     --------
     year2num
