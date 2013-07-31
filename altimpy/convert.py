@@ -456,6 +456,10 @@ def sec2year(secs, since=(1985, 1, 1, 0, 0, 0)):
         The reference time for the elapsed seconds. If only (year, month, day) 
         is provided, the following is assumed (year, month, day, 0, 0, 0).
 
+    See also
+    --------
+    sec2date
+
     """
     return date2year(sec2date(secs, since=since))
 
