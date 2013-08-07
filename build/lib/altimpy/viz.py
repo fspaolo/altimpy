@@ -690,12 +690,12 @@ def plot_matrix(mat, title='', loc=1, plot=None, **kw):
 def rcparams():
     """Set optimal figure layout parameters."""
     plt.rcParams['font.family'] = 'arial'
-    plt.rcParams['font.size'] = 16
-    plt.rcParams['axes.labelsize'] = 20
-    plt.rcParams['legend.fontsize'] = 16
+    plt.rcParams['font.size'] = 13 # 16
+    plt.rcParams['axes.labelsize'] = 17 # 20
+    plt.rcParams['legend.fontsize'] = 13 # 16
     plt.rcParams['xtick.major.size'] = 0
     plt.rcParams['ytick.major.size'] = 0
-    plt.rcParams['xtick.labelsize'] = 18 
-    plt.rcParams['ytick.labelsize'] = 18
+    plt.rcParams['xtick.labelsize'] = 15 # 18
+    plt.rcParams['ytick.labelsize'] = 15 # 18
     plt.rcParams['xtick.major.pad'] = 6
     plt.rcParams['ytick.major.pad'] = 6

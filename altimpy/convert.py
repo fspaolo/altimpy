@@ -411,7 +411,7 @@ def sph2xyz(lon, lat, radius=1):
 
 
 #--------------------------------------------
-#       time conversion function
+#       time conversion functions
 #--------------------------------------------
 
 # OK

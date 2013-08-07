@@ -411,7 +411,7 @@ def sph2xyz(lon, lat, radius=1):
 
 
 #--------------------------------------------
-#       time conversion function
+#       time conversion functions
 #--------------------------------------------
 
 # OK
@@ -441,7 +441,7 @@ def sec2date(secs, since=(1985, 1, 1, 0, 0, 0)):
         since = list(since) + [0, 0, 0]
     year, month, day, hour, minute, second = since
     dt_epoch = dt.datetime(year, month, day, hour, minute, second)
-    dates = [dt_epoch + dt.timedelta(seconds=s) for s in secs]
+    dates = [dt_epoch + dt.timedelta(seconds=s) for s in secs]  # conversion
     return np.asarray(dates)
 
 
@@ -462,6 +462,55 @@ def sec2year(secs, since=(1985, 1, 1, 0, 0, 0)):
 
     """
     return date2year(sec2date(secs, since=since))
+
+
+def day2date(days, since=(1985, 1, 1, 0, 0, 0)):
+    """Days since epoch -> datetime object.
+
+    Parameters
+    ----------
+    days : scalar or array-like
+        [Decimal] Days.
+    since : tuple, (year, month, day, hour, min, sec)
+        The reference time for the elapsed days. If only (year, month, day) 
+        is provided, the following is assumed (year, month, day, 0, 0, 0).
+
+    See also
+    --------
+    day2year
+
+    """
+    assert len(since) in [3, 6], "'since' must be (y,m,d) or (y,m,d,h,m,s)"
+    print 'elapsed days since', since, '-> date'
+    if not np.iterable(days):
+        days = np.asarray([days], 'f8')
+    else:
+        days = np.asarray(days, 'f8')  # cast type for timedelta()
+    if len(since) == 3:
+        since = list(since) + [0, 0, 0]
+    year, month, day, hour, minute, second = since
+    dt_epoch = dt.datetime(year, month, day, hour, minute, second)
+    dates = [dt_epoch + dt.timedelta(days=d) for d in days]  # conversion
+    return np.asarray(dates)
+
+
+def day2year(days, since=(1985, 1, 1, 0, 0, 0)):
+    """Days since epoch -> decimal year.
+
+    Parameters
+    ----------
+    days : scalar or array-like
+        [Decimal] Days.
+    since : tuple, (year, month, day, hour, min, sec)
+        The reference time for the elapsed days. If only (year, month, day) 
+        is provided, the following is assumed (year, month, day, 0, 0, 0).
+
+    See also
+    --------
+    day2date
+
+    """
+    return date2year(day2date(days, since=since))
 
 
 # OK
