@@ -68,10 +68,10 @@ def area_weighted_mean(X, A):
 
     """
     nt, _, _ = X.shape
-    ts = np.zeros(nt, 'f8')
+    ts = np.zeros(nt, 'f8')  # container for output time series
     X[X==0] = np.nan
     X = np.ma.masked_invalid(X)
-    for k in range(nt):
+    for k in range(nt):      # weight-average each 2d time step
         G = X[k,...]
         W = A.copy()
         W[np.isnan(G)] = 0
