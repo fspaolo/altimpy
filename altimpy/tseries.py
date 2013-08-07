@@ -16,29 +16,38 @@ from scipy import spatial
 from const import *
 
 
-def get_area_cells(X, x_edges, y_edges):
-    """ Calculates the area of each grid-cell.
+def get_area_cells(grid, x, y):
+    """Calculates the area of each grid-cell.
 
     Parameters
     ----------
-    X : 2d-array
-        The rectangular grid.
-    x_edges, y_edges : 1d-array
-        The coordinates of the nodes.
+    grid : 2d-array
+        A rectangular grid.
+    x, y : 1d-arrays
+        The coordinates of the cells or nodes (edges). If x and y are
+        of the same lengh as grid dimensions, then cell-centered 
+        coordinates are assumed, otherwise edges are assumed.
 
     Returns
     -------
-    out : 2d array
-        Same shape as X with the values of the area on each cell.
+    out : 2d-array
+        Same shape as 'grid' with the values of the area on each cell.
 
     """
+    ny, nx = grid.shape
+    # cells -> nodes
+    if len(x) == nx and len(y) == ny:  
+        dx, dy = x[1] - x[0], y[1] - y[0]
+        x -= dx/2.
+        y -= dy/2.
+        x = np.append(x, x[-1]+dx)
+        y = np.append(y, y[-1]+dy)
     C = EARTH_RADIUS**2*D2R  # deg -> rad
-    A = np.empty_like(X)
-    ny, nx = X.shape
+    A = np.empty_like(grid)
     for i in xrange(ny):
         for j in xrange(nx):
-            lat1, lat2 = y_edges[i]*D2R, y_edges[i+1]*D2R
-            lon1, lon2 = x_edges[j]*D2R, x_edges[j+1]*D2R
+            lat1, lat2 = y[i]*D2R, y[i+1]*D2R
+            lon1, lon2 = x[j]*D2R, x[j+1]*D2R
             A[i,j] = C * np.abs(np.sin(lat1) - np.sin(lat2))*np.abs(lon1 - lon2)
     return A
 
