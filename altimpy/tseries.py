@@ -42,19 +42,21 @@ def get_area_cells(grid, x, y):
         y -= dy/2.
         x = np.append(x, x[-1]+dx)
         y = np.append(y, y[-1]+dy)
-    C = EARTH_RADIUS**2*D2R  # deg -> rad
+    C = EARTH_RADIUS**2 * D2R  # deg -> rad
     A = np.empty_like(grid)
     for i in xrange(ny):
         for j in xrange(nx):
-            lat1, lat2 = y[i]*D2R, y[i+1]*D2R
-            lon1, lon2 = x[j]*D2R, x[j+1]*D2R
-            A[i,j] = C * np.abs(np.sin(lat1) - np.sin(lat2))*np.abs(lon1 - lon2)
+            lat1, lat2 = y[i] * D2R, y[i+1] * D2R
+            lon1, lon2 = x[j] * D2R, x[j+1] * D2R
+            A[i,j] = C * np.abs(np.sin(lat1)-np.sin(lat2)) * np.abs(lon1-lon2)
     return A
 
 
-# REDO THIS FUNCTION USING PANDAS DATAFRAMES?
 def area_weighted_mean(X, A):
     """Compute the area-weighted-average time series from a 3d array.
+    
+    For each value in the average time series also returns the fraction
+    of area covered by each average.
 
     Parameters
     ----------
@@ -68,8 +70,14 @@ def area_weighted_mean(X, A):
 
     Returns
     -------
-    out : 1d-array
+    ts : 1d-array
         The average time series weighted by each grid-cell area.
+    ar : 1d-array
+        The fraction of area covered by each average.
+
+    Notes
+    -----
+    This function uses numpy 'masked arrays'.
 
     See also
     --------
@@ -77,19 +85,19 @@ def area_weighted_mean(X, A):
 
     """
     nt, _, _ = X.shape
-    ts = np.zeros(nt, 'f8')  # container for output time series
-    X[X==0] = np.nan
     X = np.ma.masked_invalid(X)
+    total_area = float(X.sum(axis=0).count())
+    ts = np.zeros(nt, 'f8')  # container for output avrg time series
+    ar = np.zeros(nt, 'f8')  # container for fraction of area covered
     for k in range(nt):      # weight-average each 2d time step
         G = X[k,...]
         W = A.copy()
         W[np.isnan(G)] = 0
         s = W.sum()
         if s != 0:
-            W /= s 
+            W /= s           # normalize such that sum(W) == 1
         else:
             W[:] = 0 
-        ts[k] = np.sum(W*G)  # area-weighted average
-    return ts
-
-
+        ts[k] = np.sum(W*G)  # area-weighted average per time step
+        ar[k] =  G.count() / total_area
+    return [ts, ar]
