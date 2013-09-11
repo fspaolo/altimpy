@@ -1,26 +1,32 @@
-"""
-Module with conversion functions.
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
-Note on 'time' vs 'datetime' modules
-------------------------------------
-The time module was intended to match the functionality of the C
-standard library time.h kit, and named accordingly. The datetime
-module came much later.
+r"""
+================================
+Module with conversion functions
+================================
 
-The time module is actually more used for file dates and times. 
-That would explain the epoch and 1970 boundaries as there are not 
-much files before the pre-PC era to keep timestamps for. The 
-functions in this module do not handle dates and times before the 
-epoch or far in the future
+A note on 'time' vs 'datetime' modules
+--------------------------------------
 
-The datetime module is more suited to general data processing than 
-the time module.
+The time module was intended to match the functionality of the C standard 
+library time.h kit, and named accordingly. The datetime module came much later.
 
-Tips on using python datetime module
-------------------------------------
+The time module is actually more used for file dates and times. That would 
+explain the epoch and 1970 boundaries as there are not much files before the 
+pre-PC era to keep timestamps for. The functions in this module do not handle 
+dates and times before the epoch or far in the future
+
+The datetime module is more suited to general data processing than the time 
+module.
+
+Tips on using python 'datetime' module
+--------------------------------------
+
 http://www.enricozini.org/2009/debian/using-python-datetime/
 
 """
+print(__doc__)
 
 import os
 import re
@@ -32,7 +38,6 @@ import tables as tb
 import pandas as pd
 
 from const import *
-
 
 ### time conversion functions
 
