@@ -16,6 +16,11 @@ np.random.seed(1)
 
 
 class Krigin2d(object):
+    """Interpolate using Gaussian Process Regression (krigin).
+
+    Uses the GP pacakge from 'sklearn' to interpolate spatial data points (2d
+    fields).
+    """
 
     def __init__(self, regr='constant', corr='squared_exponential',
                  theta0=[10] * 2, thetaL=[1e-1] * 2, thetaU=[20] * 2,
