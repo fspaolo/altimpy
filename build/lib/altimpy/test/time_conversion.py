@@ -1,10 +1,10 @@
 import datetime as dt
 import altimpy as ap
 
-t1 = dt.datetime(   1, 1, 1, 0, 0, 0)
-t2 = dt.datetime(   1, 1, 1, 0, 0, 1)
-t3 = dt.datetime(   1, 1, 1, 0, 1, 0)
-t4 = dt.datetime(   1, 1, 1, 1, 0, 0)
+t1 = dt.datetime(1, 1, 1, 0, 0, 0)
+t2 = dt.datetime(1, 1, 1, 0, 0, 1)
+t3 = dt.datetime(1, 1, 1, 0, 1, 0)
+t4 = dt.datetime(1, 1, 1, 1, 0, 0)
 t5 = dt.datetime(2013, 1, 1, 0, 0, 0)
 t6 = dt.datetime(2013, 1, 1, 0, 0, 1)
 t7 = dt.datetime(2013, 1, 1, 0, 1, 0)
@@ -77,4 +77,3 @@ print t5, ' ', y5[0], ' ', d5[0]
 print t6, ' ', y6[0], ' ', d6[0]
 print t7, ' ', y7[0], ' ', d7[0]
 print t8, ' ', y8[0], ' ', d8[0]
-
