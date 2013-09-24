@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 r"""
@@ -26,7 +25,6 @@ Tips on using python 'datetime' module
 http://www.enricozini.org/2009/debian/using-python-datetime/
 
 """
-print(__doc__)
 
 import os
 import re
