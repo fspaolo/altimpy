@@ -345,3 +345,41 @@ def referenced(x, to='first'):
     else:
         x -= x[~np.isnan(x)].mean()
     return x
+
+
+def filter_std(arr, n=3, per_field=False):
+    """Filter out pts greater than n std.
+
+    Parameters
+    ----------
+    arr : array-like (2d or 3d)
+        Array containing the field(s) to filter, with or without NaNs.
+    n : integer, optional
+        Number of standar deviations to use, default n=3.
+    per_field : bool, optional
+        If 'False' (default), uses the distribution of the whole dataset. If 
+        'True', filters each 2d field independently (one distrib. per field).
+
+    """
+    nstd = lambda arr, n: n * np.std(arr[~np.isnan(arr)])
+    npts_before = len(arr[~np.isnan(arr)])
+    if per_field:
+        for i, field in enumerate(arr):
+            arr[i, np.abs(field) > nstd(field, n)] = np.nan
+    else:
+        arr[np.abs(arr) > nstd(arr, n)] = np.nan
+    npts_after = float(len(arr[~np.isnan(arr)]))
+    print 'filter out pts: %d (%.1f%%)' % \
+          (npts_before - npts_after, 100 * (1 - npts_after/npts_before))
+    return arr
+
+
+def get_mask(arr):
+    """Get mask from 3d array by summing the 0 axis.
+
+    0 = invalid region, 1 = valid region.
+    """
+    mask = np.nansum(arr, axis=0)
+    mask[:] = ~np.isnan(mask)
+    return mask
+
