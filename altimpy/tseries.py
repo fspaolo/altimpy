@@ -6,6 +6,7 @@ Module with functions to form and process time series.
 # August 6, 2013 
 
 import numpy as np
+from scipy.signal import detrend
 from altimpy.const import *
 from altimpy.util import *
 
@@ -221,7 +222,8 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9):
     return [H_cor, RR, SS]
 
 
-def backscatter_corr3(H, G, t, intervals, diff=False, robust=False):
+def backscatter_corr3(H, G, t, intervals, diff=False, robust=False, 
+                      max_increase=None):
     """Apply the backscatter correction to an elevation-change time series.
 
     It uses interval-variable correlation and sensitivity (transfer function).
@@ -252,6 +254,9 @@ def backscatter_corr3(H, G, t, intervals, diff=False, robust=False):
     robust : boolean, default False
         Performs linear fit by robust regression (M-estimate), otherwise uses
         Ordinary Least Squares (default).
+    max_increase : int, optional
+        Only apply correction if the amplitude of "corrected" data is not 
+        greater than 'max_increase' times the original value.
 
     Returns
     -------
@@ -328,9 +333,12 @@ def backscatter_corr3(H, G, t, intervals, diff=False, robust=False):
     SS[jj] = np.nan
     HH[jj] = np.nan
 
-    # apply correction only if increase is not greater than p%
     H_cor = H - SS * G - HH
-    #H_cor = limit_correction(H, H_cor, max_increase=2.)
+    '''
+    if max_increase is not None:
+        # apply correction only if increase is not greater than p%
+        H_cor = limit_correction(H, H_cor, max_increase=max_increase)
+    '''
     H_cor = referenced(H_cor, to='first')
 
     return [H_cor, RR, SS]
@@ -339,9 +347,10 @@ def backscatter_corr3(H, G, t, intervals, diff=False, robust=False):
 # Other functionalities
 #----------------------------------------------------------------
 
+# NOTE: NEED TO THINK BETTER ABOUT THIS STRATEGY. NOT WORKING AS IT IS !!!!!!
 def limit_correction(ts, ts_cor, max_increase=2.):
     """Limit the magnitude of the correction."""
-    i = (ts_cor / ts) > max_increase
+    i = (detrend(ts_cor) / detrend(ts)) > max_increase
     ts_cor[i] = ts[i]
     return ts_cor
 
