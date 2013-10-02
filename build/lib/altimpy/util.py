@@ -9,6 +9,7 @@ import os
 import re
 import numpy as np
 import scipy as sp
+import pandas as pd
 import tables as tb
 import datetime as dt
 from scipy import spatial
@@ -334,11 +335,11 @@ def referenced(x, to='first'):
     ----------
     x : array-like
         Series to be referenced.
-    to : str
+    to : str, default first
         References the series to its 'first' or 'mean'.
     """
     assert to in ['first', 'mean'], "`to` must be 'first' or 'mean'"
-    if type(x) is not np.ndarray:
+    if (not isinstance(x, np.ndarray)) and (not isinstance(x, pd.Series)):
         x = np.asarray(x)
     if to == 'first':
         x -= x[first_non_null2(x)]
@@ -356,9 +357,9 @@ def filter_std(arr, n=3, per_field=False):
         Array containing the field(s) to filter, with or without NaNs.
     n : integer, optional
         Number of standar deviations to use, default n=3.
-    per_field : bool, optional
-        If 'False' (default), uses the distribution of the whole dataset. If 
-        'True', filters each 2d field independently (one distrib. per field).
+    per_field : boolean, default False
+        If 'False', uses the distribution of the whole dataset. If 'True',
+        filters each 2d field independently (one distribution per field).
 
     """
     nstd = lambda arr, n: n * np.std(arr[~np.isnan(arr)])
