@@ -12,7 +12,9 @@ import scipy as sp
 import pandas as pd
 import tables as tb
 import datetime as dt
-from scipy import spatial
+import scipy.spatial as sl
+import scipy.ndimage as ni
+import mpl_toolkits.basemap as bm
 
 
 class CircularList(list):
@@ -322,7 +324,7 @@ def find_nearest2(x, y, points):
 
     """
     xy = np.column_stack([x.ravel(), y.ravel()]) # 2x(m,n) -> (mxn,2)
-    kdtree = spatial.cKDTree(xy)          # construct k-d tree
+    kdtree = sl.cKDTree(xy)               # construct k-d tree
     dist, indices = kdtree.query(points)  # search points in k-d tree
     indices = np.unravel_index(indices, x.shape)
     return indices
@@ -376,11 +378,50 @@ def filter_std(arr, n=3, per_field=False):
 
 
 def get_mask(arr):
-    """Get mask from 3d array by summing the 0 axis.
+    """Get mask from 3d array by summing-up the 0 axis.
 
-    0 = invalid region, 1 = valid region.
+    output: 0 = invalid region, 1 = valid region.
     """
     mask = np.nansum(arr, axis=0)
     mask[:] = ~np.isnan(mask)
     return mask
 
+
+def trend(time, arr, deg=2):
+    """Least squares polynomial fit of 2d time series (3d array)."""
+    nt, ny, nx = arr.shape
+    trend = np.empty_like(arr) * np.nan
+    for i in range(ny):
+        for j in range(nx):
+            ts = arr[:,i,j]
+            if not np.alltrue(np.isnan(ts)):
+                coef = np.polyfit(time, ts, deg=deg)
+                trend[:,i,j] = np.polyval(coef, time)
+    return trend
+
+
+def smooth(arr, sigma):
+    """Gaussian smoothing of 2d time series (3d array)."""
+    ind = np.where(np.isnan(arr))
+    arr[ind] = 0
+    for k, field in enumerate(arr):
+        arr[k] = ni.gaussian_filter(field, sigma, order=0)
+    arr[ind] = np.nan
+    return arr
+
+
+def regrid(arr, x, y, inc_by=2):
+    """Regrid 2d time series (3d array) increasing resolution."""
+    nt, ny, nx = arr.shape
+    out = np.empty((nt, inc_by * ny, inc_by * nx), 'f8')
+    xi = np.linspace(x.min(), x.max(), inc_by * len(x))
+    yi = np.linspace(y.min(), y.max(), inc_by * len(y))
+    xx, yy = np.meshgrid(xi, yi)
+    arr = np.ma.masked_invalid(arr)
+    for k, field in enumerate(arr):
+        field1 = bm.interp(field, x, y, xx, yy, order=0)
+        field2 = bm.interp(field, x, y, xx, yy, order=1)
+        ind = np.where(field2 == 0)
+        field2[ind] = field1[ind]
+        out[k] = field2
+    return [out, xx, yy]

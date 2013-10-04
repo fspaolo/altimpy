@@ -606,9 +606,13 @@ def intitle(title='', loc=1, size=None, ax=None, **kwargs):
 
     Examples
     --------
-    # with pyplot
+    # with pyplot single
     plt.figure()
     intitle('inner title', 3)
+
+    # with pyplot subplot
+    ax = plt.subplot(211)
+    intitle('inner title', 3, ax=ax)
 
     # with pandas
     ax = df.plot()
