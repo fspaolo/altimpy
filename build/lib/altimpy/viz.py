@@ -34,7 +34,7 @@ def create_colormap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True,
     nmod: Number of brightness modulations applied to the colormap.
     modlim: Magnitude of brightness modulations.
     upsample: Increase the number of samples if non-linear map (colorexp != 1)
-    invert: Intert the order of colors.
+    invert: Invert the order of colors.
     """
     if type(cmap) is str:
         cmap = colormap_lib[cmap]
@@ -86,6 +86,34 @@ def cpt(*args, **kwargs):
             v[i+1], 255 * r[i+1], 255 * g[i+1], 255 * b[i+1],
         )
     return cmap
+
+
+def pvcmap(fname, cname, cmap):
+    """Create ParaView's XML colormap file.
+
+    Parameters
+    ----------
+    fname : string
+        XML file name.
+    cname : string
+        Colorbar name.
+    cmap : 5 x N array
+        Colormap with rows specifying (value, red, green, blue, alpha), and 
+        columns the discrete values between 0 and 1 in the colorscale.
+
+    Example
+    -------
+    cmap = create_colormap(colormap_lib['wrgb'])
+    pvcmap('wrgb.xml', 'wrgb', cmap)
+    """
+    v, r, g, b, a = cmap
+    f = open(fname, 'w')
+    f.write('<ColorMap name="%s" space="RGB">\n' % cname)
+    for i, j, k, l, m in zip(v, a, r, g, b):
+        f.write('<Point x="%f" o="%f" r="%f" g="%f" b="%f"/>\n' 
+                % (i, j, k, l, m))
+    f.write('</ColorMap>\n')
+    f.close()
 
 
 colormap_lib = {
