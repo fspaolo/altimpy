@@ -350,6 +350,17 @@ def referenced(x, to='first'):
     return x
 
 
+def referenced2d(arr3d, to='first'):
+    """Reference a 2d series to its first (non-null) or mean values."""
+    nt, ny, nx = arr3d.shape
+    for i in range(ny):
+        for j in range(nx):
+            ts = arr3d[:,i,j]
+            if not np.alltrue(np.isnan(ts)):
+                arr3d[:,i,j] = referenced(ts, to=to)
+    return arr3d
+
+
 def filter_std(arr, n=3, per_field=False):
     """Filter out pts greater than n std.
 
@@ -387,41 +398,44 @@ def get_mask(arr):
     return mask
 
 
-def trend(time, arr, deg=2):
+def polyfit(time, arr3d, deg=2):
     """Least squares polynomial fit of 2d time series (3d array)."""
-    nt, ny, nx = arr.shape
-    trend = np.empty_like(arr) * np.nan
+    nt, ny, nx = arr3d.shape
+    poly = np.empty_like(arr3d) * np.nan
     for i in range(ny):
         for j in range(nx):
-            ts = arr[:,i,j]
+            ts = arr3d[:,i,j]
             if not np.alltrue(np.isnan(ts)):
                 coef = np.polyfit(time, ts, deg=deg)
-                trend[:,i,j] = np.polyval(coef, time)
-    return trend
+                poly[:,i,j] = np.polyval(coef, time)
+    return poly
 
 
-def smooth(arr, sigma):
+def smooth(arr3d, sigma):
     """Gaussian smoothing of 2d time series (3d array)."""
-    ind = np.where(np.isnan(arr))
-    arr[ind] = 0
-    for k, field in enumerate(arr):
-        arr[k] = ni.gaussian_filter(field, sigma, order=0)
-    arr[ind] = np.nan
-    return arr
+    ind = np.where(np.isnan(arr3d))
+    arr3d[ind] = 0
+    for k, field in enumerate(arr3d):
+        arr3d[k] = ni.gaussian_filter(field, sigma, order=0)
+    arr3d[ind] = np.nan
+    return arr3d
 
 
-def regrid(arr, x, y, inc_by=2):
+def regrid(arr3d, x, y, inc_by=2):
     """Regrid 2d time series (3d array) increasing resolution."""
-    nt, ny, nx = arr.shape
+    nt, ny, nx = arr3d.shape
     out = np.empty((nt, inc_by * ny, inc_by * nx), 'f8')
     xi = np.linspace(x.min(), x.max(), inc_by * len(x))
     yi = np.linspace(y.min(), y.max(), inc_by * len(y))
     xx, yy = np.meshgrid(xi, yi)
-    arr = np.ma.masked_invalid(arr)
-    for k, field in enumerate(arr):
+    arr3d = np.ma.masked_invalid(arr3d)
+    for k, field in enumerate(arr3d):
         field1 = bm.interp(field, x, y, xx, yy, order=0)
         field2 = bm.interp(field, x, y, xx, yy, order=1)
         ind = np.where(field2 == 0)
-        field2[ind] = field1[ind]
+        try:
+            field2[ind] = field1[ind]
+        except:
+            pass
         out[k] = field2
     return [out, xx, yy]
