@@ -411,6 +411,25 @@ def polyfit(time, arr3d, deg=2):
     return poly
 
 
+def _polyderiv(x, y, deg=3):
+    """Derivative of a fitted polynomial of degree N."""
+    coeff = np.polyfit(x, y, deg=deg)
+    coeff *= np.arange(deg+1)[::-1]   # [N,N-1,..,0]
+    return np.polyval(coeff[:-1], x)  # N coefficients
+
+
+def polyderiv(time, arr3d, deg=3):
+    """Derivative of fitted polynomials of degree N on a 3d array."""
+    nt, ny, nx = arr3d.shape
+    deriv = np.empty_like(arr3d) * np.nan
+    for i in range(ny):
+        for j in range(nx):
+            ts = arr3d[:,i,j]
+            if not np.alltrue(np.isnan(ts)):
+                deriv[:,i,j] = _polyderiv(time, ts, deg=deg)
+    return deriv
+
+
 def smooth(arr3d, sigma):
     """Gaussian smoothing of 2d time series (3d array)."""
     ind = np.where(np.isnan(arr3d))
@@ -432,10 +451,12 @@ def regrid(arr3d, x, y, inc_by=2):
     for k, field in enumerate(arr3d):
         field1 = bm.interp(field, x, y, xx, yy, order=0)
         field2 = bm.interp(field, x, y, xx, yy, order=1)
-        ind = np.where(field2 == 0)
+        ######## soemthing wrong here ########
+        ind = np.where(field2 == 0) #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< check!
         try:
             field2[ind] = field1[ind]
         except:
             pass
+        ########
         out[k] = field2
     return [out, xx, yy]
