@@ -411,14 +411,14 @@ def polyfit(time, arr3d, deg=2):
     return poly
 
 
-def _polyderiv(x, y, deg=3):
+def polyderiv(x, y, deg=3):
     """Derivative of a fitted polynomial of degree N."""
     coeff = np.polyfit(x, y, deg=deg)
     coeff *= np.arange(deg+1)[::-1]   # [N,N-1,..,0]
     return np.polyval(coeff[:-1], x)  # N coefficients
 
 
-def polyderiv(time, arr3d, deg=3):
+def polyderiv2d(time, arr3d, deg=3):
     """Derivative of fitted polynomials of degree N on a 3d array."""
     nt, ny, nx = arr3d.shape
     deriv = np.empty_like(arr3d) * np.nan

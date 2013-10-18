@@ -398,7 +398,7 @@ def get_mask(arr):
     return mask
 
 
-def polyfit(time, arr3d, deg=2):
+def polyfit2d(time, arr3d, deg=2):
     """Least squares polynomial fit of 2d time series (3d array)."""
     nt, ny, nx = arr3d.shape
     poly = np.empty_like(arr3d) * np.nan
@@ -426,11 +426,11 @@ def polyderiv2d(time, arr3d, deg=3):
         for j in range(nx):
             ts = arr3d[:,i,j]
             if not np.alltrue(np.isnan(ts)):
-                deriv[:,i,j] = _polyderiv(time, ts, deg=deg)
+                deriv[:,i,j] = polyderiv(time, ts, deg=deg)
     return deriv
 
 
-def smooth(arr3d, sigma):
+def smooth2d(arr3d, sigma):
     """Gaussian smoothing of 2d time series (3d array)."""
     ind = np.where(np.isnan(arr3d))
     arr3d[ind] = 0
@@ -440,7 +440,7 @@ def smooth(arr3d, sigma):
     return arr3d
 
 
-def regrid(arr3d, x, y, inc_by=2):
+def regrid2d(arr3d, x, y, inc_by=2):
     """Regrid 2d time series (3d array) increasing resolution."""
     nt, ny, nx = arr3d.shape
     out = np.empty((nt, inc_by * ny, inc_by * nx), 'f8')
