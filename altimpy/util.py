@@ -398,28 +398,29 @@ def get_mask(arr):
     return mask
 
 
-def polyfit2d(time, arr3d, deg=2):
+def polyfit2d(time, arr3d, deg=2, min_pts=5):
     """Least squares polynomial fit of 2d time series (3d array)."""
     nt, ny, nx = arr3d.shape
     poly = np.empty_like(arr3d) * np.nan
     for i in range(ny):
         for j in range(nx):
             ts = arr3d[:,i,j]
-            if not np.alltrue(np.isnan(ts)):
-                coef = np.polyfit(time, ts, deg=deg)
-                poly[:,i,j] = np.polyval(coef, time)
+            ind, = np.where(~np.isnan(ts))
+            if len(ind) >= min_pts:
+                coef = np.polyfit(time[ind], ts[ind], deg=deg)
+                poly[:,i,j] = np.polyval(coef, time) # all times
     return poly
 
 
 def polyderiv(x, y, deg=3):
-    """Derivative of a fitted polynomial of degree N."""
+    """Derivative of a fitted polynomial (x,y) of degree N."""
     coeff = np.polyfit(x, y, deg=deg)
     coeff *= np.arange(deg+1)[::-1]   # [N,N-1,..,0]
     return np.polyval(coeff[:-1], x)  # N coefficients
 
 
 def polyderiv2d(time, arr3d, deg=3):
-    """Derivative of fitted polynomials of degree N on a 3d array."""
+    """Derivative of fitted polynomials (x,y) of degree N on a 3d array."""
     nt, ny, nx = arr3d.shape
     deriv = np.empty_like(arr3d) * np.nan
     for i in range(ny):
