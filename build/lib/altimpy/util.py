@@ -436,7 +436,9 @@ def smooth2d(arr3d, sigma):
     ind = np.where(np.isnan(arr3d))
     arr3d[ind] = 0
     for k, field in enumerate(arr3d):
-        arr3d[k] = ni.gaussian_filter(field, sigma, order=0)
+        field = np.c_[field[:,-1], field, field[:,0]]  # add borders
+        field = ni.gaussian_filter(field, sigma, order=0)
+        arr3d[k] = field[:,1:-1]                       # exclude borders
     arr3d[ind] = np.nan
     return arr3d
 
@@ -453,11 +455,11 @@ def regrid2d(arr3d, x, y, inc_by=2):
         field1 = bm.interp(field, x, y, xx, yy, order=0)
         field2 = bm.interp(field, x, y, xx, yy, order=1)
         ######## soemthing wrong here ########
-        ind = np.where(field2 == 0) #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< check!
+        ind = np.where(field2 == 0) #<<<<< check!
         try:
             field2[ind] = field1[ind]
         except:
             pass
-        ########
+        ######################################
         out[k] = field2
     return [out, xx, yy]

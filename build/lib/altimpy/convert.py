@@ -404,13 +404,88 @@ def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
 
 
 def sph2xyz(lon, lat, radius=1):
-    """Spherical lon/lat[/r] -> Cartesian x/y/z (3d)."""
+    """Convert spherical lon/lat[/rad] to 3d cartesian xyz."""
     lat *= D2R 
     lon *= D2R
     x = radius * np.cos(lat) * np.cos(lon)
     y = radius * np.cos(lat) * np.sin(lon)
     z = radius * np.sin(lat)
     return [x, y, z]
+
+
+def xyz2vtk(fname, x, y, z, scalar=None):
+    """Convert xyz[s] to vtk UNSTRUCTURED GRID format.
+
+    Saves cartesian xyz[s] data points to vtk polydata ascii file.
+
+    Parameters
+    ----------
+    fname : str
+        Output file name.
+    x, y, z : 1d array-like
+        3d cartesian coordinates.
+    scalar : 1d array-like, optional 
+        The scalar value of each point. Default z values.
+
+    Notes
+    -----
+    Modified from Rod Holland & Prabhu Ramachandran by Fernando Paolo,
+    Oct 25, 2013.
+
+    See also
+    --------
+    sph2xyz, sph2vtk
+
+    """
+    if not np.iterable(x):
+        x, y, z = [x], [y], [z]
+    n = len(x)
+
+    # write header
+    out = open(fname, 'w')
+    out.writelines(['# vtk DataFile Version 2.0\n'
+                    'loop\n',
+                    'ASCII\n',
+                    'DATASET UNSTRUCTURED_GRID\n',
+                    'POINTS ' + str(n) + ' float\n'])
+
+    # write xyz data
+    for i in range(n):
+        out.write(str(x[i]) + " " + str(y[i]) + " " + str(z[i]) + '\n')
+            
+    # write cell data
+    out.write("CELLS " + str(n) + " " + str(2 * n) + '\n')
+    for i in range(n):
+        out.write("1 " + str(i) + "\n")
+            
+    # write cell types
+    out.write("CELL_TYPES " + str(n) + '\n')
+    for i in range(n): 
+        out.write("1 \n")
+
+    # write scalar values
+    out.writelines(['\n'
+                    'POINT_DATA ' + str(n) + '\n',
+                    'SCALARS Scalar_Value float 1\n',
+                    'LOOKUP_TABLE default\n'])
+    if scalar is None:
+        scalar = z
+    for i in range(n):
+        out.write(str(scalar[i]) + '\n')
+
+    out.write('\n')
+    out.close()
+    print 'number of xyz points:', n
+    print 'output file:', fname
+
+
+def sph2vtk(fname, lon, lat, radius=1, scalar=None):
+    """Convert lon/lat/rad/scalar to vtk UNSTRUCTURED GRID file format.
+
+    See sph2xyz and xyz2vtk for documentation.
+    """
+    x, y, z = sph2xyz(lon, lat, radius)
+    xyz2vtk(fname, x, y, z, scalar)
 
 
 #--------------------------------------------

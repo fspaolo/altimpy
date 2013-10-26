@@ -455,11 +455,11 @@ def regrid2d(arr3d, x, y, inc_by=2):
         field1 = bm.interp(field, x, y, xx, yy, order=0)
         field2 = bm.interp(field, x, y, xx, yy, order=1)
         ######## soemthing wrong here ########
-        ind = np.where(field2 == 0) #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< check!
+        ind = np.where(field2 == 0) #<<<<< check!
         try:
             field2[ind] = field1[ind]
         except:
             pass
-        ########
+        ######################################
         out[k] = field2
     return [out, xx, yy]
