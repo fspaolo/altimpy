@@ -112,39 +112,21 @@ def linear_fit_robust(x, y, return_coef=False):
         return (x, y_fit.fittedvalues)
 
 
-# DEPRECATED
-# use directly 'numpy.polyfit' and 'numpy.polyval'
-def poly_fit(x, y, order=3, return_coef=False, npts=200):
-    """
-    Fit a polynomial of order `order` to data points `x,y`.
-    """
-    ind, = np.where((~np.isnan(x)) & (~np.isnan(y)))
-    if len(ind) < 3: 
-        return [np.nan, np.nan]
-    x, y = x[ind], y[ind]
-    coef = np.polyfit(x, y, order)
-    if return_coef:
-        return coef
-    else:
-        x_val = np.linspace(x.min(), x.max(), npts)
-        y_fit = np.polyval(coef, x_val)
-        return (x_val, y_fit)
+def splines(x, y, x_val=None, tension=0.01):
+    """Interpolate data using cubic splines with tension.
 
-
-def spline_interp(x, y, smooth=0.01):
-    """
-    Interpolate data using cubic splines of given smoothness.
-    smooth : smoothness factor
+    tension : smoothing factor
     """
     from scipy.interpolate import splrep, splev
     ind, = np.where((~np.isnan(x)) & (~np.isnan(y)))
-    x, y = x[ind], y[ind]
+    x2, y2 = x[ind], y[ind]
     # find the knot points
-    tck = splrep(x, y, s=smooth)
-    # evaluate spline on interpolated points
-    x_val = np.linspace(x.min(), x.max(), 200)
+    tck = splrep(x2, y2, s=tension)
+    # evaluate splines on x points
+    if x_val is None:
+        x_val = x
     y_fit = splev(x_val, tck)
-    return (x_val, y_fit)
+    return y_fit
 
 
 def get_size(arr):

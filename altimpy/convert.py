@@ -406,7 +406,7 @@ def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
 def sph2xyz(lon, lat, radius=1):
     """Convert spherical lon/lat[/rad] to 3d cartesian xyz.
     """
-    lon, lat = np.asarray(lon), np.asarray(lat)
+    lon, lat = np.atleast_1d(lon), np.atleast_1d(lat)
     lat *= D2R 
     lon *= D2R
     x = radius * np.cos(lat) * np.cos(lon)
@@ -439,8 +439,7 @@ def xyz2vtk(fname, x, y, z, scalar=None):
     sph2xyz, sph2vtk
 
     """
-    if not np.iterable(x):
-        x, y, z = [x], [y], [z]
+    x, y, z = np.atleast_1d(x), np.atleast_1d(y), np.atleast_1d(z)
     n = len(x)
 
     # write header
