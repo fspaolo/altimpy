@@ -405,6 +405,7 @@ def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
 
 def sph2xyz(lon, lat, radius=1):
     """Convert spherical lon/lat[/rad] to 3d cartesian xyz."""
+    lon, lat = np.asarray(lon), np.asarray(lat)
     lat *= D2R 
     lon *= D2R
     x = radius * np.cos(lat) * np.cos(lon)
