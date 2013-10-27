@@ -15,6 +15,7 @@ import datetime as dt
 import scipy.spatial as sl
 import scipy.ndimage as ni
 import mpl_toolkits.basemap as bm
+from scipy.interpolate import UnivariateSpline as Spline
 
 
 class CircularList(list):
@@ -112,21 +113,16 @@ def linear_fit_robust(x, y, return_coef=False):
         return (x, y_fit.fittedvalues)
 
 
-def splines(x, y, x_val=None, tension=0.01):
-    """Interpolate data using cubic splines with tension.
+def spline(x, y, x_eval=None, smooth=0.01):
+    """Smoothing spline fit.
 
-    tension : smoothing factor
+    smooth : smoothing factor
     """
-    from scipy.interpolate import splrep, splev
     ind, = np.where((~np.isnan(x)) & (~np.isnan(y)))
     x2, y2 = x[ind], y[ind]
-    # find the knot points
-    tck = splrep(x2, y2, s=tension)
-    # evaluate splines on x points
-    if x_val is None:
-        x_val = x
-    y_fit = splev(x_val, tck)
-    return y_fit
+    if x_eval is None:
+        x_eval = x
+    return Spline(x2, y2, s=smooth)(x_eval)
 
 
 def get_size(arr):
@@ -434,14 +430,14 @@ def regrid2d(arr3d, x, y, inc_by=2):
     xx, yy = np.meshgrid(xi, yi)
     arr3d = np.ma.masked_invalid(arr3d)
     for k, field in enumerate(arr3d):
-        field1 = bm.interp(field, x, y, xx, yy, order=0)
-        field2 = bm.interp(field, x, y, xx, yy, order=1)
-        ######## soemthing wrong here ########
+        field1 = bm.interp(field, x, y, xx, yy, order=0) # nearest neighb.
+        field2 = bm.interp(field, x, y, xx, yy, order=1) # linear
+        ######## soemthing "wierd" when the field is zero ########
         ind = np.where(field2 == 0) #<<<<< check!
         try:
             field2[ind] = field1[ind]
         except:
             pass
-        ######################################
+        ##########################################################
         out[k] = field2
     return [out, xx, yy]
