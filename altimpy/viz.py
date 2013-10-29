@@ -645,14 +645,16 @@ def intitle(title='', loc=1, size=None, ax=None, **kwargs):
     # with pandas
     ax = df.plot()
     intitle('inner title', 3, ax=ax)
+
     """
     from matplotlib.offsetbox import AnchoredText
     from matplotlib.patheffects import withStroke
     if size is None:
         size = dict(size=plt.rcParams['axes.labelsize'])
     if ax is None:
-        fig, axs = plt.gcf(), plt.gca()
-        ax = fig.add_subplot(axs.numRows, axs.numCols, fig.number)
+        ax = plt.subplot(111)
+        #fig, axs = plt.gcf(), plt.gca()
+        #ax = fig.add_subplot(axs.numRows, axs.numCols, fig.number)
     at = AnchoredText(title, loc=loc, prop=size, pad=0., 
                       borderpad=0.5, frameon=False, **kwargs)
     ax.add_artist(at)
