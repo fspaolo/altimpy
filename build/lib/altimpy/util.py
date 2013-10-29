@@ -15,6 +15,7 @@ import datetime as dt
 import scipy.spatial as sl
 import scipy.ndimage as ni
 import mpl_toolkits.basemap as bm
+from scipy.interpolate import UnivariateSpline as Spline
 
 
 class CircularList(list):
@@ -112,21 +113,24 @@ def linear_fit_robust(x, y, return_coef=False):
         return (x, y_fit.fittedvalues)
 
 
-def splines(x, y, x_val=None, tension=0.01):
-    """Interpolate data using cubic splines with tension.
+def spline(x, y, x_eval=None, weights=None, smooth=None):
+    """Smoothing spline fit.
 
-    tension : smoothing factor
+    The fit and smoothness depend on number of samples, variance and error of
+    each data point.
+
+    weights : array-like
+        Array with 1/std of each data point. Note: to reflect the 
+        heterokedasticity use 1/moving-window-std as weight values.
+    smooth : float, optional
+        Smoothing parameter. If weights are given, then s = len(weights).
+
     """
-    from scipy.interpolate import splrep, splev
     ind, = np.where((~np.isnan(x)) & (~np.isnan(y)))
-    x2, y2 = x[ind], y[ind]
-    # find the knot points
-    tck = splrep(x2, y2, s=tension)
-    # evaluate splines on x points
-    if x_val is None:
-        x_val = x
-    y_fit = splev(x_val, tck)
-    return y_fit
+    x2, y2 , w = x[ind], y[ind], weights[ind]
+    if x_eval is None:
+        x_eval = x
+    return Spline(x2, y2, w=w, s=smooth)(x_eval)
 
 
 def get_size(arr):
@@ -382,15 +386,17 @@ def get_mask(arr):
 
 def polyfit2d(time, arr3d, deg=2, min_pts=5):
     """Least squares polynomial fit of 2d time series (3d array)."""
-    nt, ny, nx = arr3d.shape
+    #time = np.r_[time[0], time[1], time, time[-2], time[-1]]
+    _, ny, nx = arr3d.shape
     poly = np.empty_like(arr3d) * np.nan
     for i in range(ny):
         for j in range(nx):
             ts = arr3d[:,i,j]
+            #ts = np.r_[ts[0], ts[1], ts, ts[-2], ts[-1]]
             ind, = np.where(~np.isnan(ts))
             if len(ind) >= min_pts:
                 coef = np.polyfit(time[ind], ts[ind], deg=deg)
-                poly[:,i,j] = np.polyval(coef, time) # all times
+                poly[:,i,j] = np.polyval(coef, time)#[2:-2] # all times
     return poly
 
 
@@ -434,14 +440,14 @@ def regrid2d(arr3d, x, y, inc_by=2):
     xx, yy = np.meshgrid(xi, yi)
     arr3d = np.ma.masked_invalid(arr3d)
     for k, field in enumerate(arr3d):
-        field1 = bm.interp(field, x, y, xx, yy, order=0)
-        field2 = bm.interp(field, x, y, xx, yy, order=1)
-        ######## soemthing wrong here ########
+        field1 = bm.interp(field, x, y, xx, yy, order=0) # nearest neighb.
+        field2 = bm.interp(field, x, y, xx, yy, order=1) # linear
+        ######## soemthing "wierd" when the field is zero ########
         ind = np.where(field2 == 0) #<<<<< check!
         try:
             field2[ind] = field1[ind]
         except:
             pass
-        ######################################
+        ##########################################################
         out[k] = field2
     return [out, xx, yy]
