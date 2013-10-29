@@ -440,6 +440,8 @@ def xyz2vtk(fname, x, y, z, scalar=None):
 
     """
     x, y, z = np.atleast_1d(x), np.atleast_1d(y), np.atleast_1d(z)
+    if not (type(x) == type(y) == type(z)):
+        x = x.astype('f8'), y = y.astype('f8'), z = z.astype('f8')
     n = len(x)
 
     # write header

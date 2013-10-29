@@ -439,7 +439,9 @@ def xyz2vtk(fname, x, y, z, scalar=None):
     sph2xyz, sph2vtk
 
     """
-    x, y, z = np.atleast_1d(x), np.atleast_1d(y), np.atleast_1d(z)
+    x = np.atleast_1d(x).astype('f8')
+    y = np.atleast_1d(y).astype('f8')
+    z = np.atleast_1d(z).astype('f8')
     n = len(x)
 
     # write header

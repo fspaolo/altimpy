@@ -116,9 +116,11 @@ def linear_fit_robust(x, y, return_coef=False):
 def spline(x, y, x_eval=None, weights=None, smooth=None):
     """Smoothing spline fit.
 
-    The fit and smoothness depend on number of samples, variance and error of
-    each data point.
+    The fit and smoothness depend on (i) number of samples, (ii) variance and
+    (iii) error of each data point.
 
+    Parameters
+    ----------
     weights : array-like
         Array with 1/std of each data point. Note: to reflect the 
         heterokedasticity use 1/moving-window-std as weight values.
