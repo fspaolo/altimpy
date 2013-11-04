@@ -139,7 +139,6 @@ def spline(x, y, x_eval=None, weights=None, smooth=None):
         weights = weights[ind]
     if x_eval is None:
         x_eval = x
-    a, b = x2[2], x2[-2]
     return Spline(x2, y2, w=weights, s=smooth)(x_eval)
 
 
