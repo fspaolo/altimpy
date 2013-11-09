@@ -415,18 +415,18 @@ def sph2xyz(lon, lat, radius=1):
     return [x, y, z]
 
 
-def xyz2vtk(fname, x, y, z, scalar=None):
-    """Convert xyz[s] to vtk UNSTRUCTURED GRID format.
+def xyz2vtk(fname, x, y, z, value=None):
+    """Convert xyz[v] to vtk UNSTRUCTURED GRID format.
 
-    Saves cartesian xyz[s] data points to vtk polydata ascii file.
+    Saves 3d cartesian xyz[v] data points to vtk polydata ascii file.
 
     Parameters
     ----------
     fname : str
         Output file name.
-    x, y, z : 1d array-like
+    x, y, z : scalar or 1d array-like
         3d cartesian coordinates.
-    scalar : 1d array-like, optional 
+    value : scalar or 1d array-like, optional 
         The scalar value of each point. Default z values.
 
     Notes
@@ -439,11 +439,9 @@ def xyz2vtk(fname, x, y, z, scalar=None):
     sph2xyz, sph2vtk
 
     """
-    x, y, z = np.atleast_1d(x), np.atleast_1d(y), np.atleast_1d(z)
-    '''
-    if not (type(x) == type(y) == type(z)):
-        x = x.astype('f8'), y = y.astype('f8'), z = z.astype('f8')
-    '''
+    x = np.atleast_1d(x).astype('f8')
+    y = np.atleast_1d(y).astype('f8')
+    z = np.atleast_1d(z).astype('f8')
     n = len(x)
 
     # write header
@@ -473,10 +471,10 @@ def xyz2vtk(fname, x, y, z, scalar=None):
                     'POINT_DATA ' + str(n) + '\n',
                     'SCALARS Scalar_Value float 1\n',
                     'LOOKUP_TABLE default\n'])
-    if scalar is None:
-        scalar = z
+    if value is None:
+        value = z
     for i in range(n):
-        out.write(str(scalar[i]) + '\n')
+        out.write(str(value[i]) + '\n')
 
     out.write('\n')
     out.close()
@@ -484,13 +482,13 @@ def xyz2vtk(fname, x, y, z, scalar=None):
     print 'output file:', fname
 
 
-def sph2vtk(fname, lon, lat, radius=1, scalar=None):
-    """Convert lon/lat/rad/scalar to vtk UNSTRUCTURED GRID file format.
+def sph2vtk(fname, lon, lat, radius=1, value=None):
+    """Convert lon/lat/radius/value to vtk UNSTRUCTURED GRID file format.
 
     See sph2xyz and xyz2vtk for documentation.
     """
     x, y, z = sph2xyz(lon, lat, radius)
-    xyz2vtk(fname, x, y, z, scalar)
+    xyz2vtk(fname, x, y, z, value)
 
 
 #--------------------------------------------

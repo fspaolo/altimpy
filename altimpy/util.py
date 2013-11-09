@@ -142,6 +142,35 @@ def spline(x, y, x_eval=None, weights=None, smooth=None):
     return Spline(x2, y2, w=weights, s=smooth)(x_eval)
 
 
+def spline2d(time, arr3d, window=4, min_pts=10):
+    """Weighted smoothing spline fit of 2d time series (3d array)."""
+    _, ny, nx = arr3d.shape
+    splines = np.empty_like(arr3d) * np.nan
+    for i in range(ny):
+        for j in range(nx):
+            ts = arr3d[:,i,j]
+            ind, = np.where(~np.isnan(ts))
+            if len(ind) >= min_pts:
+                w = 1 / pd.rolling_std(pd.Series(ts, index=time), window,
+                                       min_periods=2).values
+                w[0] = w[1]
+                splines[:,i,j] = spline(time, ts, weights=w)
+    return splines
+
+
+def gradient2d(arr3d, dx=1, min_pts=10):
+    """Gradient of 2d time series (3d array)."""
+    _, ny, nx = arr3d.shape
+    grad = np.empty_like(arr3d) * np.nan
+    for i in range(ny):
+        for j in range(nx):
+            ts = arr3d[:,i,j]
+            ind, = np.where(~np.isnan(ts))
+            if len(ind) >= min_pts:
+                grad[:,i,j] = np.gradient(ts, dx)
+    return grad
+
+
 def get_size(arr):
     """
     Get the size in MB of a Numpy or PyTables object.
@@ -395,17 +424,15 @@ def get_mask(arr):
 
 def polyfit2d(time, arr3d, deg=2, min_pts=5):
     """Least squares polynomial fit of 2d time series (3d array)."""
-    #time = np.r_[time[0], time[1], time, time[-2], time[-1]]
     _, ny, nx = arr3d.shape
     poly = np.empty_like(arr3d) * np.nan
     for i in range(ny):
         for j in range(nx):
             ts = arr3d[:,i,j]
-            #ts = np.r_[ts[0], ts[1], ts, ts[-2], ts[-1]]
             ind, = np.where(~np.isnan(ts))
             if len(ind) >= min_pts:
                 coef = np.polyfit(time[ind], ts[ind], deg=deg)
-                poly[:,i,j] = np.polyval(coef, time)#[2:-2] # all times
+                poly[:,i,j] = np.polyval(coef, time)
     return poly
 
 

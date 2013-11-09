@@ -18,7 +18,8 @@ E2 = 6.694379852*1e-3
 E = np.sqrt(E2)
 
 # Earth radius, updated from 6378.273 on 2/11/08 
-EARTH_RADIUS = RE = 6378.1370 
+#EARTH_RADIUS = RE = 6378.1370 
+EARTH_RADIUS = RE = -99 
 
 # A Julian year (symbol: a) is a unit of measurement of time 
 # defined as exactly 365.25 days of 86,400 SI seconds each.
