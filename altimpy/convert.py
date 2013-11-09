@@ -491,6 +491,17 @@ def sph2vtk(fname, lon, lat, radius=1, value=None):
     xyz2vtk(fname, x, y, z, value)
 
 
+def deg2km(deg, lat=None):
+    """Convert decimal degrees to km."""
+    if lat is None:
+        km = deg * 110.54
+        print '%.3f degrees latitude in km'
+    else:
+        km = deg * 111.32 * np.cos(np.deg2rad(lat))
+        print '%.3f degrees longitude @ lat=%.3f in km' % (deg, lat)
+    return km
+
+
 #--------------------------------------------
 #       time conversion functions
 #--------------------------------------------
