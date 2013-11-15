@@ -455,8 +455,8 @@ def polyderiv2d(time, arr3d, deg=3):
     return deriv
 
 
-def smooth2d(arr3d, sigma):
-    """Gaussian smoothing of 2d time series (3d array)."""
+def gfilter2d(arr3d, sigma):
+    """Gaussian filter of 2d time series (3d array)."""
     ind = np.where(np.isnan(arr3d))
     arr3d[ind] = 0
     for k, field in enumerate(arr3d):

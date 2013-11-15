@@ -495,7 +495,7 @@ def deg2km(deg, lat=None):
     """Convert decimal degrees to km."""
     if lat is None:
         km = deg * 110.54
-        print '%.3f degrees latitude in km'
+        print '%.3f degrees latitude in km' % deg
     else:
         km = deg * 111.32 * np.cos(np.deg2rad(lat))
         print '%.3f degrees longitude @ lat=%.3f in km' % (deg, lat)
