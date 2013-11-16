@@ -277,14 +277,8 @@ def get_box(region, npts=None):
 ntuples = lambda lst, n: zip(*[lst[i:]+lst[:i] for i in range(n)])
 
 
-# NEED TO CHECK!
-def first_non_null(arr):
-    """Return index of first non-null element."""
-    return (i for i,elem in enumerate(arr) if ~np.isnan(elem)).next()
-
-
-def first_non_null2(arr):
-    """Return index of first non-null element."""
+def first_valid_index(arr):
+    """Return index for first non-null value."""
     ind, = np.where(~np.isnan(arr))
     if len(ind) > 0:
         return ind[0]
@@ -293,7 +287,7 @@ def first_non_null2(arr):
 
 
 def find_nearest(arr, val):
-    """Find index of array entry "nearest" to val.
+    """Find index for "nearest" value.
     
     Parameters
     ----------
@@ -324,9 +318,9 @@ def find_nearest(arr, val):
 
 
 def find_nearest2(x, y, points):
-    """Find nearest x/y coords of given points.
+    """Find nearest x/y coords to given points.
     
-    Finds the indices of nearest coords in the 2d x and y arrays 
+    Finds the indexes of nearest coords in the 2d x and y arrays 
     to the given list of points. It searches the nearest-neighbours 
     using a k-d tree.
 
@@ -355,20 +349,22 @@ def find_nearest2(x, y, points):
 
 
 def referenced(x, to='first'):
-    """Reference a series to its first (non-null) or mean values.
+    """Reference a series to its first (non-null) or mean value.
     
     Parameters
     ----------
     x : array-like
         Series to be referenced.
-    to : str, default first
-        References the series to its 'first' or 'mean'.
+    to : str, default 'first'
+        To reference the series to its 'first' or 'mean'.
     """
     assert to in ['first', 'mean'], "`to` must be 'first' or 'mean'"
     if (not isinstance(x, np.ndarray)) and (not isinstance(x, pd.Series)):
         x = np.asarray(x)
-    if to == 'first':
-        x -= x[first_non_null2(x)]
+    if np.alltrue(np.isnan(x)):
+        pass
+    elif to == 'first':
+        x -= x[first_valid_index(x)]
     else:
         x -= x[~np.isnan(x)].mean()
     return x
@@ -455,8 +451,8 @@ def polyderiv2d(time, arr3d, deg=3):
     return deriv
 
 
-def smooth2d(arr3d, sigma):
-    """Gaussian smoothing of 2d time series (3d array)."""
+def gfilter2d(arr3d, sigma):
+    """Gaussian filter of 2d time series (3d array)."""
     ind = np.where(np.isnan(arr3d))
     arr3d[ind] = 0
     for k, field in enumerate(arr3d):
