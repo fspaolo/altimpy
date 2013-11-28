@@ -483,3 +483,9 @@ def regrid2d(arr3d, x, y, inc_by=2):
         ##########################################################
         out[k] = field2
     return [out, xx, yy]
+
+
+def human_order(text):
+    """list.sort(key=human_order) sorts strings in human order."""
+    atoi = lambda text: int(text) if text.isdigit() else text
+    return [atoi(c) for c in re.split('(\d+)', text)]
