@@ -451,6 +451,22 @@ def polyderiv2d(time, arr3d, deg=3):
     return deriv
 
 
+def gfilter(field, sigma):
+    """Gaussian filter (smooth) a 2d field."""
+    ind = np.where(np.isnan(field))
+    field[ind] = 0
+    field = np.c_[field[:,-1], field, field[:,0]]  # add crossed borders!
+    field = ni.gaussian_filter(field, sigma, order=0)
+    field = field[:,1:-1]                          # exclude borders
+    field[ind] = np.nan
+    return field
+
+
+def apply_to_panel(func, panel, *args, **kw):
+    for item in panel.items:
+        panel[item] = func(panel[item], *args, **kw)
+
+
 def gfilter2d(arr3d, sigma):
     """Gaussian filter of 2d time series (3d array)."""
     ind = np.where(np.isnan(arr3d))
