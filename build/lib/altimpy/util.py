@@ -462,11 +462,6 @@ def gfilter(field, sigma):
     return field
 
 
-def apply_to_panel(func, panel, *args, **kw):
-    for item in panel.items:
-        panel[item] = func(panel[item], *args, **kw)
-
-
 def gfilter2d(arr3d, sigma):
     """Gaussian filter of 2d time series (3d array)."""
     ind = np.where(np.isnan(arr3d))
