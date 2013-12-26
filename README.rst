@@ -28,8 +28,8 @@ Functionalities are divided into the following modules:
 Download and install the library
 ---------------------------------
 
-    git clone https://github.com/fspaolo/altimpy
-    cd altimpy
-    python setup.py install --user
+    git clone https://github.com/fspaolo/altimpy 
+    cd altimpy 
+    python setup.py install --user 
 
 More coming soon...
