@@ -98,13 +98,15 @@ def pvcmap(fname, cname, cmap):
     cname : string
         Colorbar name.
     cmap : 5 x N array
-        Colormap with rows specifying (value, red, green, blue, alpha), and 
-        columns the discrete values between 0 and 1 in the colorscale.
+        Colormap with 'rows' specifying (value, red, green, blue, alpha), and
+        'columns' the discrete values between 0 and 1 in the colorscale.
 
     Example
     -------
-    cmap = create_colormap(colormap_lib['wrgb'])
-    pvcmap('wrgb.xml', 'wrgb', cmap)
+    import altimpy as ap
+    cmap = ap.create_colormap(colormap_lib['wrgb'])
+    ap.pvcmap('wrgb.xml', 'wrgb', cmap)
+
     """
     v, r, g, b, a = cmap
     f = open(fname, 'w')

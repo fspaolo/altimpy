@@ -24,4 +24,12 @@ Functionalities are divided into the following modules:
 * ``viz.py`` - plotting functionalities
 * ``mpi.py`` - simple parallelization functions (MPI)
 
+
+Download and install the library
+---------------------------------
+
+    git clone https://github.com/fspaolo/altimpy
+    cd altimpy
+    python setup.py install --user
+
 More coming soon...
