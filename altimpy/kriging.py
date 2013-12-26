@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Interpolation using Gaussian Process Regression (krigin).
+Interpolation using Gaussian Process Regression (kriging).
 
 Uses the GP pacakge from 'sklearn' to interpolate spatial data points (2d
 fields).
@@ -15,8 +15,8 @@ from sklearn.gaussian_process import GaussianProcess
 np.random.seed(1)
 
 
-class Krigin2d(object):
-    """Interpolate using Gaussian Process Regression (krigin).
+class Kriging2d(object):
+    """Interpolate using Gaussian Process Regression (kriging).
 
     Uses the GP pacakge from 'sklearn' to interpolate spatial data points (2d
     fields).
@@ -33,8 +33,8 @@ class Krigin2d(object):
         self.nugget = nugget
         self.rand_start = 50
 
-    def krigin(self, X, y, X_pred):
-        """Interpolate using Gaussian Process Regression (krigin).
+    def kriging(self, X, y, X_pred):
+        """Interpolate using Gaussian Process Regression (kriging).
 
         Uses the GP pacakge from 'sklearn' to interpolate spatial data points
         (2d).
@@ -70,7 +70,7 @@ class Krigin2d(object):
         X_pred = np.column_stack((lon2d[ij_pred], lat2d[ij_pred]))
         y_samp = field[ij_samp]
 
-        y_pred, sigma = self.krigin(X_samp, y_samp, X_pred)
+        y_pred, sigma = self.kriging(X_samp, y_samp, X_pred)
         field[ij_pred] = y_pred
         error[ij_pred] = sigma
 

@@ -19,7 +19,7 @@ Functionalities are divided into the following modules:
 * ``const.py`` - definition of constants
 * ``convert.py`` - time/coordinates/etc. conversion functions
 * ``tseries.py`` - crossover time series construction
-* ``krigin.py`` - wrapper for krigin interpolation
+* ``kriging.py`` - wrapper for kriging interpolation
 * ``util.py`` - miscellaneous utility functions
 * ``viz.py`` - plotting functionalities
 * ``mpi.py`` - simple parallelization functions (MPI)
