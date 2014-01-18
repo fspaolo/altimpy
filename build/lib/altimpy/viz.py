@@ -681,6 +681,7 @@ def _blob(x, y, area, colour):
     """
     Draws a square-shaped blob with the given area (< 1) at
     the given coordinates.
+
     """
     hs = np.sqrt(area) / 2
     xcorners = np.array([x - hs, x + hs, x + hs, x - hs])
@@ -692,7 +693,15 @@ def hinton(W, maxweight=None):
     Draws a Hinton diagram for visualizing a weight matrix. 
     Temporarily disables matplotlib interactive mode if it is on, 
     otherwise this takes forever.
+
+    Note
+    ----
+    Because the values of the matrix are assumed to be *weights*, NaN values
+    are replaced by zero (otherwise the plot doesn't come good).
+
     """
+    W[np.isnan(W)] = 0
+
     reenable = False
     if plt.isinteractive():
         plt.ioff()
@@ -725,67 +734,6 @@ def hinton(W, maxweight=None):
                       'black')
     if reenable:
         plt.ion()
-
-
-# DEPRECATED
-'''
-def hinton(W, max_weight=None, ax=None):
-    """Draws a Hinton diagram for visualizing a weight matrix."""
-    from matplotlib.patches import Rectangle
-    from matplotlib.ticker import NullLocator
-    W = W.T
-    if not ax:
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1)
-    if not max_weight:
-        max_weight = 2**np.ceil(np.log(np.abs(W).max())/np.log(2))
-    ax.patch.set_facecolor('gray')
-    ax.set_aspect('equal', 'box')
-    ax.xaxis.set_major_locator(NullLocator())
-    ax.yaxis.set_major_locator(NullLocator())
-    for (x,y),w in np.ndenumerate(W):
-        if w > 0: color = 'white'
-        else:     color = 'black'
-        size = np.sqrt(np.abs(w))
-        rect = Rectangle([x - size / 2, y - size / 2], size, size,
-            facecolor=color, edgecolor=color)
-        ax.add_patch(rect)
-    ax.autoscale_view()
-    # Reverse the yaxis limits
-    ax.set_ylim(*ax.get_ylim()[::-1])
-''' 
-
-
-def plot_matrix(mat, title='', loc=1, plot=None, **kw):
-    """Plot the representation of a matrix: matshow, hinton or spy.
-
-    plot : can be 'matshow', 'hinton' or 'spy'. If `None` (default) 
-    plots matshow and hinton diagrams.
-    """
-    from matplotlib.ticker import NullLocator
-    if plot is None:
-        fig = plt.figure(figsize=(8,4))
-        ax1 = fig.add_subplot(121)
-        ax2 = fig.add_subplot(122)
-        ax1.matshow(mat)
-        hinton(mat)
-        t = intitle(title, loc=loc, ax=ax1)
-        t = intitle(title, loc=loc, ax=ax2)
-    else:
-        fig = plt.figure(figsize=(4,4))
-        ax = fig.add_subplot((111))
-        if plot == 'matshow':
-            ax.matshow(mat)
-            ax.xaxis.set_major_locator(NullLocator())
-            ax.yaxis.set_major_locator(NullLocator())
-        elif plot == 'hinton':
-            hinton(mat)
-        elif plot == 'spy':
-            ax.spy(mat, precision=0.1, markersize=6, **kw)
-        else:
-            raise ValueError('wrong argument `plot=%s`' % plot)
-        t = intitle(title, loc=loc, ax=ax)
-    return fig
 
 
 def rcparams():
