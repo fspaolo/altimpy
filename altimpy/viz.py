@@ -681,6 +681,7 @@ def _blob(x, y, area, colour):
     """
     Draws a square-shaped blob with the given area (< 1) at
     the given coordinates.
+
     """
     hs = np.sqrt(area) / 2
     xcorners = np.array([x - hs, x + hs, x + hs, x - hs])
@@ -692,7 +693,15 @@ def hinton(W, maxweight=None):
     Draws a Hinton diagram for visualizing a weight matrix. 
     Temporarily disables matplotlib interactive mode if it is on, 
     otherwise this takes forever.
+
+    Note
+    ----
+    Because the values of the matrix are assumed to be *weights*, NaN values
+    are replaced by zero (otherwise the plot doesn't come good).
+
     """
+    W[np.isnan(W)] = 0
+
     reenable = False
     if plt.isinteractive():
         plt.ioff()
