@@ -768,7 +768,7 @@ def plot_matrix(mat, title='', loc=1, plot=None, **kw):
         ax1 = fig.add_subplot(121)
         ax2 = fig.add_subplot(122)
         ax1.matshow(mat)
-        hinton(mat, ax=ax2)
+        hinton(mat)
         t = intitle(title, loc=loc, ax=ax1)
         t = intitle(title, loc=loc, ax=ax2)
     else:
@@ -779,7 +779,7 @@ def plot_matrix(mat, title='', loc=1, plot=None, **kw):
             ax.xaxis.set_major_locator(NullLocator())
             ax.yaxis.set_major_locator(NullLocator())
         elif plot == 'hinton':
-            hinton(mat, ax=ax)
+            hinton(mat)
         elif plot == 'spy':
             ax.spy(mat, precision=0.1, markersize=6, **kw)
         else:
