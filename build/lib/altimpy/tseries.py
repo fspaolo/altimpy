@@ -344,6 +344,72 @@ def backscatter_corr3(H, G, t, intervals, diff=False, robust=False,
     return [H_cor, RR, SS]
 
 #----------------------------------------------------------------
+# constricting time series
+#----------------------------------------------------------------
+
+def reference_by_offset(df, dynamic_ref=True):
+    """
+    Reference all time series to a common reference.
+
+    Computes the 'offset' of the selected reference time series to each
+    other time series (Paolo et al.).
+
+    The selected reference time series can be:
+    - the one with the first reference time (first time series)
+    - the one with the maximum non-null entries (dynamic referencing)
+
+    Parameters
+    ----------
+    df : DataFrame
+        Pandas DataFrame containing all multi-reference time series, i.e.,
+        the matrix representation of all forward [and backward] combinations.
+
+    dynamic_ref : bool, optional
+        If True (default), selects as the reference time series the one
+        containing the largest number of non-null entries. If False, will just
+        use the one that contains the first epoch (first time series).
+
+    """
+    # if no data return
+    if np.alltrue(np.isnan(df.values)): return
+
+    if dynamic_ref:
+        # use ts with max non-null entries as ref
+        ts_ref = df[df.columns[df.count().argmax()]]  
+    else:
+        # use ts with the first epoch as ref
+        ts_ref = df[df.columns[0]]
+    for c in df.columns:
+        # offset with respect to the reference
+        offset = np.mean(ts_ref - df[c])  
+        # add the 'offset' to entire ts (column)
+        df[c] += offset
+
+
+def reference_by_first(df):
+    """
+    Reference all time series to a common reference.
+
+    Computes the 'offset' of each element in the reference time series to the
+    first non-zero element in each other time series (Davis et al.).
+
+    Parameters
+    ----------
+    df : DataFrame
+        Pandas DataFrame containing all multi-reference time series, i.e.,
+        the matrix representation of all forward [and backward] combinations.
+
+    """
+    if np.alltrue(np.isnan(df.values)): return
+
+    # use first TS as ref
+    ts_ref = df[df.columns[0]][1:]  
+    cols = df.columns[1:]
+    for c, i in zip(cols, ts_ref):
+        # add the element `i` to entire ts (column)
+        df[c] += i    
+
+#----------------------------------------------------------------
 # Other functionalities
 #----------------------------------------------------------------
 
@@ -440,3 +506,5 @@ def area_weighted_mean(X, A):
         ts[k] = np.sum(W*G)  # area-weighted average per time step
         ar[k] =  G.count() / total_area
     return [ts, ar]
+
+

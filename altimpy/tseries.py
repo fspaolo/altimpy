@@ -344,10 +344,10 @@ def backscatter_corr3(H, G, t, intervals, diff=False, robust=False,
     return [H_cor, RR, SS]
 
 #----------------------------------------------------------------
-# constricting time series
+# constructing time series
 #----------------------------------------------------------------
 
-def reference_by_offset(df, dynamic_ref=True):
+def ref_by_offset(df, dynamic_ref=True):
     """
     Reference all time series to a common reference.
 
@@ -370,7 +370,6 @@ def reference_by_offset(df, dynamic_ref=True):
         use the one that contains the first epoch (first time series).
 
     """
-    # if no data return
     if np.alltrue(np.isnan(df.values)): return
 
     if dynamic_ref:
@@ -386,7 +385,7 @@ def reference_by_offset(df, dynamic_ref=True):
         df[c] += offset
 
 
-def reference_by_first(df):
+def ref_by_first(df):
     """
     Reference all time series to a common reference.
 
