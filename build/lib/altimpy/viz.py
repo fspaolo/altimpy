@@ -688,7 +688,7 @@ def _blob(x, y, area, colour):
     ycorners = np.array([y - hs, y - hs, y + hs, y + hs])
     plt.fill(xcorners, ycorners, colour, edgecolor=colour)
  
-def hinton(W, maxweight=None):
+def hinton(m, maxweight=None):
     """
     Draws a Hinton diagram for visualizing a weight matrix. 
     Temporarily disables matplotlib interactive mode if it is on, 
@@ -700,6 +700,7 @@ def hinton(W, maxweight=None):
     are replaced by zero (otherwise the plot doesn't come good).
 
     """
+    W = m.copy()
     W[np.isnan(W)] = 0
 
     reenable = False

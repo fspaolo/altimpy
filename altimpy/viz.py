@@ -700,7 +700,7 @@ def hinton(m, maxweight=None):
     are replaced by zero (otherwise the plot doesn't come good).
 
     """
-    W = m[:]
+    W = m.copy()
     W[np.isnan(W)] = 0
 
     reenable = False
