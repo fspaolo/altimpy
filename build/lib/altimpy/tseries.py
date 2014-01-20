@@ -344,10 +344,10 @@ def backscatter_corr3(H, G, t, intervals, diff=False, robust=False,
     return [H_cor, RR, SS]
 
 #----------------------------------------------------------------
-# constricting time series
+# constructing time series
 #----------------------------------------------------------------
 
-def reference_by_offset(df, dynamic_ref=True):
+def ref_by_offset(df, dynamic_ref=True):
     """
     Reference all time series to a common reference.
 
@@ -355,7 +355,7 @@ def reference_by_offset(df, dynamic_ref=True):
     other time series (Paolo et al.).
 
     The selected reference time series can be:
-    - the one with the first reference time (first time series)
+    - the one with the first reference time (first non-null time series)
     - the one with the maximum non-null entries (dynamic referencing)
 
     Parameters
@@ -367,26 +367,27 @@ def reference_by_offset(df, dynamic_ref=True):
     dynamic_ref : bool, optional
         If True (default), selects as the reference time series the one
         containing the largest number of non-null entries. If False, will just
-        use the one that contains the first epoch (first time series).
+        use the one that contains the first epoch (first non-null time series).
 
     """
-    # if no data return
     if np.alltrue(np.isnan(df.values)): return
 
     if dynamic_ref:
         # use ts with max non-null entries as ref
         ts_ref = df[df.columns[df.count().argmax()]]  
     else:
-        # use ts with the first epoch as ref
-        ts_ref = df[df.columns[0]]
-    for c in df.columns:
-        # offset with respect to the reference
-        offset = np.mean(ts_ref - df[c])  
-        # add the 'offset' to entire ts (column)
+        # use first non-null ts as ref
+        for col, ts_ref in df.iteritems():
+            if not np.alltrue(np.isnan(ts_ref)): break
+
+    for c, ts in df.iteritems():
+        # compute offset with respect to the reference,
+        # and add the 'offset' to entire ts (column)
+        offset = np.mean(ts_ref - ts)  
         df[c] += offset
 
 
-def reference_by_first(df):
+def ref_by_first(df, dynamic_ref=True):
     """
     Reference all time series to a common reference.
 
@@ -399,15 +400,26 @@ def reference_by_first(df):
         Pandas DataFrame containing all multi-reference time series, i.e.,
         the matrix representation of all forward [and backward] combinations.
 
+    dynamic_ref : bool, optional
+        If True (default), selects as the reference time series the one
+        containing the largest number of non-null entries. If False, will just
+        use the one that contains the first epoch (first non-null time series).
+
     """
     if np.alltrue(np.isnan(df.values)): return
 
-    # use first TS as ref
-    ts_ref = df[df.columns[0]][1:]  
-    cols = df.columns[1:]
-    for c, i in zip(cols, ts_ref):
-        # add the element `i` to entire ts (column)
-        df[c] += i    
+    if dynamic_ref:
+        # use ts with max non-null entries as ref
+        ts_ref = df[df.columns[df.count().argmax()]]  
+    else:
+        # use first non-null ts as ref
+        for c, ts_ref in df.iteritems():
+            if not np.alltrue(np.isnan(ts_ref)): break
+
+    for c, hi in zip(df.columns, ts_ref):
+        # if it's not the ref column add the element 'hi' to entire ts (column)
+        if not np.alltrue(df[c] == ts_ref)):
+            df[c] += hi
 
 #----------------------------------------------------------------
 # Other functionalities
