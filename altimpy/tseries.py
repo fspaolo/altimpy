@@ -418,7 +418,7 @@ def ref_by_first(df, dynamic_ref=True):
 
     for c, hi in zip(df.columns, ts_ref):
         # if it's not the ref column add the element 'hi' to entire ts (column)
-        if not np.alltrue(df[c] == ts_ref)):
+        if not np.alltrue(df[c] == ts_ref):
             df[c] += hi
 
 #----------------------------------------------------------------
