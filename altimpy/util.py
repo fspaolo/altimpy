@@ -291,7 +291,7 @@ def find_nearest(arr, val):
     
     Parameters
     ----------
-    arr : array_like
+    arr : array_like, shape nd
         The array to search in (nd). No need to be sorted.
     val : scalar or array_like
         Value(s) to find.
@@ -299,9 +299,9 @@ def find_nearest(arr, val):
     Returns
     -------
     out : tuple
-        The index (tuple) of nearest entry found. 
-        If `val` is a list of values then a tuple of ndarray
-        with the indices of each value is return.
+        The index (or tuple if nd array) of nearest entry found. If `val` is a
+        list of values then a tuple of ndarray with the indices of each value
+        is return.
 
     See also
     --------
@@ -326,7 +326,7 @@ def find_nearest2(x, y, points):
 
     Parameters
     ----------
-    x, y : 2d arrays, shape (m,n)
+    x, y : arrays, shape (m,n)
         Arrays containing the spatial coordinates.
     points : 2d array_like (k,2)
         List of points to find, e.g., list of tuples.
@@ -334,7 +334,8 @@ def find_nearest2(x, y, points):
     Returns
     -------
     out : tuple
-        The indices (tuple of ndarray) of the nearest entries found. 
+        The i,j indices (or a tuple of ndarray) for 'x' and 'y' of the nearest
+        entries found.
 
     See also
     --------
