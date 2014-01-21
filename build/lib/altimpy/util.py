@@ -513,7 +513,7 @@ def read_climate_index(fname, from_year=1992, to_year=2012, missing_val=-9999,
     return [x[ind], y[ind]]
 
 
-def u2l(m, k=0, mult=1):
+def upp2low(m, k=0, mult=1):
     """Coppy the upper triangle to the lower triangle.
 
     Parameters
@@ -528,7 +528,7 @@ def u2l(m, k=0, mult=1):
 
     See Also
     --------
-    l2u : same thing, but copy lower to upper triangle. 
+    low2upp : same thing, but copy lower to upper triangle. 
 
     """
     nrows, ncols = m.shape
@@ -538,7 +538,7 @@ def u2l(m, k=0, mult=1):
     return m
 
 
-def l2u(m, k=0, mult=1):
+def low2upp(m, k=0, mult=1):
     """Coppy the lower triangle to the upper triangle.
 
     Parameters
@@ -553,7 +553,7 @@ def l2u(m, k=0, mult=1):
 
     See Also
     --------
-    u2l : same thing, but copy upper to lower triangle. 
+    upp2low : same thing, but copy upper to lower triangle. 
 
     """
     nrows, ncols = m.shape

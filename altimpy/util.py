@@ -320,7 +320,7 @@ def find_nearest(arr, val):
 def find_nearest2(x, y, points):
     """Find nearest x/y coords to given points.
     
-    Finds the indexes of nearest coords in the 2d x and y arrays 
+    Finds the indices of nearest coords in the 2d x and y arrays 
     to the given list of points. It searches the nearest-neighbours 
     using a k-d tree.
 
