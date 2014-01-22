@@ -387,10 +387,16 @@ def ref_by_offset(df, dynamic_ref=True):
             if not np.alltrue(np.isnan(ts_ref)): break
 
     for c, ts in df.iteritems():
-        # compute offset with respect to the reference, and add the 'offset' to
-        # entire ts (column)
-        offset = np.mean(ts_ref - ts)  
-        df[c] += offset
+        # find overlapping non-null entries
+        ind, = np.where(ts_ref.notnull() & ts.notnull())
+        if len(ind) == 0:
+            # no overlapping -> remove entire ts
+            df[c] = np.nan
+        else:
+            # compute offset with respect to the reference, and add the
+            # 'offset' to entire ts (column)
+            offset = np.mean(ts_ref - ts)  
+            df[c] += offset
 
 
 def ref_by_first(df, dynamic_ref=True):
@@ -476,13 +482,18 @@ def prop_err_by_offset(df, dynamic_ref=True):
     for c, ts in df.iteritems():
         # skip the ref column
         if np.alltrue(ts_ref == ts): continue
-        # use only the *overlapping* non-null entries for 'e_offset'.
+        # find overlapping non-null entries
         ind, = np.where(ts_ref.notnull() & ts.notnull())
-        N = len(ind)                                  # number of differences
-        e_ref_sum = np.sum(ts_ref[ind]**2)            # summation in quadrature
-        e_ts_sum = np.sum(ts[ind]**2)
-        e_offset = np.sqrt(e_ref_sum + e_ts_sum) / N  # offset error
-        df[c] = np.sqrt(ts**2 + e_offset**2)          # error propagation
+        if len(ind) == 0:
+            # no overlapping -> remove entire ts
+            df[c] = np.nan
+        else:
+            print 'ERROF:', len(ind)
+            # sum in quadrature, compute offset error and propagate
+            e_ref_sum = np.sum(ts_ref[ind]**2)            
+            e_ts_sum = np.sum(ts[ind]**2)
+            e_offset = np.sqrt(e_ref_sum + e_ts_sum) / len(ind)
+            df[c] = np.sqrt(ts**2 + e_offset**2) 
 
 
 #----------------------------------------------------------------

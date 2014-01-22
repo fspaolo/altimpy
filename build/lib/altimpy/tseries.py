@@ -369,6 +369,12 @@ def ref_by_offset(df, dynamic_ref=True):
         containing the largest number of non-null entries. If False, will just
         use the one that contains the first epoch (first non-null time series).
 
+    See also
+    --------
+    ref_by_first
+    prop_err_by_first
+    prop_err_by_offset
+
     """
     if np.alltrue(np.isnan(df.values)): return
 
@@ -405,6 +411,12 @@ def ref_by_first(df, dynamic_ref=True):
         containing the largest number of non-null entries. If False, will just
         use the one that contains the first epoch (first non-null time series).
 
+    See also
+    --------
+    ref_by_offset
+    prop_err_by_offset
+    prop_err_by_first
+
     """
     if np.alltrue(np.isnan(df.values)): return
 
@@ -420,6 +432,60 @@ def ref_by_first(df, dynamic_ref=True):
         # if it's not the ref column add the element 'hi' to entire ts (column)
         if not np.alltrue(df[c] == ts_ref):
             df[c] += hi
+
+
+def prop_err_by_offset(df, dynamic_ref=True):
+    """
+    Propagate the error due to the referencing procedure.
+
+    The error propagation takes into account (1) the average of the differences to
+    calculate the offset (e_offset), and (2) the addition of this offset to each
+    element in the time series being referenced.
+
+    For each time series there is one 'offset' and, consequently, one 'e_offset'
+    associated to it.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Pandas DataFrame containing all multi-reference time series, i.e.,
+        the matrix representation of all forward [and backward] combinations.
+
+    dynamic_ref : bool, optional
+        If True (default), selects as the reference time series the one
+        containing the largest number of non-null entries. If False, will just
+        use the one that contains the first epoch (first non-null time series).
+
+    See also
+    --------
+    ref_by_offset
+    ref_by_first
+    prop_err_by_first
+
+    """
+    if np.alltrue(np.isnan(df.values)): return
+
+    if dynamic_ref:
+        # use ts with max non-null entries as ref
+        ts_ref = df[df.columns[df.count().argmax()]]  
+    else:
+        # use first non-null ts as ref
+        for col, ts_ref in df.iteritems():
+            if not np.alltrue(np.isnan(ts_ref)): break
+
+    for c, ts in df.iteritems():
+        # skip the ref column
+        if np.alltrue(ts_ref == ts): continue
+        # use only the *overlapping* non-null entries for 'e_offset'.
+        ind, = np.where(ts_ref.notnull() & ts.notnull())
+        N = len(ind)                                  # number of differences
+        if N == 0: continue
+        print 'ERROF:', N
+        e_ref_sum = np.sum(ts_ref[ind]**2)            # summation in quadrature
+        e_ts_sum = np.sum(ts[ind]**2)
+        e_offset = np.sqrt(e_ref_sum + e_ts_sum) / N  # offset error
+        df[c] = np.sqrt(ts**2 + e_offset**2)          # error propagation
+
 
 #----------------------------------------------------------------
 # Other functionalities
