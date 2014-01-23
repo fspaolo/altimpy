@@ -543,6 +543,48 @@ def prop_obs_by_offset(df, col_ref):
         df[c] += round(n_offset)
 
 
+def weighted_average(df, df_nobs):
+    """
+    Calculate the unbiased weighted average time series, weighted by the
+    number of observations.
+
+    wi = ni / (n1 + n2 + ...)
+    mean = w1 * h1 + w2 * h2 + ...
+
+    """
+    if np.alltrue(df.isnull()):
+        ts_mean = df.sum(axis=1)           # if nothing, colapse matrix -> series
+    else:
+        # weights for averaging
+        df_nobs[df_nobs==0] = 1            # to ensure dh=0 (n_obs=0) enters the average
+        nobs_j = df_nobs.sum(axis=1)       # total #obs per row (col in matrix)
+        w_ij = df_nobs.div(nobs_j, axis=0) # one weight per element (sum_col==1)
+        ts_mean = (w_ij * df).sum(axis=1)  # weighted sum
+        #print 'weight/col:', w_ij.sum(axis=1)
+    return ts_mean
+
+
+def weighted_average_error(df, df_nobs):
+    """
+    Calculate the unbiased weighted average time series for the standard error,
+    weighted by the number of observations.
+
+    se_mean = sqrt(w1**2 * se1**2 + w2**2 * se2**2 + ...)
+
+    """
+    if np.alltrue(np.isnan(df.values)):
+        ts_mean = df.sum(axis=1)           # if nothing, colapse matrix -> series
+    else:
+        # weights for averaging
+        df_nobs[df_nobs==0] = 1            # to ensure dh=0 (n_obs=0) enters the average
+        nobs_j = df_nobs.sum(axis=1)       # total #obs per row (col in matrix)
+        w_ij = df_nobs.div(nobs_j, axis=0) # one weight per element (sum_col==1)
+        ts_mean = np.sqrt((w_ij**2 * df**2).sum(axis=1)) 
+        ts_mean.plot()
+        plt.show()
+    return ts_mean
+
+
 #----------------------------------------------------------------
 # Other functionalities
 #----------------------------------------------------------------
