@@ -460,6 +460,18 @@ def prop_err_by_offset(df, col_ref):
     col_ref : key
         The column to be used as the reference time series.
 
+    Notes
+    -----
+    x(t) = x1, x2, ..., xn
+    y(t) = y1, y2, ..., yn
+    differences: 
+        d1 = x1 - y1 
+        e_d1 = sqrt(e_x1**2 + e_y1**2)
+    offset: 
+        D = (d1 + d2 + ... + dn) / n
+        e_D = sqrt(e_d1**2 + e_d2**2 + ... + e_dn**2) / n
+            = sqrt(e_x1**2 + e_y1**2 + ... + e_xn**2 + e_yn**2) / n
+
     See also
     --------
     ref_by_offset
@@ -475,12 +487,11 @@ def prop_err_by_offset(df, col_ref):
         # find non-null overlapping values
         ind, = np.where(ts_ref.notnull() & ts.notnull())
         if len(ind) == 0: continue
-        print 'ERR:', len(ind)
         # sum in quadrature, calculate offset error and propagate
-        e_ref_sum = np.sum(ts_ref[ind]**2)            
-        e_ts_sum = np.sum(ts[ind]**2)
-        e_offset = np.sqrt(e_ref_sum + e_ts_sum) / len(ind)
-        df[c] = np.sqrt(ts**2 + e_offset**2) 
+        e2_ref_sum = np.sum(ts_ref[ind]**2)  # e**2 = variance
+        e2_ts_sum = np.sum(ts[ind]**2)
+        e_offset = np.sqrt(e2_ref_sum + e2_ts_sum) / len(ind)
+        df[c] = np.sqrt(ts**2 + e_offset**2) # add to each element
 
 
 def prop_obs_by_offset(df, col_ref):
@@ -517,7 +528,6 @@ def prop_obs_by_offset(df, col_ref):
         # find non-null overlapping values
         ind, = np.where(ts_ref.notnull() & ts.notnull())
         if len(ind) == 0: continue
-        print 'OBS:', len(ind)
         # n obs offset = average number of obs per difference
         n_offset = float(np.sum(ts_ref[ind] + ts[ind])) / len(ind)
         '''

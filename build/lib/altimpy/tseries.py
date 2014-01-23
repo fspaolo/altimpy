@@ -395,6 +395,8 @@ def ref_by_offset(df, col_ref):
     ref_by_first
     prop_err_by_first
     prop_err_by_offset
+    prop_obs_by_offset
+    prop_obs_by_first
 
     """
     ts_ref = df[col_ref]
@@ -428,6 +430,8 @@ def ref_by_first(df, col_ref):
     ref_by_offset
     prop_err_by_offset
     prop_err_by_first
+    prop_obs_by_offset
+    prop_obs_by_first
 
     """
     ts_ref = df[col_ref]
@@ -461,6 +465,8 @@ def prop_err_by_offset(df, col_ref):
     ref_by_offset
     ref_by_first
     prop_err_by_first
+    prop_obs_by_offset
+    prop_obs_by_first
 
     """
     ts_ref = df[col_ref]
@@ -469,12 +475,56 @@ def prop_err_by_offset(df, col_ref):
         # find non-null overlapping values
         ind, = np.where(ts_ref.notnull() & ts.notnull())
         if len(ind) == 0: continue
-        print 'ERR:', len(ind)
         # sum in quadrature, calculate offset error and propagate
         e_ref_sum = np.sum(ts_ref[ind]**2)            
         e_ts_sum = np.sum(ts[ind]**2)
         e_offset = np.sqrt(e_ref_sum + e_ts_sum) / len(ind)
         df[c] = np.sqrt(ts**2 + e_offset**2) 
+
+
+def prop_obs_by_offset(df, col_ref):
+    """
+    Propagate the number of observations due to the referencing procedure.
+
+    The #obs propagation takes into account (1) the average of the differences to
+    calculate the offset (n_offset), and (2) the addition of this offset to each
+    element in the time series being referenced.
+
+    For each time series there is one 'offset' and, consequently, one 'n_offset'
+    associated to it.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Pandas DataFrame containing all multi-reference time series, i.e.,
+        the matrix representation of all forward [and backward] combinations.
+    col_ref : key
+        The column to be used as the reference time series.
+
+    See also
+    --------
+    ref_by_offset
+    ref_by_first
+    prop_err_by_first
+    prop_err_by_offset
+    prop_obs_by_first
+
+    """
+    ts_ref = df[col_ref]
+    for c, ts in df.iteritems():
+        if c == col_ref: continue  # skip the ref column!!!
+        # find non-null overlapping values
+        ind, = np.where(ts_ref.notnull() & ts.notnull())
+        if len(ind) == 0: continue
+        # n obs offset = average number of obs per difference
+        n_offset = float(np.sum(ts_ref[ind] + ts[ind])) / len(ind)
+        '''
+        # total n used to calculate the offset
+        n_offset = np.sum(ts_ref[ind] + ts[ind])  
+        # EXCLUDE OBS ALREADY INCLUDED IN N_OFFSET
+        df[c][ind] = 0  
+        '''
+        df[c] += round(n_offset)
 
 
 #----------------------------------------------------------------
