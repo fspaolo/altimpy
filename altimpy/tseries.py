@@ -344,7 +344,7 @@ def backscatter_corr3(H, G, t, intervals, diff=False, robust=False,
     return [H_cor, RR, SS]
 
 #----------------------------------------------------------------
-# constructing time series
+# averaging time series
 #----------------------------------------------------------------
 
 def select_ref(df, dynamic=True):
@@ -462,15 +462,19 @@ def prop_err_by_offset(df, col_ref):
 
     Notes
     -----
-    x(t) = x1, x2, ..., xn
-    y(t) = y1, y2, ..., yn
-    differences: 
+    reference one ts to another:
+        x(t) = x1, x2, ..., xn
+        y(t) = y1, y2, ..., yn
+    error for differences: 
         d1 = x1 - y1 
         e_d1 = sqrt(e_x1**2 + e_y1**2)
-    offset: 
+    error for offset: 
         D = (d1 + d2 + ... + dn) / n
         e_D = sqrt(e_d1**2 + e_d2**2 + ... + e_dn**2) / n
             = sqrt(e_x1**2 + e_y1**2 + ... + e_xn**2 + e_yn**2) / n
+    error for referenced h:
+        h1' = h1 + D
+        e_h1' = sqrt(e_h1**2 + e_D**2)
 
     See also
     --------
