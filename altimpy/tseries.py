@@ -1,5 +1,5 @@
 """
-Module with functions to form and process time series. 
+Module with functions to construct and process time series. 
 
 """
 # Fernando Paolo <fpaolo@ucsd.edu>
@@ -54,16 +54,18 @@ def backscatter_corr(H, G, diff=False, robust=False):
     S is slope of linear fit to correlation(dG|dG', dH|dH')
     H0 is intercept of linear fit to correlation(dG|dG', dH|dH')
 
+    It excludes the NaNs forming continuous series to differentiate and
+    calculate the correlations.
+
     See also
     --------
     backscatter_corr2, bacscatter_corr3
 
     """
-    # NOTE: WHAT ABOUT ZEROS IN THE MIDDLE OF THE RECORD (W/DIFF)?
-    # use only non-null and non-zero entries for correlation
-    ind, = np.where((~np.isnan(H)) & (~np.isnan(G)) & (H!=0) & (G!=0))
+    # use only non-null entries for correlations
+    ind, = np.where(~np.isnan(H) & ~np.isnan(G))
     H2, G2 = H[ind], G[ind]
-    if len(H2) < 2: 
+    if len(H2) < 4:
         return [H, np.nan, np.nan]
 
     if diff:
@@ -145,6 +147,9 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9):
     S is slope of linear fit to correlation(dG|dG', dH|dH')
     H0 is intercept of linear fit to correlation(dG|dG', dH|dH')
     RR, SS, HH are time series of the respective parameters.
+
+    It excludes the NaNs forming continuous series to differentiate and
+    calculate the correlations.
 
     See also
     --------
