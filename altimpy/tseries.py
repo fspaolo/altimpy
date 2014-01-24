@@ -401,7 +401,7 @@ def ref_by_offset(df, col_ref):
     """
     ts_ref = df[col_ref]
     for c, ts in df.iteritems():
-        # find non-null overlapping values
+        # find the non-null overlapping values
         ind, = np.where(ts_ref.notnull() & ts.notnull())
         if len(ind) == 0: continue
         # compute offset with respect to the reference, and add the
@@ -488,7 +488,7 @@ def prop_err_by_offset(df, col_ref):
     ts_ref = df[col_ref]
     for c, ts in df.iteritems():
         if c == col_ref: continue  # skip the ref column!!!
-        # find non-null overlapping values
+        # find the non-null overlapping values
         ind, = np.where(ts_ref.notnull() & ts.notnull())
         if len(ind) == 0: continue
         # sum in quadrature, calculate offset error and propagate
@@ -517,6 +517,12 @@ def prop_obs_by_offset(df, col_ref):
     col_ref : key
         The column to be used as the reference time series.
 
+    Notes
+    -----
+    1) #obs per difference = average *pairs* of obs between the 'ref' and 'ts'
+    2) #obs per offset = average of #obs per difference
+    3) #obs per referenced value = #obs value + #obs offset
+
     See also
     --------
     ref_by_offset
@@ -529,17 +535,13 @@ def prop_obs_by_offset(df, col_ref):
     ts_ref = df[col_ref]
     for c, ts in df.iteritems():
         if c == col_ref: continue  # skip the ref column!!!
-        # find non-null overlapping values
+        # find the non-null overlapping values
         ind, = np.where(ts_ref.notnull() & ts.notnull())
         if len(ind) == 0: continue
-        # n obs offset = average number of obs per difference
-        n_offset = float(np.sum(ts_ref[ind] + ts[ind])) / len(ind)
-        '''
-        # total n used to calculate the offset
-        n_offset = np.sum(ts_ref[ind] + ts[ind])  
-        # EXCLUDE OBS ALREADY INCLUDED IN N_OFFSET
-        df[c][ind] = 0  
-        '''
+        # obs per difference = average pairs of obs between 'ref' and 'ts'
+        n_diff = (ts_ref[ind] + ts[ind]) / 2.
+        # obs per offset = average of number of obs per difference
+        n_offset = np.sum(n_diff) / len(ind)
         df[c] += round(n_offset)
 
 
@@ -580,8 +582,6 @@ def weighted_average_error(df, df_nobs):
         nobs_j = df_nobs.sum(axis=1)       # total #obs per row (col in matrix)
         w_ij = df_nobs.div(nobs_j, axis=0) # one weight per element (sum_col==1)
         ts_mean = np.sqrt((w_ij**2 * df**2).sum(axis=1)) 
-        ts_mean.plot()
-        plt.show()
     return ts_mean
 
 
