@@ -57,6 +57,9 @@ def backscatter_corr(H, G, diff=False, robust=False):
     It excludes the NaNs forming continuous series to differentiate and
     calculate the correlations.
 
+    Time series must have at least 4 values (3 differences) to fit a line.
+    Otherwise, does not applies correction.
+
     See also
     --------
     backscatter_corr2, bacscatter_corr3
@@ -365,13 +368,13 @@ def select_ref(df, dynamic=True):
 
 
 def find_non_overlap(df, col_ref):
-    """Find the columns with non-overlapping values to the reference."""
+    """Find the columns with < 2 overlapping values to the reference."""
     ts_ref = df[col_ref]
     cols = []
     for c, ts in df.iteritems():
         if c == col_ref: continue  # skip the ref column !!!
         ind, = np.where(ts_ref.notnull() & ts.notnull())
-        if len(ind) == 0: 
+        if len(ind) < 2:
             cols.append(c)
     return cols
 

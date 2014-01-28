@@ -27,15 +27,15 @@ Specific processing
 15. merge ad/da crossovers [mpi_merge.py, mpi_merge2.py] code_ok... ok
 16. average bins (and remove sector overlaps): xovers -> grid (read code header) [x2grid.py, run.py], [1] code_ok... ok
 17. join all subgrids in time/space (serial) [gridjoin.py] code_ok... ok
-[18. apply ICESat biases!]
-18. average time series: grid-cells (serial; read code header) [averagets2.py] code_ok
+[apply ICESat biases here!]
+18. average time series: grid-cells (serial; read code header) [averagets2.py] code_ok... ok
+19. independent backscatter correction (serial, extremely fast) [backscatter3.py] code_ok... ok
+20. merge satellites (serial, extremely fast) [mergesats2.py] code_ok... ok
 
-19. interpolate empty bins, but do not use interpolated values to cross-calib!
-
-19. independent backscatter correction [backscatter3.py]
-20. merge satellites (serial, extremely fast) [mergesats.py] code_ok
-21. cross calibration
+21. cross calibration [crosscalib2.py]
 22. join backscatter correction [backscatter2.py]
+
+(?) interpolate empty bins, but do not use interpolated values to cross-calib!
 
 # 22. constant backscatter correction
 # 23. tvariable backscatter correction
