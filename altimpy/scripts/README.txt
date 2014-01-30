@@ -31,11 +31,12 @@ Specific processing
 18. average time series: grid-cells (serial; read code header) [averagets2.py] code_ok... ok
 19. independent backscatter correction (serial, extremely fast) [backscatter3.py] code_ok... ok
 20. merge satellites (serial, extremely fast) [mergesats2.py] code_ok... ok
+21. cross calibration (serial, slow) [crosscalib2.py] code_ok... ok
+22. error/nobs propagation (serial, slow) [crosscalib3.py]
 
-21. cross calibration [crosscalib2.py]
-22. join backscatter correction [backscatter2.py]
+23. join backscatter correction [backscatter2.py]
 
-(?) interpolate empty bins, but do not use interpolated values to cross-calib!
+24. interpolate empty bins [kriging.py or spline.py] (but do not use interpolated values to cross-calib)!
 
 # 22. constant backscatter correction
 # 23. tvariable backscatter correction

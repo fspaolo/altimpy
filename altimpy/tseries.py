@@ -225,7 +225,7 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9):
     HH[jj] = np.nan
 
     H_cor = H - SS * G - HH
-    H_cor = referenced(H_cor, to='first')
+    #H_cor = referenced(H_cor, to='first')
 
     return [H_cor, RR, SS]
 
@@ -347,7 +347,7 @@ def backscatter_corr3(H, G, t, intervals, diff=False, robust=False,
         # apply correction only if increase is not greater than p%
         H_cor = limit_correction(H, H_cor, max_increase=max_increase)
     '''
-    H_cor = referenced(H_cor, to='first')
+    #H_cor = referenced(H_cor, to='first')
 
     return [H_cor, RR, SS]
 
