@@ -29,16 +29,22 @@ Specific processing
 17. join all subgrids in time/space (serial) [gridjoin.py] code_ok... ok
 [apply ICESat biases here!]
 18. average time series: grid-cells (serial; read code header) [averagets2.py] code_ok... ok
-19. independent backscatter correction (serial, extremely fast) [backscatter3.py] code_ok... ok
+19. independent backscatter correction (serial, fast) [backscatter3.py] code_ok... ok
 20. merge satellites (serial, extremely fast) [mergesats2.py] code_ok... ok
 21. cross calibration (serial, slow) [crosscalib2.py] code_ok... ok
-22. error/nobs propagation (serial, slow) [crosscalib3.py]
-
-23. join backscatter correction [backscatter2.py]
+22. error/nobs propagation (serial, slow) [crosscalib3.py] code_ok... ok
+23. join backscatter correction (serial, slow) [backscatter2.py] code_ok... ok
 
 24. interpolate empty bins [kriging.py or spline.py] (but do not use interpolated values to cross-calib)!
+25. post processing (reference, spherical->cartesian, filter, regrid...) [post_proc.py]
 
-# 22. constant backscatter correction
-# 23. tvariable backscatter correction
+
+# constant backscatter correction
+# tvariable backscatter correction
+
+Visualization
+-------------
+1. create XDMF to visualize in ParaView [write_xdmf.py]
+
 
 [1] do not apply 'iterative' std to ICESat (and perhaps to any sat)

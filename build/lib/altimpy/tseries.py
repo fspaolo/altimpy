@@ -225,7 +225,7 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9):
     HH[jj] = np.nan
 
     H_cor = H - SS * G - HH
-    H_cor = referenced(H_cor, to='first')
+    #H_cor = referenced(H_cor, to='first')
 
     return [H_cor, RR, SS]
 
@@ -347,7 +347,7 @@ def backscatter_corr3(H, G, t, intervals, diff=False, robust=False,
         # apply correction only if increase is not greater than p%
         H_cor = limit_correction(H, H_cor, max_increase=max_increase)
     '''
-    H_cor = referenced(H_cor, to='first')
+    #H_cor = referenced(H_cor, to='first')
 
     return [H_cor, RR, SS]
 
@@ -596,14 +596,6 @@ def weighted_average_error(df, df_nobs):
 #----------------------------------------------------------------
 # Other functionalities
 #----------------------------------------------------------------
-
-# NOTE: NEED TO THINK BETTER ABOUT THIS STRATEGY. NOT WORKING AS IT IS !!!!!!
-def limit_correction(ts, ts_cor, max_increase=2.):
-    """Limit the magnitude of the correction."""
-    i = (detrend(ts_cor) / detrend(ts)) > max_increase
-    ts_cor[i] = ts[i]
-    return ts_cor
-
 
 def get_area_cells(grid, x, y):
     """Calculates the area of each grid-cell.

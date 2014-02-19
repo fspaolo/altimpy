@@ -261,7 +261,7 @@ def align_data_with_fig(x, y, data, res=10):
 
 
 def plot_moa_subreg(m, moafile, res=10):
-    """Plot MOA image subregion defined by projection `m`.
+    """Plot MOA image subregion defined by projection 'm'.
     
     m : Basemap projection
     moafile : GeoTiff file of MOA image
@@ -272,6 +272,9 @@ def plot_moa_subreg(m, moafile, res=10):
     x, y, data, bbox_moa = get_gtif(moafile, lat_ts=-71)          
     # fig coords
     x, y, data = align_data_with_fig(x, y, data, res) 
+    # MOA coods m -> km
+    x /= 1e3
+    y /= 1e3
     # MOA fig domain
     m1 = make_proj_stere(bbox_moa)
     # subregion corners in fig coords 
@@ -302,7 +305,7 @@ def make_proj_stere(bbox, lat_ts=-71, lon_0=0, lat_0=-90):
     """
     # Ellipsoid: http://nsidc.org/data/polar_stereo/ps_grids.html
     a = RE
-    b = a*np.sqrt(1.0 - E2) 
+    b = a * np.sqrt(1.0 - E2) 
     m = Basemap(
         projection='stere', 
         lat_ts=lat_ts,         

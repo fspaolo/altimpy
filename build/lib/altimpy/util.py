@@ -88,7 +88,7 @@ def linear_fit(x, y, return_coef=False):
         return (m, c)
     else:
         x_val = np.linspace(x.min(), x.max(), 200)
-        y_fit = m*x_val + c
+        y_fit = m * x_val + c
         return (x_val, y_fit)
 
 
@@ -497,6 +497,21 @@ def regrid2d(arr3d, x, y, inc_by=2):
     return [out, xx, yy]
 
 
+def get_dydx(time, arr3d):
+    """Returns a 2d array with linear dy/dx per grid cell."""
+    _, ny, nx = arr3d.shape
+    dydx = np.zeros((ny, nx), 'f8') * np.nan
+    for i in range(ny):
+        for j in range(nx):
+            ii, = np.where(~np.isnan(arr3d[:,i,j]))
+            if len(ii) < 3:
+                pass
+            else:
+                m, c = linear_fit(time, arr3d[:,i,j], return_coef=True)
+                dydx[i,j] = m
+    return dydx
+
+
 def human_order(text):
     """Usage: list.sort(key=human_order), sorts strings in human order."""
     atoi = lambda text: int(text) if text.isdigit() else text
@@ -515,7 +530,7 @@ def read_climate_index(fname, from_year=1992, to_year=2012, missing_val=-9999,
 
 
 def upp2low(m, k=0, mult=1):
-    """Coppy the upper triangle to the lower triangle.
+    """Coppy the upper triangle into the lower triangle.
 
     Parameters
     ----------
@@ -540,7 +555,7 @@ def upp2low(m, k=0, mult=1):
 
 
 def low2upp(m, k=0, mult=1):
-    """Coppy the lower triangle to the upper triangle.
+    """Coppy the lower triangle into the upper triangle.
 
     Parameters
     ----------

@@ -597,14 +597,6 @@ def weighted_average_error(df, df_nobs):
 # Other functionalities
 #----------------------------------------------------------------
 
-# NOTE: NEED TO THINK BETTER ABOUT THIS STRATEGY. NOT WORKING AS IT IS !!!!!!
-def limit_correction(ts, ts_cor, max_increase=2.):
-    """Limit the magnitude of the correction."""
-    i = (detrend(ts_cor) / detrend(ts)) > max_increase
-    ts_cor[i] = ts[i]
-    return ts_cor
-
-
 def get_area_cells(grid, x, y):
     """Calculates the area of each grid-cell.
 
