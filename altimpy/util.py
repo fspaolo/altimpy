@@ -475,6 +475,23 @@ def gfilter2d(arr3d, sigma):
     return arr3d
 
 
+def regrid(x, y, arr, inc_by=2):
+    """Regrid a 2d array increasing its resolution."""
+    ny, nx = arr.shape
+    xi = np.linspace(x.min(), x.max(), inc_by * len(x))
+    yi = np.linspace(y.min(), y.max(), inc_by * len(y))
+    xx, yy = np.meshgrid(xi, yi)
+    arr = np.ma.masked_invalid(arr)
+    arr1 = bm.interp(arr, x, y, xx, yy, order=0) # nearest neighb.
+    arr2 = bm.interp(arr, x, y, xx, yy, order=1) # linear interp.
+    ind = np.where(arr2 == 0) #<<<<< check!
+    try:
+        arr2[ind] = arr1[ind]
+    except:
+        pass
+    return [xx, yy, arr2]
+
+
 def regrid2d(arr3d, x, y, inc_by=2):
     """Regrid 2d time series (3d array) increasing resolution."""
     nt, ny, nx = arr3d.shape

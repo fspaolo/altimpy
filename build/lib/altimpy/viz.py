@@ -272,9 +272,8 @@ def plot_moa_subreg(m, moafile, res=10):
     x, y, data, bbox_moa = get_gtif(moafile, lat_ts=-71)          
     # fig coords
     x, y, data = align_data_with_fig(x, y, data, res) 
-    # MOA coods m -> km
-    x /= 1e3
-    y /= 1e3
+    # MOA coords m -> km
+    x /= 1e3; y /= 1e3
     # MOA fig domain
     m1 = make_proj_stere(bbox_moa)
     # subregion corners in fig coords 
