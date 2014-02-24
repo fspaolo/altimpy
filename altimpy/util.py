@@ -71,6 +71,15 @@ class CircularList(list):
             raise TypeError
 
 
+class GetMask():
+    """Generate a mask for 'arr' based on the original 'maskfile'.
+    
+    Generates a 2d array with: 0 = invalid region, 1 = valid region.
+    """
+    def __init__(mask, arr):
+        pass
+
+
 def linear_fit(x, y, return_coef=False):
     """
     Fit a straight-line by Ordinary Least Squares.
@@ -410,7 +419,7 @@ def filter_std(arr, n=3, per_field=False):
 
 
 def get_mask(arr):
-    """Get mask from 3d array by summing-up the 0 axis.
+    """Get mask from 3d array by summing-up the 0-axis (colapse the z-dim).
 
     output: 0 = invalid region, 1 = valid region.
     """

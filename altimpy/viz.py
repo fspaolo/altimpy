@@ -552,7 +552,7 @@ def savefig(fig, fh=None, format=None, distill=False, **kwargs):
         return
 
 
-def digitize(img, xlim=(-1, 1), ylim=(-1, 1), color='r'):
+def digitize2(img, xlim=(-1, 1), ylim=(-1, 1), color='r'):
     """
     Digitize points on an image and rectify to a rectangular coordinate system.
     """
