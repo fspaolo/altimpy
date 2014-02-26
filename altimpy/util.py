@@ -115,8 +115,7 @@ class Mask(object):
         return [self.mask_x[j[0]:j[-1]+1], self.mask_y[i[0]:i[-1]+1],
                 self.mask_z[i[0]:i[-1]+1,j[0]:j[-1]+1]]
 
-    def get_mask(self, fname=None, x='/x', y='/y', mask='/mask', 
-                 paddzeros=False):
+    def get_mask(self, fname=None, x='/x', y='/y', mask='/mask'):
         """Load mask from HDF5 file."""
         print 'loading mask...'
         if self.fname is not None:
