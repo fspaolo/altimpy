@@ -7,6 +7,7 @@ Module with some high level utility functions.
 
 import os
 import re
+import math
 import numpy as np
 import scipy as sp
 import pandas as pd
@@ -17,6 +18,7 @@ import scipy.ndimage as ni
 import mpl_toolkits.basemap as bm
 from scipy.interpolate import UnivariateSpline as Spline
 
+from altimpy import ll2xy
 
 class CircularList(list):
     """A list that wraps around instead of throwing an index error.
@@ -71,13 +73,106 @@ class CircularList(list):
             raise TypeError
 
 
-class GetMask():
-    """Generate a mask for 'arr' based on the original 'maskfile'.
+class Mask(object):
+    """Generate a mask for 2d array (in lat/lon).
     
-    Generates a 2d array with: 0 = invalid region, 1 = valid region.
+    Generates a mask for a given 2d array using a full filemask.
     """
-    def __init__(mask, arr):
-        pass
+    def __init__(self, fname=None):
+        self.fname = fname
+
+    def _digitize(self, x, y, xm, ym):
+        """Digitize x/y according to xm/ym (mask coords).
+        x, y, xm, ym : 1d array_like
+        len(x) == len(y), len(xm) == or != len(ym)
+        """
+        print 'digitizing x,y ...'
+        # construct array with edges from mask coords
+        dx = np.abs(xm[1] - xm[0])
+        dy = np.abs(ym[1] - ym[0])
+        xmin, xmax = xm.min(), xm.max()
+        ymin, ymax = ym.min(), ym.max()
+        xmin -= dx/2.; xmax += dx/2.  # both ends
+        ymin -= dy/2.; ymax += dy/2.
+        x_edges = np.arange(xmin, xmax+dx, dx)
+        y_edges = np.arange(ymin, ymax+dy, dy)
+        j_bins = np.digitize(x, bins=x_edges)
+        i_bins = np.digitize(y, bins=y_edges)
+        # substitute indices out of mask bounds: 0 -> 1 and N+1 -> N
+        n = len(xm)
+        m = len(ym)
+        j_bins[j_bins==0] = 1
+        j_bins[j_bins==n+1] = n
+        i_bins[i_bins==0] = 1
+        i_bins[i_bins==m+1] = m
+        print 'done.'
+        return [j_bins-1, i_bins-1]  # shift inds to the left (from edges)
+
+    def _get_subreg(self, x, y):
+        """Subset original mask for performance."""
+        j, = np.where((x.min() <= self.mask_x) & (self.mask_x <= x.max()))
+        i, = np.where((y.min() <= self.mask_y) & (self.mask_y <= y.max()))
+        return [self.mask_x[j[0]:j[-1]+1], self.mask_y[i[0]:i[-1]+1],
+                self.mask_z[i[0]:i[-1]+1,j[0]:j[-1]+1]]
+
+    def get_mask(self, fname=None, x='/x', y='/y', mask='/mask', 
+                 paddzeros=False):
+        """Load mask from HDF5 file."""
+        print 'loading mask...'
+        if self.fname is not None:
+            fname = self.fname
+        fin = tb.openFile(fname, 'r')
+        x = fin.getNode(x).read()
+        y = fin.getNode(y).read()
+        mask = fin.getNode(mask).read()
+        print 'mask loaded from:', fin
+        fin.close()
+        if ism(x):  # if coords in m, convert to km
+            x = x * 1e-3
+            y = y * 1e-3
+        self.mask_x = x
+        self.mask_y = y
+        self.mask_z = mask
+        del x, y, mask
+        print 'done.'
+
+    def gen_mask(self, lon, lat, arr, **kw):
+        """Creates a mask for given 2d array."""
+        print "generating array's mask..."
+        if np.ndim(lon) == 1:
+            lon, lat = np.meshgrid(lon, lat)     # 1d -> 2d
+            lon, lat = lon.ravel(), lat.ravel()
+        arr_x, arr_y = ll2xy(lon, lat, **kw)     # lon/lat -> x/y
+        arr_x, arr_y = np.rint(arr_x), np.rint(arr_y)
+        self.mask_x, self.mask_y, self.mask_z = self._get_subreg(arr_x, arr_y)
+        # if not monotonically increasing (usually the y-dim)
+        if self.mask_y[0] > self.mask_y[-1]:
+            self.mask_y = self.mask_y[::-1]
+            self.mask_z = self.mask_z[::-1,:]
+        jj, ii = self._digitize(arr_x, arr_y, self.mask_x, self.mask_y)
+        self.arr_z = self.mask_z[ii,jj].reshape(arr.shape)  # 2d mask
+        self.arr_x = arr_x
+        self.arr_y = arr_y
+        del arr_x, arr_y
+        print 'done.'
+
+
+def ism(x):
+    """Check if in meters."""
+    return True if (int(math.log10(np.max(x)) + 1) > 4) else False
+
+
+def digitize(lon, lat, x_range, y_range, dx, dy):
+    """Digitize lons and lats."""
+    x_edges = np.arange(x_range[0], x_range[-1]+dx, dx)
+    y_edges = np.arange(y_range[0], y_range[-1]+dy, dy)
+    j_bins = np.digitize(lon, bins=x_edges)
+    i_bins = np.digitize(lat, bins=y_edges)
+    nx, ny = len(x_edges)-1, len(y_edges)-1
+    hx, hy = dx/2., dy/2.
+    lon_d = (x_edges + hx)[:-1]
+    lat_d = (y_edges + hy)[:-1]
+    return (lon_d, lat_d, j_bins, i_bins, x_edges, y_edges, nx, ny)
 
 
 def linear_fit(x, y, return_coef=False):
