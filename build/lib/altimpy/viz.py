@@ -187,64 +187,6 @@ colormap_lib = {
 
 ### Map projection utilities
 
-def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90):
-    """Reads a GeoTIFF image and returns the respective 2D array.
-
-    (it assumes polar stereographic proj)
-
-    Return
-    ------
-    x, y : 1D arrays containing the coordinates.
-    img : 2D array containing the image.
-    bbox_ll : lon/lat limits (lllon,lllat,urlon,urlat).
-
-    Notes
-    -----
-    MOA parameters: http://nsidc.org/data/moa/users_guide.html
-    lat_ts is standard lat (lat of true scale), or "latitude_of_origin"
-    lon_0/lat_0 is proj center (NOT grid center!)
-
-    To get GeoTIFF metadata:
-
-        $ gdalinfo file.tif
-    
-    """
-    try:
-        from osgeo import osr, gdal
-        import pyproj as pj
-    except:
-        msg = """some of the following modules are missing: 
-        `osgeo` (GDAL) or `pyproj`"""
-        raise ImportError(msg)
-    ds = gdal.Open(fname) 
-    img = ds.ReadAsArray()       # img -> matrix
-    gt = ds.GetGeoTransform()    # coordinates
-    nx = ds.RasterXSize          # number of pixels in x
-    ny = ds.RasterYSize          # number of pixels in y 
-    dx = gt[1]                   # pixel size in x
-    dy = gt[5]                   # pixel size in y 
-    xmin = gt[0]
-    ymax = gt[3]
-    # from: http://gdal.org/gdal_datamodel.html
-    ymin = ymax + nx*gt[4] + ny*dy 
-    xmax = xmin + nx*dx + ny*gt[2] 
-    # Polar stereo coords x,y
-    x = np.arange(xmin, xmax, dx)    
-    # in reverse order -> raster origin = urcrn
-    y = np.arange(ymax, ymin, dy)  
-    # bbox of raster img in x,y 
-    bbox_xy = (xmin, ymin, xmax, ymax)
-    # bbox of raster img in lon,lat (to plot proj)
-    p1 = pj.Proj(proj='stere', lat_ts=lat_ts, lon_0=lon_0, lat_0=lat_0)
-    xmin, ymin = p1(bbox_xy[0], bbox_xy[1], inverse=True)
-    xmax, ymax = p1(bbox_xy[2], bbox_xy[3], inverse=True)
-    bbox_ll = (xmin, ymin, xmax, ymax)
-    print 'image limits (left/right/bottom/top):'
-    print '(x,y)', bbox_xy[0], bbox_xy[2], bbox_xy[1], bbox_xy[3]
-    print '(lon,lat)', bbox_ll[0], bbox_ll[2], bbox_ll[1], bbox_ll[3]
-    return [x, y, img, bbox_ll]
-
-
 def align_data_with_fig(x, y, data, res=10):
     """Align map grid with figure frame. 
     
@@ -260,16 +202,16 @@ def align_data_with_fig(x, y, data, res=10):
     return [x, y, data]
 
 
-def plot_moa_subreg(m, moafile, res=10):
+def plot_moa_subreg(m, x, y, data, bbox, res=10):
     """Plot MOA image subregion defined by projection 'm'.
     
-    m : Basemap projection
-    moafile : GeoTiff file of MOA image
+    m : Basemap projection defining subregion
+    x, y : 1d arrays of coordinates
+    data : 2d array with MOA image
+    bbox : low-left and upp-right lon/lat
     res : resolution, step size to be plotted
     """
     bbox_sub = (m.llcrnrlon, m.llcrnrlat, m.urcrnrlon, m.urcrnrlat) 
-    # real proj coords (stere)
-    x, y, data, bbox_moa = get_gtif(moafile, lat_ts=-71)          
     # fig coords
     x, y, data = align_data_with_fig(x, y, data, res) 
     # MOA coords m -> km
