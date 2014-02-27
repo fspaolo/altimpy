@@ -206,8 +206,8 @@ def plot_moa_subreg(m, x, y, data, bbox, res=10):
     """Plot MOA image subregion defined by projection 'm'.
     
     m : Basemap projection defining subregion
-    x, y : 1d array_like of coordinates
-    data : 2d array_like with MOA image
+    x, y : 1d arrays of coordinates
+    data : 2d array with MOA image
     bbox : low-left and upp-right lon/lat
     res : resolution, step size to be plotted
     """
