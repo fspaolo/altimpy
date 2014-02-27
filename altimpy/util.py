@@ -126,6 +126,9 @@ class Mask(object):
         mask = fin.getNode(mask).read()
         print 'mask loaded from:', fin
         fin.close()
+        if not ism(x): # if km -> m
+            x *= 1e3
+            y *= 1e3
         self.mask_x = x
         self.mask_y = y
         self.mask_z = mask
@@ -136,10 +139,10 @@ class Mask(object):
         """Creates a mask for given 2d array."""
         print "generating array's mask..."
         if np.ndim(lon) == 1:
-            lon, lat = np.meshgrid(lon, lat)       # 1d -> 2d
+            lon, lat = np.meshgrid(lon, lat)                 # 1d -> 2d
             lon, lat = lon.ravel(), lat.ravel()
         if coord == 'lon/lat':
-            arr_x, arr_y = ll2xy(lon, lat, **kw)   # lon/lat -> x/y (m)
+            arr_x, arr_y = ll2xy(lon, lat, units='m', **kw)  # lon/lat -> x/y m
         else:
             arr_x, arr_y = lon, lat
         arr_x, arr_y = np.rint(arr_x), np.rint(arr_y)
