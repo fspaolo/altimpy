@@ -217,7 +217,7 @@ def plot_moa_subreg(m, x, y, data, bbox, res=10):
     # MOA coords m -> km
     x /= 1e3; y /= 1e3
     # MOA fig domain
-    m1 = make_proj_stere(bbox_moa)
+    m1 = make_proj_stere(bbox)
     # subregion corners in fig coords 
     x0, y0 = m1(bbox_sub[0], bbox_sub[1])
     x1, y1 = m1(bbox_sub[2], bbox_sub[3])

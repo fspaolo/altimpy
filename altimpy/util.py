@@ -126,9 +126,6 @@ class Mask(object):
         mask = fin.getNode(mask).read()
         print 'mask loaded from:', fin
         fin.close()
-        if ism(x):  # if coords in m, convert to km
-            x = x * 1e-3
-            y = y * 1e-3
         self.mask_x = x
         self.mask_y = y
         self.mask_z = mask
@@ -142,7 +139,7 @@ class Mask(object):
             lon, lat = np.meshgrid(lon, lat)       # 1d -> 2d
             lon, lat = lon.ravel(), lat.ravel()
         if coord == 'lon/lat':
-            arr_x, arr_y = ll2xy(lon, lat, **kw)   # lon/lat -> x/y
+            arr_x, arr_y = ll2xy(lon, lat, **kw)   # lon/lat -> x/y (m)
         else:
             arr_x, arr_y = lon, lat
         arr_x, arr_y = np.rint(arr_x), np.rint(arr_y)
@@ -160,7 +157,7 @@ class Mask(object):
 
 
 def ism(x):
-    """Check if in meters."""
+    """Check if units are m."""
     return True if (int(math.log10(np.max(x)) + 1) > 4) else False
 
 

@@ -11,6 +11,8 @@ import tables as tb
 import datetime as dt
 import netCDF4 as nc
 
+from altimpy import ism
+
 
 # definition of Table structures for HDF5 files
 
@@ -170,10 +172,11 @@ class NetCDF(object):
         self.file.close()
 
 
-def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90):
+def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     """Reads a GeoTIFF image and returns the respective 2d array.
 
     It assumes polar stereographic proj.
+    If units == 'km', converts x/y from m to km.
 
     Return
     ------
@@ -184,8 +187,9 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90):
     Notes
     -----
     MOA parameters: http://nsidc.org/data/moa/users_guide.html
-    lat_ts is standard lat (lat of true scale), or "latitude_of_origin"
-    lon_0/lat_0 is proj center (NOT grid center!)
+    lat_ts is standard lat (lat of true scale), or "latitude_of_origin".
+    lon_0/lat_0 is proj center (NOT grid center!).
+    The MOA image has x/y units in m.
 
     To get GeoTIFF metadata:
 
@@ -209,8 +213,8 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90):
     xmin = gt[0]
     ymax = gt[3]
     # from: http://gdal.org/gdal_datamodel.html
-    ymin = ymax + nx*gt[4] + ny*dy 
-    xmax = xmin + nx*dx + ny*gt[2] 
+    ymin = ymax + nx * gt[4] + ny * dy 
+    xmax = xmin + nx * dx + ny * gt[2] 
     # Polar stereo coords x,y
     x = np.arange(xmin, xmax, dx)    
     # in reverse order -> raster origin = urcrn
@@ -222,9 +226,12 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90):
     xmin, ymin = p1(bbox_xy[0], bbox_xy[1], inverse=True)
     xmax, ymax = p1(bbox_xy[2], bbox_xy[3], inverse=True)
     bbox_ll = (xmin, ymin, xmax, ymax)
+    print 'XXXXXXXXXXXXXXXX', x
+    if units == 'km' and ism(x):  # if coords in m, convert to km
+        x /= 1e3
+        y /= 1e3
+    print 'XXXXXXXXXXXXXXXX', x
     print 'image limits (left/right/bottom/top):'
     print '(x,y)', bbox_xy[0], bbox_xy[2], bbox_xy[1], bbox_xy[3]
     print '(lon,lat)', bbox_ll[0], bbox_ll[2], bbox_ll[1], bbox_ll[3]
     return [x, y, img, bbox_ll]
-
-
