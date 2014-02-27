@@ -226,11 +226,9 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     xmin, ymin = p1(bbox_xy[0], bbox_xy[1], inverse=True)
     xmax, ymax = p1(bbox_xy[2], bbox_xy[3], inverse=True)
     bbox_ll = (xmin, ymin, xmax, ymax)
-    print 'XXXXXXXXXXXXXXXX', x
     if units == 'km' and ism(x):  # if coords in m, convert to km
         x /= 1e3
         y /= 1e3
-    print 'XXXXXXXXXXXXXXXX', x
     print 'image limits (left/right/bottom/top):'
     print '(x,y)', bbox_xy[0], bbox_xy[2], bbox_xy[1], bbox_xy[3]
     print '(lon,lat)', bbox_ll[0], bbox_ll[2], bbox_ll[1], bbox_ll[3]

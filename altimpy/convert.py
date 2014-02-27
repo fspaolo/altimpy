@@ -256,8 +256,8 @@ def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
     y =  RHO * T * np.cos(lon2)
 
     if units == 'm':            # computations are done in km
-        x *= 1000.
-        y *= 1000.
+        x *= 1e3
+        y *= 1e3
 
     print 'done.'
     return [x, y]

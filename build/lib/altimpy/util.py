@@ -139,7 +139,7 @@ class Mask(object):
             lon, lat = np.meshgrid(lon, lat)       # 1d -> 2d
             lon, lat = lon.ravel(), lat.ravel()
         if coord == 'lon/lat':
-            arr_x, arr_y = ll2xy(lon, lat, **kw)   # lon/lat -> x/y
+            arr_x, arr_y = ll2xy(lon, lat, **kw)   # lon/lat -> x/y (m)
         else:
             arr_x, arr_y = lon, lat
         arr_x, arr_y = np.rint(arr_x), np.rint(arr_y)
