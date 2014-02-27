@@ -190,7 +190,7 @@ colormap_lib = {
 def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90):
     """Reads a GeoTIFF image and returns the respective 2D array.
 
-    (it assumes polar stereographic proj)
+    It assumes polar stereographic proj.
 
     Return
     ------
