@@ -59,9 +59,11 @@ class Kriging2d(object):
 
         return [y_pred, np.sqrt(MSE)]
 
-    def interpolate(self, field, mask, lat2d, lon2d):
-        """Interpolate missing points in 'field' according to 'mask'.
+    def interpolate(self, field, mask, lon, lat):
+        """Interpolate missing points in 'field' defined on 'mask' (value=1).
         """
+        if np.dim(lon) == 1:
+            lon2d, lat2d = np.meshgrid(lon, lat)
         error = np.empty_like(field) * np.nan
 
         ij_samp = np.where((mask == 1) & (~np.isnan(field)))

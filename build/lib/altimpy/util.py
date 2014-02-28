@@ -617,7 +617,7 @@ def regrid2d(arr3d, x, y, inc_by=2):
             pass
         ##########################################################
         out[k] = field2
-    return [out, xx, yy]
+    return [out, xi, yi]
 
 
 def get_dydx(time, arr3d):
