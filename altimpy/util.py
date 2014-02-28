@@ -595,7 +595,7 @@ def regrid(x, y, arr, inc_by=2):
         arr2[ind] = arr1[ind]
     except:
         pass
-    return [xx, yy, arr2]
+    return [xi, yi, arr2]
 
 
 def regrid2d(arr3d, x, y, inc_by=2):
