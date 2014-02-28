@@ -202,7 +202,7 @@ def align_data_with_fig(x, y, data, res=10):
     return [x, y, data]
 
 
-def plot_moa_subreg(m, x, y, data, bbox, res=10):
+def plot_moa_subreg(m, x, y, data, bbox, res=10, **kw):
     """Plot MOA image subregion defined by projection 'm'.
     
     m : Basemap projection defining subregion
@@ -229,7 +229,7 @@ def plot_moa_subreg(m, x, y, data, bbox, res=10):
     y2 = y[i[0]:i[-1]]
     # plot MOA img
     data2 = np.ma.masked_values(data2, 0)
-    m.imshow(data2, cmap=cm.gray)
+    m.imshow(data2, cmap=cm.gray, **kw)
     return [m, x2, y2, data2]
 
 
