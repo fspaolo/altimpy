@@ -73,11 +73,11 @@ def create_colormap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True,
     return np.array([v, r, g, b, a])
 
 
-def cpt(*args, **kwargs):
+def cpt(*args, **kw):
     """
     GMT style colormap. See `create_colormap` for details.
     """
-    v, r, g, b, a = create_colormap(*args, **kwargs)
+    v, r, g, b, a = create_colormap(*args, **kw)
     cmap = ''
     fmt = '%-10r %3.0f %3.0f %3.0f     %-10r %3.0f %3.0f %3.0f\n'
     for i in range(len(v) - 1):
@@ -290,9 +290,9 @@ def plot_grid_proj(m, lon, lat, grid, shift=True, masked=True,
     """
     if np.ndim(lon) == 1:
         lon, lat = np.meshgrid(lon, lat)
-    #if shift:
-    #    lon -= (lon[1] - lon[0])/2.
-    #    lat -= (lat[1] - lat[0])/2.
+    if shift:
+        lon -= (lon[1] - lon[0]) / 2.
+        lat -= (lat[1] - lat[0]) / 2.
     # map lon/lat into proj and fig coords.
     xx, yy = m(lon, lat)    
     if masked:
@@ -330,17 +330,17 @@ def get_gtif_subreg(m, filename, res=10):
 ### Matplotlib utilities
 
 def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, 
-         npmb=16, **kwargs):
+         npmb=16, **kw):
     """
     Matplotlib text command augmented with poor man's bold.
     """
-    h = [ax.text(x, y, s, **kwargs)]
+    h = [ax.text(x, y, s, **kw)]
     h[0].zorder += 1
     if edgecolor is not None:
-        if 'bbox' in kwargs:
-            del(kwargs['bbox'])
-        kwargs['color'] = edgecolor
-        kwargs['alpha'] = edgealpha
+        if 'bbox' in kw:
+            del(kw['bbox'])
+        kw['color'] = edgecolor
+        kw['alpha'] = edgealpha
         aspect = ax.get_aspect()
         dx, dy = ax.get_position().size * ax.figure.get_size_inches() * 72.0
         x1, x2 = ax.get_xbound()
@@ -358,14 +358,14 @@ def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75,
             y_ = y + dy * np.sin(phi)
             #x_ = x + dx * np.maximum(-m, np.minimum(m, np.cos(phi)))
             #y_ = y + dy * np.maximum(-m, np.minimum(m, np.sin(phi)))
-            h += [ax.text(x_, y_, s, **kwargs)]
+            h += [ax.text(x_, y_, s, **kw)]
     return h
 
 
-def colormap(*args, **kwargs):
+def colormap(*args, **kw):
     """Matplotlib enhanced colormap. See `create_colormap` for details."""
     from matplotlib.colors import LinearSegmentedColormap
-    v, r, g, b, a = create_colormap(*args, **kwargs)
+    v, r, g, b, a = create_colormap(*args, **kw)
     n = 2001
     cmap = { 'red':np.c_[v, r, r],
            'green':np.c_[v, g, g],
@@ -376,8 +376,12 @@ def colormap(*args, **kwargs):
 
 def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None, 
              ticklabels=None, boxcolor='k', boxalpha=1.0, 
-             boxwidth=0.2, **kwargs):
-    """Matplotlib enhanced colorbar."""
+             boxwidth=0.2, **kw):
+    """Matplotlib enhanced colorbar.
+    
+    Original by Geoffrey Ely.
+    Modified by Fernando Paolo.
+    """
     if rect is None:
         rect = 0.25, 0.04, 0.5, 0.02
     axis = clim[0], clim[1], 0, 1
@@ -391,20 +395,24 @@ def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None,
     ax.axis(axis)
     if title:
         x = 0.5 * (clim[0] + clim[1])
-        text(ax, x, 2, title, ha='center', va='baseline', **kwargs)
+        text(ax, x, 2, title, ha='center', va='baseline', **kw)
     if ticks is None:
         ticks = clim[0], 0.5 * (clim[0] + clim[1]), clim[1]
     if ticklabels is None:
         ticklabels = ticks
     for i, x in enumerate(ticks):
         s = '%s' % ticklabels[i]
-        text(ax, x, -0.6, s, ha='center', va='top', **kwargs)
+        text(ax, x, -0.6, s, ha='center', va='top', **kw)
     return ax
 
 
-def lengthscale(ax, x, y, w=None, label='%s', style='k-', **kwargs):
-    """
-    Draw a length scale bar between the points (x[0], y[0]) and (x[1], y[1]).
+def lengthscale(ax, x, y, w=None, label='%s', style='k-', linewidth=1, 
+                color='k', **kw):
+    """Draw a length scale bar between the points (x[0], y[0]) and (x[1], 
+    y[1]).
+
+    Original by Geoffrey Ely.
+    Modified by Fernando Paolo.
     """
     x0 = 0.5 * (x[0] + x[1])
     y0 = 0.5 * (y[0] + y[1])
@@ -429,16 +437,17 @@ def lengthscale(ax, x, y, w=None, label='%s', style='k-', **kwargs):
     y =  0, 0, np.nan, -w,  w, np.nan, -w, w
     x, y = 0.5 / l * np.dot(rot, [x, y])
     theta = np.arctan2(dy, dx) * 180.0 / np.pi
-    h1 = ax.plot(x0 + x, y0 + y, style, clip_on=False)
-    h2 = text(ax, x0, y0, label, ha='center', va='center', rotation=theta, **kwargs)
+    h1 = ax.plot(x0 + x, y0 + y, style, clip_on=False, lw=linewidth, c=color)
+    h2 = text(ax, x0, y0, label, ha='center', va='center', rotation=theta, 
+              color=color, **kw)
     return h1, h2
 
 
-def compass_rose(ax, x, y, r, style='k-', **kwargs):
+def compass_rose(ax, x, y, r, style='k-', **kw):
     theta = 0.0
-    if 'rotation' in kwargs:
-        theta = kwargs['rotation']
-    kwargs.update(rotation_mode='anchor')
+    if 'rotation' in kw:
+        theta = kw['rotation']
+    kw.update(rotation_mode='anchor')
     c  = np.cos(theta / 180.0 * np.pi)
     s  = np.sin(theta / 180.0 * np.pi)
     x_ = x + r * np.array([(c,  s), (-c, -s)])
@@ -447,15 +456,15 @@ def compass_rose(ax, x, y, r, style='k-', **kwargs):
     x_ = x + r * np.array([(c, -c), (s, -s)]) * 1.3
     y_ = y + r * np.array([(s, -s), (-c,  c)]) * 1.3
     h += [
-        text(ax, x_[0,0], y_[0,0], 'E', ha='left', va='center', **kwargs),
-        text(ax, x_[0,1], y_[0,1], 'W', ha='right', va='center', **kwargs),
-        text(ax, x_[1,0], y_[1,0], 'S', ha='center', va='top', **kwargs),
-        text(ax, x_[1,1], y_[1,1], 'N', ha='center', va='bottom', **kwargs),
+        text(ax, x_[0,0], y_[0,0], 'E', ha='left', va='center', **kw),
+        text(ax, x_[0,1], y_[0,1], 'W', ha='right', va='center', **kw),
+        text(ax, x_[1,0], y_[1,0], 'S', ha='center', va='top', **kw),
+        text(ax, x_[1,1], y_[1,1], 'N', ha='center', va='bottom', **kw),
     ]
     return h
 
 
-def savefig(fig, fh=None, format=None, distill=False, **kwargs):
+def savefig(fig, fh=None, format=None, distill=False, **kw):
     """
     Enhanced version of Matplotlib savefig command.
 
@@ -473,18 +482,18 @@ def savefig(fig, fh=None, format=None, distill=False, **kwargs):
             format = 'array'
     out = cStringIO.StringIO()
     if format == 'array':
-        if 'dpi' not in kwargs:
-            kwargs['dpi'] = fig.dpi
-        dpi = kwargs['dpi']
+        if 'dpi' not in kw:
+            kw['dpi'] = fig.dpi
+        dpi = kw['dpi']
         n = fig.get_size_inches()
         n = int(n[1] * dpi), int(n[0] * dpi), 4
-        fig.savefig(out, format='raw', **kwargs)
+        fig.savefig(out, format='raw', **kw)
         out = np.fromstring(out.getvalue(), 'u1').reshape(n)
     elif distill and format == 'pdf':
-        fig.savefig(out, format='eps', **kwargs)
+        fig.savefig(out, format='eps', **kw)
         out = distill_eps(out)
     else:
-        fig.savefig(out, format=format, **kwargs)
+        fig.savefig(out, format=format, **kw)
         out.reset()
     if fh is None:
         return(out)
@@ -547,7 +556,7 @@ def digitize2(img, xlim=(-1, 1), ylim=(-1, 1), color='r'):
     return xr, yr
 
 
-def contour(*args, **kwargs):
+def contour(*args, **kw):
     """
     Extract contour polygons using matplotlib.
     """
@@ -556,7 +565,7 @@ def contour(*args, **kwargs):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     if concat:
-        for cc in ax.contour(*args, **kwargs).collections:
+        for cc in ax.contour(*args, **kw).collections:
             p = []
             for c in cc.get_paths():
                 p += c.to_polygons() + [[[np.nan, np.nan]]]
@@ -566,7 +575,7 @@ def contour(*args, **kwargs):
             else:
                 pp += [None]
     else:
-        for cc in ax.contour(*args, **kwargs).collections:
+        for cc in ax.contour(*args, **kw).collections:
             p = []
             for c in cc.get_paths():
                 p += c.to_polygons()
@@ -575,7 +584,7 @@ def contour(*args, **kwargs):
     return pp
 
 
-def intitle(title='', loc=1, size=None, ax=None, **kwargs):
+def intitle(title='', loc=1, size=None, ax=None, **kw):
     """Add title inside the figure, same locations as 'label'.
 
     Examples
@@ -602,7 +611,7 @@ def intitle(title='', loc=1, size=None, ax=None, **kwargs):
         #fig, axs = plt.gcf(), plt.gca()
         #ax = fig.add_subplot(axs.numRows, axs.numCols, fig.number)
     at = AnchoredText(title, loc=loc, prop=size, pad=0., 
-                      borderpad=0.5, frameon=False, **kwargs)
+                      borderpad=0.5, frameon=False, **kw)
     ax.add_artist(at)
     at.txt._text.set_path_effects([withStroke(foreground="w", linewidth=4)])
     at.patch.set_alpha(0.5)

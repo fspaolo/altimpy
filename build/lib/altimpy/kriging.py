@@ -60,7 +60,7 @@ class Kriging2d(object):
         return [y_pred, np.sqrt(MSE)]
 
     def interpolate(self, field, mask, lon, lat):
-        """Interpolate missing cells in 'field' defined on 'mask' (value=1).
+        """Interpolate missing cells in 'field' defined on 'mask' (values=1).
         """
         if np.ndim(lon) == 1:
             lon2d, lat2d = np.meshgrid(lon, lat)
