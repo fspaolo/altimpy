@@ -187,7 +187,7 @@ colormap_lib = {
 
 ### Map projection utilities
 
-def align_data_with_fig(x, y, data, res=1):
+def align_data_with_fig(x, y, data):
     """Align map grid with figure frame.
     
     Map proj origin (x0,y0) is at the center of the grid 
@@ -196,24 +196,23 @@ def align_data_with_fig(x, y, data, res=1):
     """
     x = np.asarray(x)
     y = np.asarray(y)
-    x = x[::res] - x.min()        # shift
-    y = y[::-res] - y.min()       # reverse y-dim and shift
-    data = data[::-res, ::res]    # reverse y-dim
+    x = x - x.min()             # shift
+    y = y[::-1] - y.min()       # reverse y-dim and shift
+    data = data[::-1,:]         # reverse y-dim
     return [x, y, data]
 
 
-def plot_moa_subreg(m, x, y, data, bbox, res=10, **kw):
+def plot_moa_subreg(m, x, y, data, bbox, **kw):
     """Plot MOA image subregion defined by projection 'm'.
     
     m : Basemap projection defining subregion
     x, y : 1d arrays of coordinates
     data : 2d array with MOA image
     bbox : low-left and upp-right lon/lat
-    res : resolution, step size to be plotted
     """
     bbox_sub = (m.llcrnrlon, m.llcrnrlat, m.urcrnrlon, m.urcrnrlat) 
     # fig coords
-    x, y, data = align_data_with_fig(x, y, data, res) 
+    x, y, data = align_data_with_fig(x, y, data) 
     # MOA coords m -> km
     x /= 1e3; y /= 1e3
     # MOA fig domain
@@ -304,12 +303,14 @@ def plot_grid_proj(m, lon, lat, grid, shift=True, masked=True,
     return m
 
 
-def get_gtif_subreg(m, filename, res=10):
+def get_gtif_subreg(m, filename, res=1):
     bbox_sub = (m.llcrnrlon, m.llcrnrlat, m.urcrnrlon, m.urcrnrlat) 
     # img coords (assuming polar stere)
     x, y, data, bbox_ll = get_gtif(filename, lat_ts=-71)          
+    # downsample
+    x, y, data = x[::res], y[::res], data[::res,::res]
     # img coords -> fig coords
-    x, y, data = align_data_with_fig(x, y, data, res) 
+    x, y, data = align_data_with_fig(x, y, data) 
     # fig domain
     m1 = make_proj_stere(bbox_ll)
     # subregion corners in fig coords 
