@@ -443,7 +443,11 @@ def lengthscale(ax, x, y, w=None, label='%s', style='k-', linewidth=1,
     return h1, h2
 
 
-def compass_rose(ax, x, y, r, style='k-', **kw):
+def compassrose(ax, x, y, r, style='k-', **kw):
+    """
+    Original by Geoffrey Ely.
+    Modified by Fernando Paolo.
+    """
     theta = 0.0
     if 'rotation' in kw:
         theta = kw['rotation']

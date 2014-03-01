@@ -331,8 +331,7 @@ def get_gtif_subreg(m, filename, res=10):
 
 def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, 
          npmb=16, **kw):
-    """
-    Matplotlib text command augmented with poor man's bold.
+    """Matplotlib text command augmented with poor man's bold.
     """
     h = [ax.text(x, y, s, **kw)]
     h[0].zorder += 1
@@ -363,7 +362,10 @@ def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75,
 
 
 def colormap(*args, **kw):
-    """Matplotlib enhanced colormap. See `create_colormap` for details."""
+    """Matplotlib enhanced colormap. 
+    
+    See `create_colormap` for details.
+    """
     from matplotlib.colors import LinearSegmentedColormap
     v, r, g, b, a = create_colormap(*args, **kw)
     n = 2001
@@ -375,8 +377,7 @@ def colormap(*args, **kw):
 
 
 def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None, 
-             ticklabels=None, boxcolor='k', boxalpha=1.0, 
-             boxwidth=0.2, **kw):
+             ticklabels=None, boxcolor='k', boxalpha=1.0, boxwidth=0.2, **kw):
     """Matplotlib enhanced colorbar.
     
     Original by Geoffrey Ely.
@@ -444,6 +445,10 @@ def lengthscale(ax, x, y, w=None, label='%s', style='k-', linewidth=1,
 
 
 def compassrose(ax, x, y, r, style='k-', **kw):
+    """
+    Original by Geoffrey Ely.
+    Modified by Fernando Paolo.
+    """
     theta = 0.0
     if 'rotation' in kw:
         theta = kw['rotation']
@@ -455,12 +460,10 @@ def compassrose(ax, x, y, r, style='k-', **kw):
     h  = [ax.plot(x_, y_, style, clip_on=False)]
     x_ = x + r * np.array([(c, -c), (s, -s)]) * 1.3
     y_ = y + r * np.array([(s, -s), (-c,  c)]) * 1.3
-    h += [
-        text(ax, x_[0,0], y_[0,0], 'E', ha='left', va='center', **kw),
-        text(ax, x_[0,1], y_[0,1], 'W', ha='right', va='center', **kw),
-        text(ax, x_[1,0], y_[1,0], 'S', ha='center', va='top', **kw),
-        text(ax, x_[1,1], y_[1,1], 'N', ha='center', va='bottom', **kw),
-    ]
+    h += [text(ax, x_[0,0], y_[0,0], 'E', ha='left', va='center', **kw),
+          text(ax, x_[0,1], y_[0,1], 'W', ha='right', va='center', **kw),
+          text(ax, x_[1,0], y_[1,0], 'S', ha='center', va='top', **kw),
+          text(ax, x_[1,1], y_[1,1], 'N', ha='center', va='bottom', **kw),]
     return h
 
 
