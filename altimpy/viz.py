@@ -187,8 +187,8 @@ colormap_lib = {
 
 ### Map projection utilities
 
-def align_data_with_fig(x, y, data, res=10):
-    """Align map grid with figure frame. 
+def align_data_with_fig(x, y, data, res=1):
+    """Align map grid with figure frame.
     
     Map proj origin (x0,y0) is at the center of the grid 
     (polar stereo) and y-dim increases up, figure origin is at 
