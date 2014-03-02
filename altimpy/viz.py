@@ -202,17 +202,17 @@ def align_data_with_fig(x, y, data):
     return [x, y, data]
 
 
-def plot_moa_subreg(m, x, y, data, bbox, **kw):
+def plot_moa_subreg(m, x, y, moa, bbox, cmap=cm.gray, **kw):
     """Plot MOA image subregion defined by projection 'm'.
     
     m : Basemap projection defining subregion
     x, y : 1d arrays of coordinates
-    data : 2d array with MOA image
+    moa : 2d array with MOA image
     bbox : low-left and upp-right lon/lat
     """
     bbox_sub = (m.llcrnrlon, m.llcrnrlat, m.urcrnrlon, m.urcrnrlat) 
     # fig coords
-    x, y, data = align_data_with_fig(x, y, data) 
+    x, y, moa = align_data_with_fig(x, y, moa) 
     # MOA coords m -> km
     x /= 1e3; y /= 1e3
     # MOA fig domain
@@ -223,13 +223,12 @@ def plot_moa_subreg(m, x, y, data, bbox, **kw):
     # select MOA subregion
     j, = np.where((x0 < x) & (x < x1))
     i, = np.where((y0 < y) & (y < y1))
-    data2 = data[i[0]:i[-1], j[0]:j[-1]]
+    moa2 = moa[i[0]:i[-1], j[0]:j[-1]]
     x2 = x[j[0]:j[-1]]
     y2 = y[i[0]:i[-1]]
     # plot MOA img
-    data2 = np.ma.masked_values(data2, 0)
-    m.imshow(data2, cmap=cm.gray, **kw)
-    return [m, x2, y2, data2]
+    m.imshow(moa2, cmap=cmap, **kw)
+    return [m, x2, y2, moa2]
 
 
 def make_proj_stere(bbox, lat_ts=-71, lon_0=0, lat_0=-90):

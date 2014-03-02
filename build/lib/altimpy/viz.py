@@ -187,7 +187,7 @@ colormap_lib = {
 
 ### Map projection utilities
 
-def align_data_with_fig(x, y, data, res=1):
+def align_data_with_fig(x, y, data):
     """Align map grid with figure frame.
     
     Map proj origin (x0,y0) is at the center of the grid 
@@ -196,24 +196,23 @@ def align_data_with_fig(x, y, data, res=1):
     """
     x = np.asarray(x)
     y = np.asarray(y)
-    x = x[::res] - x.min()        # shift
-    y = y[::-res] - y.min()       # reverse y-dim and shift
-    data = data[::-res, ::res]    # reverse y-dim
+    x = x - x.min()             # shift
+    y = y[::-1] - y.min()       # reverse y-dim and shift
+    data = data[::-1,:]         # reverse y-dim
     return [x, y, data]
 
 
-def plot_moa_subreg(m, x, y, data, bbox, res=10, **kw):
+def plot_moa_subreg(m, x, y, moa, bbox, cmap=cm.gray, **kw):
     """Plot MOA image subregion defined by projection 'm'.
     
     m : Basemap projection defining subregion
     x, y : 1d arrays of coordinates
-    data : 2d array with MOA image
+    moa : 2d array with MOA image
     bbox : low-left and upp-right lon/lat
-    res : resolution, step size to be plotted
     """
     bbox_sub = (m.llcrnrlon, m.llcrnrlat, m.urcrnrlon, m.urcrnrlat) 
     # fig coords
-    x, y, data = align_data_with_fig(x, y, data, res) 
+    x, y, moa = align_data_with_fig(x, y, moa) 
     # MOA coords m -> km
     x /= 1e3; y /= 1e3
     # MOA fig domain
@@ -224,13 +223,12 @@ def plot_moa_subreg(m, x, y, data, bbox, res=10, **kw):
     # select MOA subregion
     j, = np.where((x0 < x) & (x < x1))
     i, = np.where((y0 < y) & (y < y1))
-    data2 = data[i[0]:i[-1], j[0]:j[-1]]
+    moa2 = moa[i[0]:i[-1], j[0]:j[-1]]
     x2 = x[j[0]:j[-1]]
     y2 = y[i[0]:i[-1]]
     # plot MOA img
-    data2 = np.ma.masked_values(data2, 0)
-    m.imshow(data2, cmap=cm.gray, **kw)
-    return [m, x2, y2, data2]
+    m.imshow(moa2, cmap=cmap, **kw)
+    return [m, x2, y2, moa2]
 
 
 def make_proj_stere(bbox, lat_ts=-71, lon_0=0, lat_0=-90):
@@ -304,12 +302,14 @@ def plot_grid_proj(m, lon, lat, grid, shift=True, masked=True,
     return m
 
 
-def get_gtif_subreg(m, filename, res=10):
+def get_gtif_subreg(m, filename, res=1):
     bbox_sub = (m.llcrnrlon, m.llcrnrlat, m.urcrnrlon, m.urcrnrlat) 
     # img coords (assuming polar stere)
     x, y, data, bbox_ll = get_gtif(filename, lat_ts=-71)          
+    # downsample
+    x, y, data = x[::res], y[::res], data[::res,::res]
     # img coords -> fig coords
-    x, y, data = align_data_with_fig(x, y, data, res) 
+    x, y, data = align_data_with_fig(x, y, data) 
     # fig domain
     m1 = make_proj_stere(bbox_ll)
     # subregion corners in fig coords 
