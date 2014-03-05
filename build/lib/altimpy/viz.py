@@ -5,6 +5,7 @@ Notes
 -----
 Some of the functionalities were taken/modified from:
 http://earth.usc.edu/~gely/coseis/www/index.html
+https://github.com/gely/coseis
 
 """
 # Fernando Paolo <fpaolo@ucsd.edu>
@@ -376,6 +377,24 @@ def colormap(*args, **kw):
     return cmap
 
 
+# THIS NEEDS TO BE CHANGED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+def colormap2(*args, **kwargs):
+    """
+    Mayavi colormap. See viz.colormap for details.
+    """
+    import numpy as np
+    cmap = create_colormap(*args, **kwargs)
+    v, r, g, b, a = cmap
+    if len(v) < 1001:
+        vi = np.linspace(v[0], v[-1], 2001)
+        r = np.interp(vi, v, r)
+        g = np.interp(vi, v, g)
+        b = np.interp(vi, v, b)
+        a = np.interp(vi, v, a)
+        cmap = np.array([r, g, b, a])
+    return 255 * cmap.T
+
+
 def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None, 
              ticklabels=None, boxcolor='k', boxalpha=1.0, boxwidth=0.2, **kw):
     """Matplotlib enhanced colorbar.
@@ -691,6 +710,113 @@ def hinton(m, maxweight=None):
                       'black')
     if reenable:
         plt.ion()
+
+
+"""
+Matplotlib module enables hillshade method (shade) using a LightSource class
+(v 0.99). The problem is it uses the data itself as intensity and data. It is
+very useful for viewing a DEM but sometimes you would like the DEM as intensity
+underlying some other data. Another problem is that the shade method is
+producing a very light colored image sometimes even white where intensity is
+high.
+
+The difference in the shading colors derived from the method used to produce
+it. While the matplotlib method uses "hard light" method I use a "soft light"
+method. the matplotlib is converting the RGB colors to HSV and then calculate
+the new saturation and value according to the intensity. I use a formula based
+on the description of ImageMagick's pegtop_light.which is much faster as it is
+a single formula. Another advantage is the option to use a separate layer as
+the intensity and another as the data used for colors.
+
+Functions modified from:
+http://rnovitsky.blogspot.com/2010/04/using-hillshade-image-as-intensity.html
+"""
+
+def shade(data, intensity=None, cmap=cm.jet, scale=10.0, azdeg=165.0, 
+          altdeg=45.0):
+    '''Sets shading for data array based on intensity layer or the data's value
+    itself.
+
+    Parameters
+    ----------
+    data : 2d array or masked array
+        The grid to shade.
+    intensity : 2d array of same size as data
+        The intensity layer for shading. If None, the data itself is used after
+        getting the hillshade values (see hillshade for more details).
+    cmap : colormap, default plt.cm.jet
+        e.g. matplotlib.colors.LinearSegmentedColormap instance.
+    scale, azdeg, altdeg : floats, default 10.0, 165.0, 45.0
+        Parameters for hilshade function (see there for more details).
+
+    Output
+    ------
+    rgb : rgb set of the 'Pegtop soft light composition' (see Notes) of the
+        data and intensity. It can be used as input for imshow().
+
+    Notes
+    -----
+    Based on ImageMagick's Pegtop_light:
+    http://www.imagemagick.org/Usage/compose/#pegtoplight
+
+    See also
+    --------
+    hillshade
+
+    '''
+    if intensity is None:
+        # hilshading the data
+        intensity = hillshade(data, scale=scale, azdeg=azdeg, altdeg=altdeg)
+    else:
+        # or normalize the intensity
+        intensity = (intensity - intensity.min()) / \
+                    (intensity.max() - intensity.min())
+    # get rgb of normalized data based on cmap
+    rgb = cmap((data - data.min()) / float(data.max() - data.min()))[:,:,:3]
+    # form an rgb eqvivalent of intensity
+    d = intensity.repeat(3).reshape(rgb.shape)
+    # simulate illumination based on pegtop algorithm.
+    rgb = 2 * d * rgb + (rgb**2) * (1 - 2 * d)
+    return rgb
+
+
+def hillshade(data, scale=10.0, azdeg=165.0, altdeg=45.0):
+    '''Convert data to hillshade based on matplotlib.colors.LightSource class.
+
+    Parameters
+    ----------
+    data : 2d array
+        The grid to be used as shading.
+    scale : float, default 10.0
+        Scaling value for shading. Higher number = lower gradient.
+    azdeg : float, default 165.0
+        Direction where the light comes from: 0=south, 90=east, 180=north,
+        270=west.
+    altdeg : float, default 45.0
+        Altitude where the light comes from: 0=horison, 90=zenith.
+
+    Output
+    ------
+    intensity : 2d array
+        Normalized hilshade.
+
+    See also
+    --------
+    shade
+
+    '''
+    # convert alt, az to radians
+    az = azdeg * np.pi / 180.0
+    alt = altdeg * np.pi / 180.0
+    # gradient in x and y directions
+    dx, dy = np.gradient(data/float(scale))
+    slope = 0.5 * np.pi - np.arctan(np.hypot(dx, dy))
+    aspect = np.arctan2(dx, dy)
+    intensity = np.sin(alt) * np.sin(slope) + np.cos(alt) * np.cos(slope) * \
+                np.cos(-az - aspect - 0.5 * np.pi)
+    intensity = (intensity - intensity.min()) / \
+                (intensity.max() - intensity.min())
+    return intensity
 
 
 def rcparams():
