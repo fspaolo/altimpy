@@ -73,6 +73,8 @@ class CircularList(list):
             raise TypeError
 
 
+# DEPRECATED. Use instead 'from mpl_toolkits.basemap import interp' with 
+# order=0 (nearest neighbor interpolation)
 class Mask(object):
     """Generate a mask for 2d array (in lat/lon).
     
