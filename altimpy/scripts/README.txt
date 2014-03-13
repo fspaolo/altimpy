@@ -35,16 +35,16 @@ Specific processing
 22. error/nobs propagation (serial, slow) [crosscalib3.py] code_ok... ok
 23. join backscatter correction (serial, slow) [backscatter2.py] code_ok... ok
 
-24. interpolate empty bins [kriging.py or spline.py] (but do not use interpolated values to cross-calib)!
+24. interpolate empty bins [kriging.py] (but do not use interpolated values to cross-calib)!
 25. post processing (reference, spherical->cartesian, filter, regrid...) [post_proc.py]
-
 
 # constant backscatter correction
 # tvariable backscatter correction
 
 Visualization
 -------------
-1. create XDMF to visualize in ParaView [write_xdmf.py]
+1. create file with multiple layers (for time dimension) [post_proc.py] (for XDMF)
+2. create XDMF for data/error/coord to visualize in ParaView [write_xdmf.py]
 
 
 [1] do not apply 'iterative' std to ICESat (and perhaps to any sat)

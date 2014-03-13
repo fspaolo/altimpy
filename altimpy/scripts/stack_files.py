@@ -63,22 +63,26 @@ fname2 = root + '_vec.txt'
 # matrix file
 #------------
 '''
-THIS PROVIDES THE BEST RESUT FOR MSSA (with full seasonal data)
+THIS PROVIDES THE BEST RESULT FOR MSSA (with full seasonal data)
 Using the following parameters:
 sampling: 0.25, Varimax: yes, PCA channels: 10, window: 26, components: 10
 Obs: do not detrend!
 '''
 d = pd.concat([pd.read_csv(f, usecols=[0]) for f in files], axis=1).dropna(1, 'all')
-#d = d.apply(hpfilter)
-#d = d.apply(gradient)
-d = d.apply(normalize)
-d.to_csv(fname1, sep=' ', header=False, index=False, float_format='%.6f')
-#d.to_csv(root+'_grad_mat.txt', sep=' ', header=False, index=False, float_format='%.6f')
-'''
-d = d.mean(axis=1)
-d = normalize(d)     
-d.to_csv(root+'_mean_vec.txt', sep=' ', header=False, index=False, float_format='%.6f')
-'''
+if 0:
+    d = d.apply(hpfilter)
+if 0:
+    d = d.apply(gradient)
+if 0:
+    d = d.apply(normalize)
+if 0:
+    # with time info
+    t = pd.read_csv(files[0], usecols=[2])
+    d.index = t['Time']
+    d.to_csv(fname1, sep=' ', header=False, index=True, float_format='%.6f')
+else:
+    # without time info
+    d.to_csv(fname1, sep=' ', header=False, index=False, float_format='%.6f')
 
 # vector file
 #------------

@@ -206,7 +206,7 @@ def linear_fit_robust(x, y, return_coef=False):
 
     If `return_coef=True` returns the slope (m) and intercept (c).
     """
-    import scikits.statsmodels.api as sm
+    import statsmodels.api as sm
     ind, = np.where((~np.isnan(x)) & (~np.isnan(y)))
     if len(ind) < 2: 
         return [np.nan, np.nan]
