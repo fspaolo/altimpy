@@ -623,7 +623,7 @@ def get_area_cells(grid, x, y):
         y -= dy/2.
         x = np.append(x, x[-1]+dx)
         y = np.append(y, y[-1]+dy)
-    C = EARTH_RADIUS**2 * D2R  # deg -> rad
+    C = EARTH_RADIUS_M**2 * D2R  # deg -> rad
     A = np.empty_like(grid)
     for i in xrange(ny):
         for j in xrange(nx):

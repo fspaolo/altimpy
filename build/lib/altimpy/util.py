@@ -73,6 +73,8 @@ class CircularList(list):
             raise TypeError
 
 
+# DEPRECATED. Use instead 'from mpl_toolkits.basemap import interp' with 
+# order=0 (nearest neighbor interpolation)
 class Mask(object):
     """Generate a mask for 2d array (in lat/lon).
     
@@ -204,7 +206,7 @@ def linear_fit_robust(x, y, return_coef=False):
 
     If `return_coef=True` returns the slope (m) and intercept (c).
     """
-    import scikits.statsmodels.api as sm
+    import statsmodels.api as sm
     ind, = np.where((~np.isnan(x)) & (~np.isnan(y)))
     if len(ind) < 2: 
         return [np.nan, np.nan]
@@ -213,8 +215,10 @@ def linear_fit_robust(x, y, return_coef=False):
     y_model = sm.RLM(y, X, M=sm.robust.norms.HuberT())
     y_fit = y_model.fit()
     if return_coef:
-        if len(y_fit.params) < 2: return (y_fit.params[0], 0.)
-        else: return y_fit.params[:]
+        if len(y_fit.params) < 2: 
+            return (y_fit.params[0], 0.)
+        else: 
+            return y_fit.params[:]
     else:
         return (x, y_fit.fittedvalues)
 
@@ -620,8 +624,8 @@ def regrid2d(arr3d, x, y, inc_by=2):
     return [out, xi, yi]
 
 
-def get_dydx(time, arr3d):
-    """Returns a 2d array with linear dy/dx per grid cell."""
+def get_dydx(time, arr3d, robust=False):
+    """Returns a 2d array with "linear" dy/dx per grid cell."""
     _, ny, nx = arr3d.shape
     dydx = np.zeros((ny, nx), 'f8') * np.nan
     for i in range(ny):
@@ -629,6 +633,9 @@ def get_dydx(time, arr3d):
             ii, = np.where(~np.isnan(arr3d[:,i,j]))
             if len(ii) < 3:
                 pass
+            elif robust:
+                m, c = linear_fit_robust(time, arr3d[:,i,j], return_coef=True)
+                dydx[i,j] = m
             else:
                 m, c = linear_fit(time, arr3d[:,i,j], return_coef=True)
                 dydx[i,j] = m
