@@ -18,7 +18,8 @@ import scipy.ndimage as ni
 import mpl_toolkits.basemap as bm
 from scipy.interpolate import UnivariateSpline as Spline
 
-from altimpy import ll2xy
+from altimpy import ll2xy, lon_180_360
+
 
 class CircularList(list):
     """A list that wraps around instead of throwing an index error.
@@ -707,3 +708,28 @@ def low2upp(m, k=0, mult=1):
         for i in range(j+k, ncols):
             m[j][i] = mult * m[i][j]
     return m
+
+
+def get_subreg(region, arr, x, y):
+    """Get subregion from a 2d/3d-array.
+
+    Parameters
+    ----------
+    region : (left, right, bottom, top)
+    arr : 2d/3d array to subset
+    x, y : 1d arrays with coordinates
+
+    Returns
+    -------
+    arr_sub, x_sub, y_sub : a subset of 'arr'
+
+    """
+    l, r, b, t = region
+    x = lon_180_360(x, region)
+    j, = np.where((l <= x) & (x <= r))
+    i, = np.where((b <= y) & (y <= t))
+    if len(j) == 0 or len(i) == 0:
+        raise ValueError('region given does not agree with coordinates!')
+    j1, j2 = j.min(), j.max()
+    i1, i2 = i.min(), i.max()
+    return arr[...,i1:i2,j1:j2], x[j1:j2], y[i1:i2]

@@ -18,7 +18,8 @@ import scipy.ndimage as ni
 import mpl_toolkits.basemap as bm
 from scipy.interpolate import UnivariateSpline as Spline
 
-from altimpy import ll2xy
+from altimpy import ll2xy, lon_180_360
+
 
 class CircularList(list):
     """A list that wraps around instead of throwing an index error.
@@ -724,7 +725,7 @@ def get_subreg(region, arr, x, y):
 
     """
     l, r, b, t = region
-    x = ap.lon_180_360(x, region)
+    x = lon_180_360(x, region)
     j, = np.where((l <= x) & (x <= r))
     i, = np.where((b <= y) & (y <= t))
     if len(j) == 0 or len(i) == 0:

@@ -8,10 +8,10 @@ import numpy as np
 PI = 3.1415926535897932384626433
 
 # Conversion from degrees to radians and vice-versa
-CDR = 180/PI    # to divide
-CRD = PI/180
-D2R = PI/180    # to multiply
-R2D = 180/PI
+CDR = 180 / PI    # to divide
+CRD = PI / 180
+D2R = PI / 180    # to multiply
+R2D = 180 / PI
 
 # Eccentricity of the Earth (squared)
 E2 = 6.694379852*1e-3 
@@ -31,6 +31,6 @@ JULIAN_YEAR = YEAR_IN_DAYS = 365.25
 DAY_IN_SECS = 86400.
 
 # From the above definitions it follows:
-YEAR_IN_SECS = JULIAN_YEAR*DAY_IN_SECS
-MONTH_IN_DAYS = JULIAN_YEAR/12
-MONTH_IN_SECS = MONTH_IN_DAYS*DAY_IN_SECS
+YEAR_IN_SECS = JULIAN_YEAR * DAY_IN_SECS
+MONTH_IN_DAYS = JULIAN_YEAR / 12
+MONTH_IN_SECS = MONTH_IN_DAYS * DAY_IN_SECS
