@@ -3,6 +3,12 @@ Module with definition of ice-shelf "boxes" and other regions.
 
 """
 # general regions
+ais = (0, 360, -90, -60),
+wais = (179, 311.5, -90, -60)
+eais1 = (0, 179, -85, -60)         # lon is 0/360!
+eais2 = (311.5, 360, -85, -60)
+eais1_no_rf = (0, 179, -77, -60)   # w/o Ross and Filchner 
+eais2_no_rf = (330, 360, -85, -60)
 antpen = (276, 310, -74.5, -64)
 amundsen = (220, 276, -76, -71)
 

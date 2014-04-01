@@ -180,7 +180,7 @@ def digitize(lon, lat, x_range, y_range, dx, dy):
     return (lon_d, lat_d, j_bins, i_bins, x_edges, y_edges, nx, ny)
 
 
-def linear_fit(x, y, return_coef=False):
+def linear_fit(x, y, return_coef=False, npts=None):
     """
     Fit a straight-line by Ordinary Least Squares.
 
@@ -196,9 +196,10 @@ def linear_fit(x, y, return_coef=False):
     if return_coef:
         return (m, c)
     else:
-        x_val = np.linspace(x.min(), x.max(), 200)
-        y_fit = m * x_val + c
-        return (x_val, y_fit)
+        if npts is not None:
+            x = np.linspace(x.min(), x.max(), npts)
+        y_fit = m * x + c
+        return (x, y_fit)
 
 
 def linear_fit_robust(x, y, return_coef=False):
