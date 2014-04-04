@@ -725,12 +725,13 @@ def get_subreg(region, arr, x, y):
     arr_sub, x_sub, y_sub : a subset of 'arr'
 
     """
+    arr2, x2, y2 = arr.copy(), x.copy(), y.copy()  # important!
     l, r, b, t = region
     x = lon_180_360(x, region)
-    j, = np.where((l <= x) & (x <= r))
-    i, = np.where((b <= y) & (y <= t))
+    j, = np.where((l <= x2) & (x2 <= r))
+    i, = np.where((b <= y2) & (y2 <= t))
     if len(j) == 0 or len(i) == 0:
         raise ValueError('region given does not agree with coordinates!')
     j1, j2 = j.min(), j.max()
     i1, i2 = i.min(), i.max()
-    return arr[...,i1:i2,j1:j2], x[j1:j2], y[i1:i2]
+    return arr2[...,i1:i2,j1:j2], x2[j1:j2], y2[i1:i2]
