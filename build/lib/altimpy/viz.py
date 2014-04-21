@@ -819,6 +819,42 @@ def hillshade(data, scale=10.0, azdeg=165.0, altdeg=45.0):
     return intensity
 
 
+def adjust_spines(ax, spines):
+    """Adjust the axis of a plot.
+
+    Example
+    -------
+    # display only 'y' and 'x-axis'
+    adjust_spines(ax, ['left', 'bottom'])
+
+    From
+    ----
+    http://matplotlib.org/examples/pylab_examples/spine_placement_demo.html
+
+    """
+    for loc, spine in ax.spines.items():
+        if loc in spines:
+            # outward by 10 points
+            spine.set_position(('outward', 10)) 
+            spine.set_smart_bounds(True)
+        else:
+            # don't draw spine
+            spine.set_color('none')             
+
+    # turn off ticks where there is no spine
+    if 'left' in spines:
+        ax.yaxis.set_ticks_position('left')
+    else:
+        # no yaxis ticks
+        ax.yaxis.set_ticks([])
+
+    if 'bottom' in spines:
+        ax.xaxis.set_ticks_position('bottom')
+    else:
+        # no xaxis ticks
+        ax.xaxis.set_ticks([])
+
+
 def rcparams():
     """Set optimal figure layout parameters."""
     plt.rcParams['font.family'] = 'arial'

@@ -33,7 +33,7 @@ Specific processing
 20. merge satellites (serial, extremely fast) [mergesats2.py] code_ok... ok
 21. cross calibration (serial, slow) [crosscalib2.py] code_ok... ok
 22. error/nobs propagation (serial, slow) [crosscalib3.py] code_ok... ok
-23. join backscatter correction (serial, slow) [backscatter2.py] code_ok... ok
+23. joint backscatter correction (serial, slow) [backscatter2.py] code_ok... ok
 
 24. interpolate empty bins [kriging.py] (but do not use interpolated values to cross-calib)!
 25. post processing (reference, spherical->cartesian, filter, regrid...) [post_proc.py]
