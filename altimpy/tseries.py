@@ -94,11 +94,11 @@ def backscatter_corr(H, G, diff=False, robust=False, plot=False):
     else:
         S, H0 = linear_fit(G2, H2, return_coef=True)
 
-   if plot:
-       plt.plot(G2, S*G2+H0, 'k')
-       plt.plot(G2, H2, 'ob')
-       plt.title('r = %.2f   s = %.2f   Ho = %.2f' % (R, S, H0))
-       plt.show()
+    if plot:
+        plt.plot(G2, S*G2+H0, 'k')
+        plt.plot(G2, H2, 'ob')
+        plt.title('r = %.2f   s = %.2f   Ho = %.2f' % (R, S, H0))
+        plt.show()
 
     # a) no correction applied if |R| < 0.2
     # b) fix values outside the range [-0.2, 0.7]
@@ -214,11 +214,11 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9, plot=False):
         SS[k] = S
         HH[k] = H0 
 
-       if plot:
-           plt.plot(G2, S*G2+H0, 'k')
-           plt.plot(G2, H2, 'ob')
-           plt.title('r = %.2f   s = %.2f   Ho = %.2f' % (R, S, H0))
-           plt.show()
+        if plot:
+            plt.plot(G2, S*G2+H0, 'k')
+            plt.plot(G2, H2, 'ob')
+            plt.title('r = %.2f   s = %.2f   Ho = %.2f' % (R, S, H0))
+            plt.show()
 
     # fill both ends
     RR[:l] = RR[l]

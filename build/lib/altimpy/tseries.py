@@ -14,13 +14,14 @@ from altimpy.util import *
 # Backscatter corrections
 #----------------------------------------------------------------
 
-def backscatter_corr(H, G, diff=False, robust=False): 
+def backscatter_corr(H, G, diff=False, robust=False, plot=False):
     """Apply the backscatter correction to an elevation-change time series.
 
     It uses constant correlation and sensitivity (transfer function).
 
-    Implements the correction using a time series of dAGC formed exactly as the
-    dh time series, following: Zwally, et al. (2005); Yi, et al. (2011):
+    Implements the correction using a time series of dAGC (or dsigma) formed
+    exactly as the dh time series, following: Zwally, et al. (2005); Yi, et
+    al. (2011):
         
         H_cor(t) = H(t) - S * G(t) - H0
 
@@ -39,6 +40,8 @@ def backscatter_corr(H, G, diff=False, robust=False):
     robust : boolean, default False
         Performs linear fit by robust regression (M-estimate), otherwise uses
         Ordinary Least Squares (default).
+    plot : boolean, default False
+        Plots the backscatter-elevation correlation.
 
     Returns
     -------
@@ -91,6 +94,12 @@ def backscatter_corr(H, G, diff=False, robust=False):
     else:
         S, H0 = linear_fit(G2, H2, return_coef=True)
 
+    if plot:
+        plt.plot(G2, S*G2+H0, 'k')
+        plt.plot(G2, H2, 'ob')
+        plt.title('r = %.2f   s = %.2f   Ho = %.2f' % (R, S, H0))
+        plt.show()
+
     # a) no correction applied if |R| < 0.2
     # b) fix values outside the range [-0.2, 0.7]
     if np.abs(R) < 0.2:                          
@@ -100,14 +109,14 @@ def backscatter_corr(H, G, diff=False, robust=False):
     elif S > 0.7:
         S = 0.7
 
-    #G0 = -H0 * (1. / S)
-    #H_cor = H - S * (G - G0)
-    H_cor = H - S * G - H0 
+    G0 = -H0 * S**(-1)
+    H_cor = H - S * (G - G0)
+    #H_cor = H - S * G - H0  # this is equivalent to the 2 lines above!
 
     return [H_cor, R, S]
 
 
-def backscatter_corr2(H, G, diff=False, robust=False, npts=9):
+def backscatter_corr2(H, G, diff=False, robust=False, npts=9, plot=False):
     """Apply the backscatter correction to an elevation-change time series.
 
     It uses time-variable correlation and sensitivity (transfer function).
@@ -135,6 +144,9 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9):
         Ordinary Least Squares (default).
     npts : int, optional
         Number of points used for correlation at each time (window size).
+    plot : boolean, default False
+        Plots the backscatter-elevation correlation.
+
 
     Returns
     -------
@@ -202,6 +214,12 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9):
         SS[k] = S
         HH[k] = H0 
 
+        if plot:
+            plt.plot(G2, S*G2+H0, 'k')
+            plt.plot(G2, H2, 'ob')
+            plt.title('r = %.2f   s = %.2f   Ho = %.2f' % (R, S, H0))
+            plt.show()
+
     # fill both ends
     RR[:l] = RR[l]
     SS[:l] = SS[l]
@@ -224,12 +242,14 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9):
     SS[jj] = np.nan
     HH[jj] = np.nan
 
-    H_cor = H - SS * G - HH
-    #H_cor = referenced(H_cor, to='first')
+    GG = -HH * SS**(-1)
+    H_cor = H - SS * (G - GG)
+    #H_cor = H - SS * G - HH  # this is equivalent to the 2 lines above!
 
     return [H_cor, RR, SS]
 
 
+# DEPRECATED! Needs revision.
 def backscatter_corr3(H, G, t, intervals, diff=False, robust=False, 
                       max_increase=None):
     """Apply the backscatter correction to an elevation-change time series.
