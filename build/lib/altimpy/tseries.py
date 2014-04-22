@@ -116,7 +116,8 @@ def backscatter_corr(H, G, diff=False, robust=False, plot=False):
     return [H_cor, R, S]
 
 
-def backscatter_corr2(H, G, diff=False, robust=False, npts=9, plot=False):
+def backscatter_corr2(H, G, diff=False, robust=False, npts=9, centered=False,
+                      plot=False):
     """Apply the backscatter correction to an elevation-change time series.
 
     It uses time-variable correlation and sensitivity (transfer function).
@@ -144,6 +145,9 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9, plot=False):
         Ordinary Least Squares (default).
     npts : int, optional
         Number of points used for correlation at each time (window size).
+    centered : boolean, default False
+        It centers the correlation window on each point, othewise the point of
+        calculation is at the begening of the window.
     plot : boolean, default False
         Plots the backscatter-elevation correlation.
 
@@ -181,13 +185,21 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9, plot=False):
     RR = np.empty(N, 'f8') * np.nan
     SS = np.empty(N, 'f8') * np.nan
     HH = np.empty(N, 'f8') * np.nan
-    l = int(npts/2.)
+    if centered:
+        l = int(npts/2.)
+        N2 = N
+    else:
+        l = npts
+        N2 = N-l
 
-    for k in range(N):
-        if k < l or k >= N-l: 
+    for k in range(N2):
+        if centered and (k < l or k >= N-l): 
             continue
         # take chunks (time window) every iteration
-        H2, G2 = H[k-l:k+l+1], G[k-l:k+l+1]    
+        if centered:
+            H2, G2 = H[k-l:k+l+1], G[k-l:k+l+1]    
+        else:
+            H2, G2 = H[k:k+l+1], G[k:k+l+1]    
         ind, = np.where((~np.isnan(H2)) & (~np.isnan(G2)))
         H2, G2 = H2[ind], G2[ind]
         if diff:
@@ -221,9 +233,10 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9, plot=False):
             plt.show()
 
     # fill both ends
-    RR[:l] = RR[l]
-    SS[:l] = SS[l]
-    HH[:l] = HH[l]
+    if centered:
+        RR[:l] = RR[l]
+        SS[:l] = SS[l]
+        HH[:l] = HH[l]
     RR[N-l:] = RR[N-l-1]
     SS[N-l:] = SS[N-l-1]
     HH[N-l:] = HH[N-l-1]
