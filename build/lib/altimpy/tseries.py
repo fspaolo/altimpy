@@ -6,6 +6,7 @@ Module with functions to construct and process time series.
 # August 6, 2013 
 
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.signal import detrend
 from altimpy.const import *
 from altimpy.util import *
@@ -75,12 +76,10 @@ def backscatter_corr(H, G, diff=False, robust=False, plot=False):
         return [H, np.nan, np.nan]
 
     if diff:
+        # diff -> N-1
         if isinstance(H2, pd.Series):
-            # pandas diff -> N (w/NaN)
-            H2, G2 = H2.diff(), G2.diff()
-            H2, G2 = H2[H2.notnull()], G2[G2.notnull()]
+            H2, G2 = np.diff(H2.values), np.diff(G2.values)
         else:
-            # numpy diff -> N-1
             H2, G2 = np.diff(H2), np.diff(G2)
     else:
         pass
@@ -151,7 +150,6 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9, centered=False,
     plot : boolean, default False
         Plots the backscatter-elevation correlation.
 
-
     Returns
     -------
     H_cor : array-like
@@ -203,12 +201,10 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9, centered=False,
         ind, = np.where((~np.isnan(H2)) & (~np.isnan(G2)))
         H2, G2 = H2[ind], G2[ind]
         if diff:
+            # diff -> N-1
             if isinstance(H2, pd.Series):
-                # pandas diff -> N (w/NaN)
-                H2, G2 = H2.diff(), G2.diff()
-                H2, G2 = H2[H2.notnull()], G2[G2.notnull()]
+                H2, G2 = np.diff(H2.values), np.diff(G2.values)
             else:
-                # numpy diff -> N-1
                 H2, G2 = np.diff(H2), np.diff(G2)
         else:
             pass
