@@ -102,15 +102,20 @@ def backscatter_corr(H, G, diff=False, robust=False, plot=False):
     # a) no correction applied if |R| < 0.2
     # b) fix values outside the range [-0.2, 0.7]
     if np.abs(R) < 0.2:                          
-        return [H, R, S]
+        S = 0.0
+        H0 = 0.0
     elif S < -0.2:
         S = -0.2
     elif S > 0.7:
         S = 0.7
+    else:
+        pass
 
+    '''
     G0 = -H0 * S**(-1)
     H_cor = H - S * (G - G0)
-    #H_cor = H - S * G - H0  # this is equivalent to the 2 lines above!
+    '''
+    H_cor = H - S * G - H0  # this is equivalent to the 2 lines above!
 
     return [H_cor, R, S]
 
@@ -251,9 +256,11 @@ def backscatter_corr2(H, G, diff=False, robust=False, npts=9, centered=False,
     SS[jj] = np.nan
     HH[jj] = np.nan
 
-    GG = -HH * SS**(-1)
+    '''
+    GG = -HH * SS**(-1)  # ambiguity when S = 0!
     H_cor = H - SS * (G - GG)
-    #H_cor = H - SS * G - HH  # this is equivalent to the 2 lines above!
+    '''
+    H_cor = H - SS * G - HH  # this is equivalent to the 2 lines above!
 
     return [H_cor, RR, SS]
 
