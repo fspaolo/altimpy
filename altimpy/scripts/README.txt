@@ -25,10 +25,10 @@ Specific processing
 13. find crossovers [mpi_ntasks.py, mpi_x2sys.py]. Warning: lon -/+180 is changed to 0/360!... ok
 14. predict tides: OTPSm, check struct idr/gla! (on Triton)... ok
 15. merge ad/da crossovers [mpi_merge.py, mpi_merge2.py] code_ok... ok
-16. average bins (and remove sector overlaps): xovers -> grid (read code header) [x2grid.py, run.py], [1] code_ok... ok
-17. join all subgrids in time/space (serial) [gridjoin.py] code_ok... ok
+16. average bins (and remove sector overlaps): xovers -> grid (read code header) [x2grid.py], [1] code_ok... ok
+17. join all subgrids in time/space (serial, slow) [gridjoin.py] code_ok... ok
 [apply ICESat biases here!]
-18. average time series: grid-cells (serial; read code header) [averagets2.py] code_ok... ok
+18. average time series: grid-cells (serial, very slow; read code header) [averagets2.py] code_ok... ok
 19. independent backscatter correction (serial, fast) [backscatter3.py] code_ok... ok
 20. merge satellites (serial, extremely fast) [mergesats2.py] code_ok... ok
 21. cross calibration (serial, slow) [crosscalib2.py] code_ok... ok
@@ -43,7 +43,7 @@ Specific processing
 
 Visualization
 -------------
-1. create file with multiple layers (for time dimension) [post_proc.py] (for XDMF)
+1. create file with multiple layers (2d arrays, for time dimension) [post_proc.py] (for XDMF)
 2. create XDMF for data/error/coord to visualize in ParaView [write_xdmf.py]
 
 

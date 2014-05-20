@@ -587,6 +587,41 @@ def gfilter2d(arr3d, sigma):
     return arr3d
 
 
+def mfilter(field, size, mode='reflect'):
+    """Median filter (smooth) a 2d field."""
+    ind = np.where(np.isnan(field))
+    field[ind] = 0
+    field = np.c_[field[:,-1], field, field[:,0]]  # add crossed borders!
+    field = ni.median_filter(field, size, mode=mode)
+    field = field[:,1:-1]                          # exclude borders
+    field[ind] = np.nan
+    return field
+
+
+def mfilter2d(arr3d, size, mode='reflect'):
+    """Median filter of 2d time series (3d array)."""
+    ind = np.where(np.isnan(arr3d))
+    #arr3d[ind] = 0  #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    for k, field in enumerate(arr3d):
+        field = np.c_[field[:,-1], field, field[:,0]]  # add borders
+        field = ni.median_filter(field, size, mode=mode)
+        arr3d[k] = field[:,1:-1]                       # exclude borders
+    arr3d[ind] = np.nan
+    return arr3d
+
+
+def rfilter2d(arr3d, rank, size, mode='reflect'):
+    """Rank filter of 2d time series (3d array)."""
+    ind = np.where(np.isnan(arr3d))
+    arr3d[ind] = 0  #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    for k, field in enumerate(arr3d):
+        field = np.c_[field[:,-1], field, field[:,0]]  # add borders
+        field = ni.rank_filter(field, rank=rank, size=size, mode=mode)
+        arr3d[k] = field[:,1:-1]                       # exclude borders
+    arr3d[ind] = np.nan
+    return arr3d
+
+
 def regrid(x, y, arr, inc_by=2):
     """Regrid a 2d array increasing its resolution."""
     ny, nx = arr.shape
