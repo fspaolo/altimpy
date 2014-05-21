@@ -63,7 +63,7 @@ def hpfilt(y, lamb=7):
 
 def timefilt(t, y, from_time=1991, to_time=2013):
     """Filter array based on time interval."""
-    k, = np.where((t > from_year) & (t < to_year))
+    k, = np.where((t > from_time) & (t < to_time))
     return t[k], y[k,...]
 
 
