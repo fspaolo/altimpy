@@ -53,7 +53,7 @@ def medfilt(arr, size=(3,3), min_pixels=3, **kw):
         else:
             m = np.median(valid_pixels)
         return m
-    return ni.generic_filter(arr, medfilt, size=size, **kw)
+    return ni.generic_filter(arr, median, size=size, **kw)
 
 
 def hpfilt(y, lamb=7):

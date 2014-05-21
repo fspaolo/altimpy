@@ -74,7 +74,7 @@ class CircularList(list):
             raise TypeError
 
 
-# DEPRECATED. Use instead 'from mpl_toolkits.basemap import interp' with 
+# DEPRECATED! Use instead 'from mpl_toolkits.basemap import interp' with 
 # order=0 (nearest neighbor interpolation)
 class Mask(object):
     """Generate a mask for 2d array (in lat/lon).
@@ -163,7 +163,7 @@ class Mask(object):
 
 
 def ism(x):
-    """Check if units are m."""
+    """Check if units are in meters."""
     return True if (int(math.log10(np.max(x)) + 1) > 4) else False
 
 
@@ -494,6 +494,7 @@ def referenced2d(arr3d, to='first'):
     return arr3d
 
 
+# DEPRECATED! Used 'filter.stdfilt' instead.
 def filter_std(arr, n=3, per_field=False):
     """Filter out pts greater than n std.
 
@@ -564,6 +565,7 @@ def polyderiv2d(time, arr3d, deg=3):
     return deriv
 
 
+# DEPRECATED! Used 'ni.gaussian_filter' directly.
 def gfilter(field, sigma):
     """Gaussian filter (smooth) a 2d field."""
     ind = np.where(np.isnan(field))
@@ -575,6 +577,7 @@ def gfilter(field, sigma):
     return field
 
 
+# DEPRECATED! Use 'ni.gaussian_filter' directly.
 def gfilter2d(arr3d, sigma):
     """Gaussian filter of 2d time series (3d array)."""
     ind = np.where(np.isnan(arr3d))
@@ -582,41 +585,6 @@ def gfilter2d(arr3d, sigma):
     for k, field in enumerate(arr3d):
         field = np.c_[field[:,-1], field, field[:,0]]  # add borders
         field = ni.gaussian_filter(field, sigma, order=0)
-        arr3d[k] = field[:,1:-1]                       # exclude borders
-    arr3d[ind] = np.nan
-    return arr3d
-
-
-def mfilter(field, size, mode='reflect'):
-    """Median filter (smooth) a 2d field."""
-    ind = np.where(np.isnan(field))
-    field[ind] = 0
-    field = np.c_[field[:,-1], field, field[:,0]]  # add crossed borders!
-    field = ni.median_filter(field, size, mode=mode)
-    field = field[:,1:-1]                          # exclude borders
-    field[ind] = np.nan
-    return field
-
-
-def mfilter2d(arr3d, size, mode='reflect'):
-    """Median filter of 2d time series (3d array)."""
-    ind = np.where(np.isnan(arr3d))
-    #arr3d[ind] = 0  #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    for k, field in enumerate(arr3d):
-        field = np.c_[field[:,-1], field, field[:,0]]  # add borders
-        field = ni.median_filter(field, size, mode=mode)
-        arr3d[k] = field[:,1:-1]                       # exclude borders
-    arr3d[ind] = np.nan
-    return arr3d
-
-
-def rfilter2d(arr3d, rank, size, mode='reflect'):
-    """Rank filter of 2d time series (3d array)."""
-    ind = np.where(np.isnan(arr3d))
-    arr3d[ind] = 0  #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    for k, field in enumerate(arr3d):
-        field = np.c_[field[:,-1], field, field[:,0]]  # add borders
-        field = ni.rank_filter(field, rank=rank, size=size, mode=mode)
         arr3d[k] = field[:,1:-1]                       # exclude borders
     arr3d[ind] = np.nan
     return arr3d
@@ -631,7 +599,7 @@ def regrid(x, y, arr, inc_by=2):
     arr = np.ma.masked_invalid(arr)
     arr1 = bm.interp(arr, x, y, xx, yy, order=0) # nearest neighb.
     arr2 = bm.interp(arr, x, y, xx, yy, order=1) # linear interp.
-    ind = np.where(arr2 == 0) #<<<<< check!
+    ind = np.where(arr2 == 0)                    #<<<<< check!
     try:
         arr2[ind] = arr1[ind]
     except:
