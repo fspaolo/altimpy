@@ -81,7 +81,7 @@ class Kriging2d(object):
         return [field, error]
 
 
-def medimput(arr, ij, size=3, min_pixels=3):
+def medimpute(arr, ij, size=3, min_pixels=3):
     """Median imputation of 2d array.
 
     Fill-in i,j elements using median of footprint.
