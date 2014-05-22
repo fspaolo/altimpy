@@ -1,10 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Interpolation using Gaussian Process Regression (kriging).
+Some interpolation functionalities.
 
-Uses the GP pacakge from 'sklearn' to interpolate spatial data points (2d
-fields).
+Notes
+-----
+The Gaussian Process Regression (kriging) uses the GP pacakge from 'sklearn'
+to interpolate spatial data points (2d fields).
 
 """
 
@@ -77,3 +79,26 @@ class Kriging2d(object):
         error[ij_pred] = sigma
 
         return [field, error]
+
+
+def medimput(arr, ij, size=3, min_pixels=3):   # FIXME add borders and update indices
+    """Median imputation of 2d array.
+
+    Fill-in i,j elements using median of footprint.
+
+    It handleds NaNs.
+    It uses a minimum number of valid pixels.
+    """
+    def median(x, min_pixels=3):
+        x = x.ravel()
+        central_pixel = x[(len(x)-1)/2]
+        valid_pixels = x[~np.isnan(x)]
+        if len(valid_pixels) < min_pixels:
+            m = central_pixel
+        else:
+            m = np.median(valid_pixels)
+        return m
+    l = size / 2
+    for i, j in ij:
+        arr[i,j] = median(arr[i-l:i+l+1, j-l:j+l+1], min_pixels=min_pixels)
+    return arr
