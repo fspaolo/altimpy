@@ -35,7 +35,7 @@ Specific processing
 22. error/nobs propagation (serial, slow) [crosscalib3.py] code_ok... ok
 23. joint backscatter correction (serial, slow) [backscatter2.py] code_ok... ok
 
-24. interpolate empty bins [kriging.py] (but do not use interpolated values to cross-calib)!
+24. [no!] interpolate empty bins [kriging.py] (but do not use interpolated values to cross-calib)!
 25. post processing (reference, spherical->cartesian, filter, regrid...) [post_proc.py]
 
 # constant backscatter correction

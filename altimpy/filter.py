@@ -62,9 +62,18 @@ def hpfilt(y, lamb=7):
 
 
 def timefilt(t, y, from_time=1991, to_time=2013):
-    """Filter array based on time interval."""
+    """Filter an array based on time interval."""
     k, = np.where((t > from_time) & (t < to_time))
     return t[k], y[k,...]
 
 
+def shiftfilt(x, delta=1):
+    """Detects and corrects steps and spikes in a verctor."""
+    n = len(x)
+    for i in xrange(n-1):
+        diff = x[i+1] - x[i]
+        if np.abs(diff) > delta:
+            x[i+1:] -= diff
+    return x
+ 
 
