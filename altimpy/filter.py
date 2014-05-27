@@ -68,6 +68,15 @@ def timefilt(t, y, from_time=1991, to_time=2013):
     return t[k], y[k,...]
 
 
+def percfilt(x, min_perc=0.7):
+    """Filter vector with a min percentage of non-null entries."""
+    if np.isnan(x).all():
+        pass 
+    elif ( len(x[~np.isnan(x)]) / float(len(x)) ) < min_perc:
+        x[:] = np.nan
+    return x
+
+
 def stepfilt(x, delta=3, window=7):
     """Filter step-changes in a verctor.
     
