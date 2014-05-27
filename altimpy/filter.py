@@ -8,6 +8,7 @@ Module with some high level filter functions.
 import os
 import re
 import numpy as np
+import pandas as pd
 import scipy.ndimage as ni
 import statsmodels.api as sm
 
@@ -67,13 +68,22 @@ def timefilt(t, y, from_time=1991, to_time=2013):
     return t[k], y[k,...]
 
 
-def shiftfilt(x, delta=1):
-    """Detects and corrects steps and spikes in a verctor."""
-    n = len(x)
-    for i in xrange(n-1):
-        diff = x[i+1] - x[i]
+def stepfilt(x, delta=3, window=7):
+    """Filter step-changes in a verctor.
+    
+    Detects level-shifts in a time series and corrects them by levelling both
+    sides of the record. 
+    
+    It discrimitaes steps from peaks using a moving-median approach.
+    """
+    assert window % 2 != 0, 'window size must be odd'
+    n = window / 2
+    v = np.r_[np.repeat(x[0], n), x, np.repeat(x[-1], n)] # expanded arr
+    m = pd.rolling_median(v, window, center=True)         # filtered arr
+    for i in range(len(m)-1):
+        diff = m[i+1] - m[i]
         if np.abs(diff) > delta:
-            x[i+1:] -= diff
-    return x
+            v[i+1:] -= diff
+    return v[n:-n], m[n:-n]
  
 
