@@ -41,10 +41,10 @@ def stdfilt(arr, n=3, per_field=False):
 
 
 def medfilt(arr, size=(3,3), min_pixels=3, **kw):
-    """Median filter 2d array. 
+    """Median filter (with constrain) 2d array. 
     
     It handleds NaNs.
-    It uses a minimum number of valid pixels.
+    It uses a minimum number of non-null pixels.
     """
     def median(x, min_pixels=min_pixels):
         central_pixel = x[(len(x)-1)/2]
