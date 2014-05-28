@@ -629,7 +629,7 @@ def regrid2d(arr3d, x, y, inc_by=2):
     return [out, xi, yi]
 
 
-def get_dydx(time, arr3d, robust=False):
+def get_slope(time, arr3d, robust=False):
     """Returns a 2d array with "linear" dy/dx per grid cell."""
     _, ny, nx = arr3d.shape
     dydx = np.zeros((ny, nx), 'f8') * np.nan
