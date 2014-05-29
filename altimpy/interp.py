@@ -88,7 +88,7 @@ def med_impute(arr, ij, size=3, min_pixels=3):
 
     It handleds NaNs.
     It uses a minimum number of non-null pixels.
-    ij = ([i0,i1,..], [j0,j1,..])
+    ij = ([i0,i1,..], [j0,j1,..])  # output of 'numpy.where()'
     """
     def median(x, min_pixels=3):
         x = x.ravel()

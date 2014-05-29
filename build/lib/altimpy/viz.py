@@ -119,6 +119,23 @@ def pv_cmap(fname, cname, cmap):
     f.close()
 
 
+def mayavi_cmap(*args, **kwargs):
+    """
+    Mayavi colormap. See 'viz.cmap' for details.
+    """
+    import numpy as np
+    cmap = create_cmap(*args, **kwargs)
+    v, r, g, b, a = cmap
+    if len(v) < 1001:
+        vi = np.linspace(v[0], v[-1], 2001)
+        r = np.interp(vi, v, r)
+        g = np.interp(vi, v, g)
+        b = np.interp(vi, v, b)
+        a = np.interp(vi, v, a)
+        cmap = np.array([r, g, b, a])
+    return 255 * cmap.T
+
+
 cmap_lib = {
     'wwwwbgr': [
         (0, 4, 5, 7, 8, 9, 11, 12),
@@ -160,13 +177,6 @@ cmap_lib = {
         (0,  0,  0,  0,  2,  2,  2),
         (0,  1,  2,  2,  2,  1,  0),
         (2,  2,  2,  0,  0,  0,  0),
-        (2,  2,  2,  2,  2,  2,  2),
-    ],
-    'rgb': [
-        (0,  1,  3,  4,  5,  7,  8),
-        (2,  2,  2,  0,  0,  0,  0),
-        (0,  1,  2,  2,  2,  1,  0),
-        (0,  0,  0,  0,  2,  2,  2),
         (2,  2,  2,  2,  2,  2,  2),
     ],
     'bwr': [
@@ -332,8 +342,7 @@ def get_gtif_subreg(m, filename, res=1):
 
 def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, 
          npmb=16, **kw):
-    """Matplotlib text command augmented with poor man's bold.
-    """
+    """Matplotlib text command augmented with poor man's bold."""
     h = [ax.text(x, y, s, **kw)]
     h[0].zorder += 1
     if edgecolor is not None:
@@ -362,36 +371,18 @@ def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75,
     return h
 
 
-def cmap(*args, **kw):
+def get_cmap(*args, n=2001, **kw):
     """Matplotlib enhanced colormap. 
     
-    See `create_cmap` for details.
+    See 'create_cmap' for details.
     """
     from matplotlib.colors import LinearSegmentedColormap
     v, r, g, b, a = create_cmap(*args, **kw)
-    n = 2001
-    cm = {'red': np.c_[v, r, r],
-          'green': np.c_[v, g, g],
-          'blue': np.c_[v, b, b] }
-    cm = LinearSegmentedColormap('cmap', cm, n)
-    return cm
-
-
-def mayavi_cmap(*args, **kwargs):
-    """
-    Mayavi colormap. See viz.colormap for details.
-    """
-    import numpy as np
-    cmap = create_cmap(*args, **kwargs)
-    v, r, g, b, a = cmap
-    if len(v) < 1001:
-        vi = np.linspace(v[0], v[-1], 2001)
-        r = np.interp(vi, v, r)
-        g = np.interp(vi, v, g)
-        b = np.interp(vi, v, b)
-        a = np.interp(vi, v, a)
-        cmap = np.array([r, g, b, a])
-    return 255 * cmap.T
+    cmap = {'red': np.c_[v, r, r],
+            'green': np.c_[v, g, g],
+            'blue': np.c_[v, b, b] }
+    cmap = LinearSegmentedColormap('cmap', cmap, n)
+    return cmap
 
 
 def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None, 
