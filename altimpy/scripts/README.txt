@@ -34,7 +34,7 @@ Specific processing
 21. cross calibration (serial, slow) [crosscalib2.py] code_ok... ok
 22. error/nobs propagation (serial, slow) [crosscalib3.py] code_ok... ok
 23. joint backscatter correction (serial, slow) [backscatter2.py] code_ok... ok
-24. post processing [post_proc.py] code_ok... ok
+24. post processing [postproc.py] code_ok... ok
     - filter out uncomplete ts
     - fill in gaps in time
     - filter out step-changes
@@ -45,8 +45,8 @@ Specific processing
 
 Visualization
 -------------
-1. create file with multiple layers (2d arrays, for time dimension) [post_proc.py] (for XDMF)
-2. create XDMF for data/error/coord to visualize in ParaView [write_xdmf.py]
+1. create file with multiple layers (2d arrays, for time dimension) [postproc.py] (for XDMF)
+2. create XDMF for data/error/coord to visualize in ParaView [writexdmf.py]
 
 
 [1] do not apply 'iterative' std to any satellite!
