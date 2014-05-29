@@ -134,7 +134,21 @@ def mayavi_cmap(*args, **kwargs):
         cmap = np.array([r, g, b, a])
     return 255 * cmap.T
 
+"""
+5 x N cmap array is:
 
+row 1 - the discretre position of each defined color
+row 2 - the amount of red at each position (0 to 2)
+row 3 - the amount of green at each position (0 to 2)
+row 4 - the amount of blue at each position (0 to 2)
+row 5 - the amount of transparency at each position (0 to 2)
+
+Note 1: Each column represents discrete positions to be interpolated to create
+color intervals (range of colors).
+
+Note 2: Progressive colormaps (0,..,N) cannot be inverted, only divergent
+colormaps (-N,..,N) can be inverted.
+"""
 cmap_lib = {
     'wwwwbgr': [
         (0, 4, 5, 7, 8, 9, 11, 12),
@@ -184,6 +198,13 @@ cmap_lib = {
         (0,  1,  2,  2,  2,  1,  0),
         (0,  0,  0,  0,  2,  2,  2),
         (2,  2,  2,  2,  2,  2,  2),
+    ],
+    'r2b': [
+        (-4, -3, -1,  0,  1,  3,  4),
+        ( 2,  2,  2,  2,  0,  0,  0),
+        ( 0,  1,  2,  2,  2,  1,  0),
+        ( 0,  0,  0,  2,  2,  2,  2),
+        ( 2,  2,  2,  2,  2,  2,  2),
     ],
     'bwr': [
         (-4, -3, -1,  0,  1,  3,  4),
