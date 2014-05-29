@@ -22,14 +22,14 @@ from const import *
 
 ### Visualization utilities
 
-def create_colormap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True, 
+def create_cmap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True, 
               invert=False):
     """
     Color map creator.
 
     Parameters
     ----------
-    cmap: Either a named colormap from colormap_lib or a 5 x N array,
+    cmap: Either a named colormap from cmap_lib or a 5 x N array,
         with rows specifying: (value, red, green, blue, alpha) components.
     colorexp: Exponent applied to the values to shift the colormap.
     nmod: Number of brightness modulations applied to the colormap.
@@ -38,7 +38,7 @@ def create_colormap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True,
     invert: Invert the order of colors.
     """
     if type(cmap) is str:
-        cmap = colormap_lib[cmap]
+        cmap = cmap_lib[cmap]
     cmap = np.array(cmap, 'f')
     if invert:
         cmap = cmap[:,::-1]
@@ -74,11 +74,11 @@ def create_colormap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True,
     return np.array([v, r, g, b, a])
 
 
-def cpt(*args, **kw):
+def gmt_cmap(*args, **kw):
     """
-    GMT style colormap. See `create_colormap` for details.
+    GMT style colormap (cpt). See `create_cmap` for details.
     """
-    v, r, g, b, a = create_colormap(*args, **kw)
+    v, r, g, b, a = create_cmap(*args, **kw)
     cmap = ''
     fmt = '%-10r %3.0f %3.0f %3.0f     %-10r %3.0f %3.0f %3.0f\n'
     for i in range(len(v) - 1):
@@ -89,7 +89,7 @@ def cpt(*args, **kw):
     return cmap
 
 
-def pvcmap(fname, cname, cmap):
+def pv_cmap(fname, cname, cmap):
     """Create ParaView's XML colormap file.
 
     Parameters
@@ -105,8 +105,8 @@ def pvcmap(fname, cname, cmap):
     Example
     -------
     import altimpy as ap
-    cmap = ap.create_colormap(colormap_lib['wrgb'])
-    ap.pvcmap('wrgb.xml', 'wrgb', cmap)
+    cmap = ap.create_cmap(cmap_lib['wrgb'])
+    ap.pv_cmap('wrgb.xml', 'wrgb', cmap)
 
     """
     v, r, g, b, a = cmap
@@ -119,7 +119,7 @@ def pvcmap(fname, cname, cmap):
     f.close()
 
 
-colormap_lib = {
+cmap_lib = {
     'wwwwbgr': [
         (0, 4, 5, 7, 8, 9, 11, 12),
         (2, 2, 0, 0, 0, 2, 2, 2),
@@ -362,28 +362,27 @@ def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75,
     return h
 
 
-def colormap(*args, **kw):
+def cmap(*args, **kw):
     """Matplotlib enhanced colormap. 
     
-    See `create_colormap` for details.
+    See `create_cmap` for details.
     """
     from matplotlib.colors import LinearSegmentedColormap
-    v, r, g, b, a = create_colormap(*args, **kw)
+    v, r, g, b, a = create_cmap(*args, **kw)
     n = 2001
-    cmap = { 'red':np.c_[v, r, r],
-           'green':np.c_[v, g, g],
-            'blue':np.c_[v, b, b] }
-    cmap = LinearSegmentedColormap('cmap', cmap, n)
-    return cmap
+    cm = {'red': np.c_[v, r, r],
+          'green': np.c_[v, g, g],
+          'blue': np.c_[v, b, b] }
+    cm = LinearSegmentedColormap('cmap', cm, n)
+    return cm
 
 
-# THIS NEEDS TO BE CHANGED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-def colormap2(*args, **kwargs):
+def mayavi_cmap(*args, **kwargs):
     """
     Mayavi colormap. See viz.colormap for details.
     """
     import numpy as np
-    cmap = create_colormap(*args, **kwargs)
+    cmap = create_cmap(*args, **kwargs)
     v, r, g, b, a = cmap
     if len(v) < 1001:
         vi = np.linspace(v[0], v[-1], 2001)
@@ -426,7 +425,7 @@ def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None,
     return ax
 
 
-def lengthscale(ax, x, y, w=None, label='%s', style='k-', linewidth=1, 
+def length_scale(ax, x, y, w=None, label='%s', style='k-', linewidth=1, 
                 color='k', **kw):
     """Draw a length scale bar between the points (x[0], y[0]) and (x[1], 
     y[1]).
@@ -463,7 +462,7 @@ def lengthscale(ax, x, y, w=None, label='%s', style='k-', linewidth=1,
     return h1, h2
 
 
-def compassrose(ax, x, y, r, style='k-', **kw):
+def compass_rose(ax, x, y, r, style='k-', **kw):
     """
     Original by Geoffrey Ely.
     Modified by Fernando Paolo.
@@ -607,7 +606,7 @@ def contour(*args, **kw):
 
 
 def intitle(title='', loc=1, size=None, ax=None, **kw):
-    """Add title inside the figure, same locations as 'label'.
+    """Add title inside the figure. Same locations as 'label'.
 
     Examples
     --------
