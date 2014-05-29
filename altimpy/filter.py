@@ -13,7 +13,7 @@ import scipy.ndimage as ni
 import statsmodels.api as sm
 
 
-def stdfilt(arr, n=3, per_field=False):
+def std_filt(arr, n=3, per_field=False):
     """Filter out pts greater than n std.
 
     Parameters
@@ -40,7 +40,7 @@ def stdfilt(arr, n=3, per_field=False):
     return arr
 
 
-def medfilt(arr, size=(3,3), min_pixels=3, **kw):
+def med_filt(arr, size=(3,3), min_pixels=3, **kw):
     """Median filter (with constrain) 2d array. 
     
     It handleds NaNs.
@@ -57,18 +57,18 @@ def medfilt(arr, size=(3,3), min_pixels=3, **kw):
     return ni.generic_filter(arr, median, size=size, **kw)
 
 
-def hpfilt(y, lamb=7):
+def hp_filt(y, lamb=7):
     """Hodrick-Prescott filter 1d array."""
-    return sm.tsa.filters.hpfilter(y, lamb=lamb)[1]
+    return sm.tsa.filters.hp_filter(y, lamb=lamb)[1]
 
 
-def timefilt(t, y, from_time=1991, to_time=2013):
+def time_filt(t, y, from_time=1991, to_time=2013):
     """Filter an array based on time interval."""
     k, = np.where((t > from_time) & (t < to_time))
     return t[k], y[k,...]
 
 
-def percfilt(x, min_perc=0.7):
+def perc_filt(x, min_perc=0.7):
     """Filter vector with a min percentage of non-null entries."""
     if np.isnan(x).all():
         pass 
@@ -77,7 +77,7 @@ def percfilt(x, min_perc=0.7):
     return x
 
 
-def stepfilt(x, delta=3, window=7):
+def step_filt(x, delta=3, window=7):
     """Filter step-changes in a verctor.
     
     Detects level-shifts in a time series and corrects them by levelling both
