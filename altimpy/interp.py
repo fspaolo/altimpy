@@ -81,13 +81,13 @@ class Kriging2d(object):
         return [field, error]
 
 
-def medimpute(arr, ij, size=3, min_pixels=3):
-    """Median imputation of 2d array.
+def med_impute(arr, ij, size=3, min_pixels=3):
+    """Median imputation for 2d array.
 
-    Fill-in i,j elements using median of footprint.
+    Fill in i,j elements using median of footprint.
 
     It handleds NaNs.
-    It uses a minimum number of valid pixels.
+    It uses a minimum number of non-null pixels.
     ij = ([i0,i1,..], [j0,j1,..])
     """
     def median(x, min_pixels=3):
@@ -101,7 +101,7 @@ def medimpute(arr, ij, size=3, min_pixels=3):
         return m
     l = size / 2
     for i, j in zip(ij[0], ij[1]):
-        try:                           # FIXME. Add borders and update indices
+        try:  # 'try' to avoid border issues. Add borders and update indices. FIXME
             arr[i,j] = median(arr[i-l:i+l+1, j-l:j+l+1], min_pixels=min_pixels)
         except:
             print 'footprint outside the boundaries, need to add borders!'
