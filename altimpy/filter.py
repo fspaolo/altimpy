@@ -59,7 +59,7 @@ def med_filt(arr, size=(3,3), min_pixels=3, **kw):
 
 def hp_filt(y, lamb=7):
     """Hodrick-Prescott filter 1d array."""
-    return sm.tsa.filters.hp_filter(y, lamb=lamb)[1]
+    return sm.tsa.filters.hpfilter(y, lamb=lamb)[1]
 
 
 def time_filt(t, y, from_time=1991, to_time=2013):

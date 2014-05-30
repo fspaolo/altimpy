@@ -149,6 +149,7 @@ color intervals (range of colors).
 Note 2: Progressive colormaps (0,..,N) cannot be inverted, only divergent
 colormaps (-N,..,N) can be inverted.
 """
+
 cmap_lib = {
     'wwwwbgr': [
         (0, 4, 5, 7, 8, 9, 11, 12),
@@ -843,7 +844,7 @@ def adjust_spines(ax, spines):
 
     Example
     -------
-    # display only 'y' and 'x-axis'
+    # display only 'y-' and 'x-axis'
     adjust_spines(ax, ['left', 'bottom'])
 
     From
