@@ -43,10 +43,10 @@ def std_filt(arr, n=3, per_field=False):
 def med_filt(arr, size=(3,3), min_pixels=3, **kw):
     """Median filter with constrain for 2d array. 
     
-    It supports NaNs.
-    It uses a minimum number of non-null pixels.
+    Supports NaNs.
+    Uses a minimum number of non-null pixels.
     """
-    def median(x, min_pixels=min_pixels):
+    def _median(x, min_pixels=min_pixels):  # not an ordinary median
         central_pixel = x[(len(x)-1)/2]
         valid_pixels = x[~np.isnan(x)]
         if np.isnan(central_pixel) or len(valid_pixels) < min_pixels:
@@ -54,14 +54,14 @@ def med_filt(arr, size=(3,3), min_pixels=3, **kw):
         else:
             m = np.median(valid_pixels)
         return m
-    return ni.generic_filter(arr, median, size=size, **kw)
+    return ni.generic_filter(arr, _median, size=size, **kw)
 
 
 def hp_filt(y, lamb=7, nan=False):
     """Hodrick-Prescott filter for 1d array.
     
-    It supports NaNs, nan=True.
-    It assumes an evenly spaced array.
+    Supports NaNs, nan=True.
+    Assumes an evenly spaced array.
     """
     if nan:
         y2 = y.copy()
