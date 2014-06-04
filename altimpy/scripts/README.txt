@@ -31,8 +31,8 @@ Specific processing
 18. average time series: grid-cells (serial, very slow; read code header) [averagets2.py] code_ok... ok
 19. independent backscatter correction (serial, fast) [backscatter3.py] code_ok... ok
 20. merge satellites (serial, extremely fast) [mergesats2.py] code_ok... ok
-21. cross calibration (serial, slow) [crosscalib2.py] code_ok... ok
-22. error/nobs propagation (serial, slow) [crosscalib3.py] code_ok... ok
+21. cross calibration (serial, slow) [xcalib2.py] code_ok... ok
+22. error/nobs propagation (serial, slow) [xcalib3.py] code_ok... ok
 23. joint backscatter correction (serial, slow) [backscatter2.py] code_ok... ok
 24. post processing [postproc.py] code_ok... ok
     - filter out uncomplete ts

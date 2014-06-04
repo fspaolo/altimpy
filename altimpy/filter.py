@@ -41,9 +41,9 @@ def std_filt(arr, n=3, per_field=False):
 
 
 def med_filt(arr, size=(3,3), min_pixels=3, **kw):
-    """Median filter (with constrain) 2d array. 
+    """Median filter with constrain for 2d array. 
     
-    It handleds NaNs.
+    It supports NaNs.
     It uses a minimum number of non-null pixels.
     """
     def median(x, min_pixels=min_pixels):
@@ -57,9 +57,23 @@ def med_filt(arr, size=(3,3), min_pixels=3, **kw):
     return ni.generic_filter(arr, median, size=size, **kw)
 
 
-def hp_filt(y, lamb=7):
-    """Hodrick-Prescott filter 1d array."""
-    return sm.tsa.filters.hpfilter(y, lamb=lamb)[1]
+def hp_filt(y, lamb=7, nan=False):
+    """Hodrick-Prescott filter for 1d array.
+    
+    It supports NaNs, nan=True.
+    It assumes an evenly spaced array.
+    """
+    if nan:
+        y2 = y.copy()
+        i_nan, = np.where(np.isnan(y))
+        i_notnan, = np.where(~np.isnan(y))
+        x = np.arange(len(y))
+        y2[i_nan] = np.interp(i_nan, x[i_notnan], y[i_notnan])
+        y2 = sm.tsa.filters.hpfilter(y2, lamb=lamb)[1]
+        y2[i_nan] = np.nan
+    else:
+        y2 = sm.tsa.filters.hpfilter(y, lamb=lamb)[1]
+    return y2
 
 
 def time_filt(t, y, from_time=1991, to_time=2013):
