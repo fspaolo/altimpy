@@ -65,12 +65,12 @@ def hp_filt(y, lamb=7, nan=False):
     """
     if nan:
         y2 = y.copy()
-        i_nan, = np.where(np.isnan(y))
+        i_isnan, = np.where(np.isnan(y))
         i_notnan, = np.where(~np.isnan(y))
         x = np.arange(len(y))
-        y2[i_nan] = np.interp(i_nan, x[i_notnan], y[i_notnan])
+        y2[i_isnan] = np.interp(i_isnan, x[i_notnan], y[i_notnan])
         y2 = sm.tsa.filters.hpfilter(y2, lamb=lamb)[1]
-        y2[i_nan] = np.nan
+        y2[i_isnan] = np.nan
     else:
         y2 = sm.tsa.filters.hpfilter(y, lamb=lamb)[1]
     return y2
@@ -97,7 +97,7 @@ def step_filt(x, delta=3, window=7):
     Detects level-shifts in a time series and corrects them by levelling both
     sides of the record. 
     
-    It discrimitaes steps from peaks using a moving-median approach.
+    Discriminates steps from peaks using a moving-median approach.
     """
     assert window % 2 != 0, 'window size must be odd'
     n = window / 2
