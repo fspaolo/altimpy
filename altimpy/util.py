@@ -111,7 +111,7 @@ class Mask(object):
         print 'done.'
         return [j_bins-1, i_bins-1]  # shift inds to the left (from edges)
 
-    def _get_subreg(self, x, y):
+    def _get_subset(self, x, y):
         """Subset original mask for performance."""
         j, = np.where((x.min() <= self.mask_x) & (self.mask_x <= x.max()))
         i, = np.where((y.min() <= self.mask_y) & (self.mask_y <= y.max()))
@@ -149,7 +149,7 @@ class Mask(object):
         else:
             arr_x, arr_y = lon, lat
         arr_x, arr_y = np.rint(arr_x), np.rint(arr_y)
-        self.mask_x, self.mask_y, self.mask_z = self._get_subreg(arr_x, arr_y)
+        self.mask_x, self.mask_y, self.mask_z = self._get_subset(arr_x, arr_y)
         # if not monotonically increasing (usually the y-dim)
         if self.mask_y[0] > self.mask_y[-1]:
             self.mask_y = self.mask_y[::-1]
@@ -714,14 +714,14 @@ def low2upp(m, k=0, mult=1):
     return m
 
 
-def get_subreg(region, arr, x, y):
-    """Get subregion from a 2d/3d-array.
+def get_subset(region, arr, x, y):
+    """Get subset from a 2d/3d-array.
 
     Parameters
     ----------
     region : (left, right, bottom, top)
     arr : 2d/3d array to subset
-    x, y : 1d arrays with coordinates
+    x, y : 1d arrays with coordinates of arr
 
     Returns
     -------
