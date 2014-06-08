@@ -15,5 +15,7 @@ setup(
     long_description=open('README.rst').read(),
     install_requires=[
         "PyTables >= 2.3.1",
+        "basemap >= 1.0.7",
+        "netcdf4 >= 1.0.8",
     ],
 )

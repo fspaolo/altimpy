@@ -201,11 +201,11 @@ cmap_lib = {
         (2,  2,  2,  2,  2,  2,  2),
     ],
     'r2b': [
-        (-4, -3, -1,  0,  1,  3,  4),
-        ( 2,  2,  2,  2,  0,  0,  0),
-        ( 0,  1,  2,  2,  2,  1,  0),
-        ( 0,  0,  0,  2,  2,  2,  2),
-        ( 2,  2,  2,  2,  2,  2,  2),
+        (-3, -1, -0.1, 0, 0.1,  2,  3),
+        ( 2,  2,  2,   2,   0,  0,  0),
+        ( 0,  1,  2,   2,   2,  1,  0),
+        ( 0,  0,  0,   2,   2,  2,  2),
+        ( 2,  2,  2,   2,   2,  2,  2),
     ],
     'bwr': [
         (-4, -3, -1,  0,  1,  3,  4),
@@ -839,13 +839,17 @@ def hillshade(data, scale=10.0, azdeg=165.0, altdeg=45.0):
     return intensity
 
 
-def adjust_spines(ax, spines):
+def adjust_spines(ax, spines, pad=10):
     """Adjust the axis of a plot.
 
     Example
     -------
     # display only 'y-' and 'x-axis'
-    adjust_spines(ax, ['left', 'bottom'])
+    adjust_spines(ax, ['left', 'bottom'], 10)
+
+    Notes
+    -----
+    If in 'subplot' environment, do not share axis!
 
     From
     ----
@@ -855,19 +859,17 @@ def adjust_spines(ax, spines):
     for loc, spine in ax.spines.items():
         if loc in spines:
             # outward by 10 points
-            spine.set_position(('outward', 10)) 
+            spine.set_position(('outward', pad))
             spine.set_smart_bounds(True)
         else:
             # don't draw spine
             spine.set_color('none')             
-
     # turn off ticks where there is no spine
     if 'left' in spines:
         ax.yaxis.set_ticks_position('left')
     else:
         # no yaxis ticks
         ax.yaxis.set_ticks([])
-
     if 'bottom' in spines:
         ax.xaxis.set_ticks_position('bottom')
     else:
