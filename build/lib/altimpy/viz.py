@@ -847,6 +847,10 @@ def adjust_spines(ax, spines, pad=10):
     # display only 'y-' and 'x-axis'
     adjust_spines(ax, ['left', 'bottom'], 10)
 
+    Notes
+    -----
+    If in 'subplot' environment, do not share axis!
+
     From
     ----
     http://matplotlib.org/examples/pylab_examples/spine_placement_demo.html
@@ -860,14 +864,12 @@ def adjust_spines(ax, spines, pad=10):
         else:
             # don't draw spine
             spine.set_color('none')             
-
     # turn off ticks where there is no spine
     if 'left' in spines:
         ax.yaxis.set_ticks_position('left')
     else:
         # no yaxis ticks
         ax.yaxis.set_ticks([])
-
     if 'bottom' in spines:
         ax.xaxis.set_ticks_position('bottom')
     else:

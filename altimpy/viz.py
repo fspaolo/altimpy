@@ -849,7 +849,7 @@ def adjust_spines(ax, spines, pad=10):
 
     Notes
     -----
-    If in 'subplot' environment, do not share axis!
+    Do not share axis in 'subplot' environment!
 
     From
     ----
