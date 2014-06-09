@@ -370,7 +370,11 @@ def get_gtif_subreg(m, filename, res=1):
 
 def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, 
          npmb=16, **kwargs):
-    """Matplotlib text command augmented with poor man's bold."""
+    """Matplotlib text command augmented with poor man's bold.
+
+    See plt.text() doctring for complete documentation.
+
+    """
     h = [ax.text(x, y, s, **kwargs)]
     h[0].zorder += 1
     if edgecolor is not None:
@@ -626,7 +630,7 @@ def contour(*args, **kwargs):
     return pp
 
 
-def intitle(title='', loc=1, size=None, ax=None, **kwargs):
+def intitle(title='', loc=1, size=None, pad=0., ax=None, **kwargs):
     """Add title inside the figure. Same locations as 'label'.
 
     Examples
@@ -652,12 +656,13 @@ def intitle(title='', loc=1, size=None, ax=None, **kwargs):
         ax = plt.subplot(111)
         #fig, axs = plt.gcf(), plt.gca()
         #ax = fig.add_subplot(axs.numRows, axs.numCols, fig.number)
-    at = AnchoredText(title, loc=loc, prop=size, pad=0., 
+    at = AnchoredText(title, loc=loc, prop=size, pad=pad, 
                       borderpad=0.5, frameon=False, **kwargs)
     ax.add_artist(at)
     at.txt._text.set_path_effects([withStroke(foreground="w", linewidth=4)])
     at.patch.set_alpha(0.5)
     return ax
+
 
 """
 Draws Hinton diagrams using matplotlib ( http://matplotlib.sf.net/ ).
