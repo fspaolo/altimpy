@@ -18,8 +18,8 @@ larsen = lis = ape = (294, 302, -74, -64)
 belling = bellingshausen =  (260.8, 294.4, -74, -69)  # revise boundaries!
 amundsen = (220, 263, -76, -73.1)
 ross = ris = (155, 213.3, -85, -77.3)    # revise boundaries!
-westshac = (80, 105, -68, -64.5)
-tottmosc = (113, 124, -67.5, -66)
+wesshac = westshac = (80, 105, -68, -64.5)
+totmos = tottmosc = (113, 124, -67.5, -66)
 
 # individual ice shelves (clock-wise starting at lon=0)
 fimbulw = (349, 360, -72, -68)     # revise boundaries!
