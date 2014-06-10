@@ -631,7 +631,7 @@ def contour(*args, **kwargs):
 
 
 def intitle(title='', loc=1, size=None, pad=0., borderpad=0.5, borderwidth=4,
-            borderalpha=0.5, ax=None, **kwargs):
+            borderalpha=1, ax=None, **kwargs):
     """Add title inside the figure. Same locations as 'label'.
 
     Examples
