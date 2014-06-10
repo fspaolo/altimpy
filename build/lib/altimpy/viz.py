@@ -630,7 +630,8 @@ def contour(*args, **kwargs):
     return pp
 
 
-def intitle(title='', loc=1, size=None, pad=0., ax=None, **kwargs):
+def intitle(title='', loc=1, size=None, pad=0., borderpad=0.5, borderwidth=4,
+            borderalpha=0.5, ax=None, **kwargs):
     """Add title inside the figure. Same locations as 'label'.
 
     Examples
@@ -654,14 +655,14 @@ def intitle(title='', loc=1, size=None, pad=0., ax=None, **kwargs):
         size = dict(size=plt.rcParams['axes.labelsize'])
     if ax is None:
         ax = plt.subplot(111)
-        #fig, axs = plt.gcf(), plt.gca()
-        #ax = fig.add_subplot(axs.numRows, axs.numCols, fig.number)
     at = AnchoredText(title, loc=loc, prop=size, pad=pad, 
-                      borderpad=0.5, frameon=False, **kwargs)
+                      borderpad=borderpad, frameon=False, **kwargs)
     ax.add_artist(at)
-    at.txt._text.set_path_effects([withStroke(foreground="w", linewidth=4)])
-    at.patch.set_alpha(0.5)
+    at.txt._text.set_path_effects([withStroke(foreground="w",
+                                              linewidth=borderwidth,
+                                              alpha=borderalpha)])
     return ax
+
 
 """
 Draws Hinton diagrams using matplotlib ( http://matplotlib.sf.net/ ).

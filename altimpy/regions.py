@@ -3,15 +3,18 @@ Module with definition of ice-shelf "boxes" and other regions.
 
 """
 # general regions
-ais = (0, 360, -90, -60)
+ais = antarctica = (0, 360, -90, -60)
 wais = (179, 311.5, -90, -60)
 eais1 = (0, 179, -90, -60)         # lon is 0/360!
 eais2 = (311.5, 360, -90, -60)
 eais1_no_rf = (0, 179, -77, -60)   # w/o Ross and Filchner 
 eais2_no_rf = (330, 360, -77, -60)
-antpen = (276, 310, -74.5, -64)
-amundsen = (220, 276, -76, -71)
 fris = (272, 332, -90, -74.5)
+antpen = ap = (276, 310, -74.5, -64)
+larsen = lis = ape = (294, 302, -74, -64)
+belling = bellingshausen =  (260.8, 294.4, -74, -69)  # its wrong, revise!
+amundsen = (220, 263, -76, -73.1)
+ross = ris = (155, 213.3, -85, -77.3)    # revise boundaries!
 
 # individual ice shelves (clock-wise starting at lon=0)
 fimbulw = (349, 360, -72, -68)     # revise boundaries!
@@ -23,7 +26,9 @@ shackleton = (94.5, 101.5, -67, -64)
 conger = (101.5, 105.5, -67, -65)
 totten = (112, 117.5, -68, -66)
 moscow = (117.5, 123, -68, -66)
-ross = (150, 213.3, -85, -77.3)    # revise boundaries!
+rosse = (155, 179, -85, -77)    # revise boundaries!
+rossw = (178.3, 213.3, -85, -77.5)
+sulzberger = (207, 216, -78, -76)
 getz = (224, 245, -76, -73)
 dotson = (245, 249, -76, -73.5)    # revise boundaries!
 crosson = (248.5, 251, -76, -73.5) # revise boundaries!
