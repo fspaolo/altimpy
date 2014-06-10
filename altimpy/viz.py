@@ -882,6 +882,23 @@ def adjust_spines(ax, spines, pad=10):
         ax.xaxis.set_ticks([])
 
 
+def get_limits(x, digits=1):
+    """Get the ceiling and floor limits according number of digits.
+    
+    Useful to set the y-/x-limits in matplotlib.
+
+    """
+    mn0 = x.min()
+    mx0 = x.max()
+    mn = mn0.round(digits)
+    mx = mx0.round(digits)
+    if mn > mn0:
+        mn -= 1. / 10**digits
+    if mx < mx0:
+        mx += 1. / 10**digits
+    return mn, mx
+
+
 def rcparams():
     """Set optimal figure layout parameters."""
     plt.rcParams['font.family'] = 'arial'
