@@ -12,7 +12,7 @@ eais1 = (0, 179, -90, -60)         # lon is 0/360!
 eais2 = (311.5, 360, -90, -60)
 eais1_no_rf = (0, 179, -77, -60)   # w/o Ross and Filchner 
 eais2_no_rf = (330, 360, -77, -60)
-fimbulall = (0, 38, -71.5, -68.5)        # revise boundaries!
+queenmaud = qml = (0, 38, -71.5, -68.5)   # revise boundaries!
 fris = (272, 332, -90, -74.5)
 antpen = ap = (276, 310, -74.5, -64)
 larsen = lis = ape = (294, 302, -74, -64)
