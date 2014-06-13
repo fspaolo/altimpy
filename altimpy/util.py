@@ -816,3 +816,18 @@ def get_area(grid, x, y, region=None):
     area[np.isnan(grid)] = np.nan
     return np.nansum(area)
 
+
+def lasso_cv(x, y, max_deg=3):
+    """Regularized linear regression using LASSO and Cross-validation.
+    
+    Fits the best polynomial selected from a range of degrees up to n=max_deg.
+    Best here refers to minimum RMSE fit and simpler model.
+
+    """
+    Xpoly = dmatrix('C(x, Poly)')
+    lasso_model = LassoCV(cv=10, copy_X=True, normalize=True, max_iter=1e4)
+    lasso_fit = lasso_model.fit(Xpoly[:, 1:max_deg+1], y)
+    lasso_path = lasso_model.score(Xpoly[:, 1:max_deg+1], y)
+    return lasso_fit.predict(Xpoly[:, 1:max_deg+1])[np.argsort(x)]
+
+
