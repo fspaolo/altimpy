@@ -650,6 +650,10 @@ def get_area_cells(grid, x, y):
     out : 2d-array
         Same shape as 'grid' with the values of the area on each cell.
 
+    Notes
+    -----
+    If coordinates are lon/lat, then area is given in m**2.
+
     """
     ny, nx = grid.shape
     # cells -> nodes
@@ -659,7 +663,7 @@ def get_area_cells(grid, x, y):
         y -= dy/2.
         x = np.append(x, x[-1]+dx)
         y = np.append(y, y[-1]+dy)
-    C = EARTH_RADIUS_M**2 * D2R  # deg -> rad
+    C = EARTH_RADIUS_M**2 * D2R  # deg -> rad (Earth radius is in meters)
     A = np.empty_like(grid)
     for i in xrange(ny):
         for j in xrange(nx):
