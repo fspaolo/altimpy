@@ -7,11 +7,14 @@ import numpy as np
 # pi with 25 digits. See http://www.piday.org/million/
 PI = 3.1415926535897932384626433
 
+# DEPRECATED. Use instead np.rad2deg, np.deg2rad, math.radians...
+"""
 # Conversion from degrees to radians and vice-versa
 CDR = 180 / PI    # to divide
 CRD = PI / 180
 D2R = PI / 180    # to multiply
 R2D = 180 / PI
+"""
 
 # Eccentricity of the Earth (squared)
 E2 = 6.694379852*1e-3 

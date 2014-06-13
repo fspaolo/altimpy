@@ -633,47 +633,7 @@ def weighted_average_error(df, df_nobs):
 # Other functionalities
 #----------------------------------------------------------------
 
-def get_area_cells(grid, x, y):
-    """Calculates the area of each grid-cell.
-
-    Parameters
-    ----------
-    grid : 2d-array
-        A rectangular grid.
-    x, y : 1d-arrays
-        The coordinates of the cells or nodes (edges). If x and y are
-        of the same lengh as grid dimensions, then cell-centered 
-        coordinates are assumed, otherwise edges are assumed.
-
-    Returns
-    -------
-    out : 2d-array
-        Same shape as 'grid' with the values of the area on each cell.
-
-    Notes
-    -----
-    The area is given in m**2.
-
-    """
-    ny, nx = grid.shape
-    # cells -> nodes
-    if len(x) == nx and len(y) == ny:  
-        dx, dy = x[1] - x[0], y[1] - y[0]
-        x -= dx/2.
-        y -= dy/2.
-        x = np.append(x, x[-1]+dx)
-        y = np.append(y, y[-1]+dy)
-    C = EARTH_RADIUS_M**2 # (Earth radius is in meters) <<<<<<<<<<<<<<<<<<<<<<<
-    A = np.empty_like(grid)
-    for i in xrange(ny):
-        for j in xrange(nx):
-            lat1, lat2 = y[i] * D2R, y[i+1] * D2R
-            lon1, lon2 = x[j] * D2R, x[j+1] * D2R
-            A[i,j] = C * np.abs(np.sin(lat1)-np.sin(lat2)) * np.abs(lon1-lon2)
-    return A
-
-
-def area_weighted_mean(X, A):
+def area_weighted_mean(X, area):
     """Compute the area-weighted-average time series from a 3d array.
     
     For each value in the average time series also returns the fraction
@@ -685,7 +645,7 @@ def area_weighted_mean(X, A):
         Array containing one time series per grid-cell, where the
         first dimension (i) is the time, and the second and thrid 
         dimensions (j and k) are the spatial coordinates (x,y).
-    A : 2d-array
+    area : 2d-array
         A grid containing the area of each grid-cell on X, i.e.,
         the spatial coordinates.
 
@@ -712,7 +672,7 @@ def area_weighted_mean(X, A):
     ar = np.zeros(nt, 'f8')  # container for fraction of area covered
     for k in range(nt):      # weight-average each 2d time step
         G = X[k,...]
-        W = A.copy()
+        W = area.copy()
         W[np.isnan(G)] = 0
         s = W.sum()
         if s != 0:

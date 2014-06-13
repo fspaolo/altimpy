@@ -18,7 +18,7 @@ import scipy.ndimage as ni
 import mpl_toolkits.basemap as bm
 from scipy.interpolate import UnivariateSpline as Spline
 
-from altimpy import ll2xy, lon_180_360, EARTH_RADIUS_KM
+from altimpy import ll2xy, lon_180_360, EARTH_RADIUS_KM, cell2node
 
 
 class CircularList(list):
@@ -793,15 +793,16 @@ def get_area_cells(grid, lon, lat):
     return area
 
 
-def get_area(arr, x, y, region=None):
-    """Integrates the area of non-null grid cells in 'region'.
+def get_area(grid, x, y, region=None):
+    """Integrates the area of non-null grid cells.
 
+    If 'region' is provided, subsets the grid.
     Region bounds are inclusive.
 
     Parameters
     ----------
-    arr : 2d-array to subset
-    x, y : 1d arrays with the coordinates of arr
+    grid : 2d-array, the grid [to subset]
+    x, y : 1d arrays with the grid coordinates
     region : (left, right, bottom, top), inclusive
 
     Returns
@@ -810,6 +811,8 @@ def get_area(arr, x, y, region=None):
 
     """
     if region is not None:
-        arr, x, y = get_subset(region, arr, x, y)
-    return np.nansum(get_area_cells(arr, x, y))
+        grid, x, y = get_subset(region, grid, x, y)
+    area = get_area_cells(grid, x, y)
+    area[np.isnan(grid)] = np.nan
+    return np.nansum(area)
 

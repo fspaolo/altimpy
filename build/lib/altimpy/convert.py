@@ -783,3 +783,18 @@ def date2year(date):
         fraction = year_elapsed/year_duration
         return date.year + fraction
     return np.asarray([d2y(d) for d in date])
+
+
+def cell2node(x, y):
+    """Convert cell-centered coordinates to node-centered (the edges).
+    
+    x/y : 1d-arrays
+    """
+    dx = x[1] - x[0]
+    dy = y[1] - y[0]
+    x -= dx / 2.
+    y -= dy / 2.
+    x = np.append(x, x[-1]+dx)
+    y = np.append(y, y[-1]+dy)
+    return x, y
+

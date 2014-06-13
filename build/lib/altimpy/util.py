@@ -18,7 +18,7 @@ import scipy.ndimage as ni
 import mpl_toolkits.basemap as bm
 from scipy.interpolate import UnivariateSpline as Spline
 
-from altimpy import ll2xy, lon_180_360, EARTH_RADIUS_KM
+from altimpy import ll2xy, lon_180_360, EARTH_RADIUS_KM, cell2node
 
 
 class CircularList(list):
@@ -742,32 +742,75 @@ def get_subset(region, arr, x, y):
 
 def haversine(lon1, lat1, lon2, lat2):
     """
-    Calculate the great circle distance between two points 
-    on the earth (specified in decimal degrees) -> km.
+    Calculate the great circle distance between two points on the earth.
+
+    Corrdinates in decimal degrees -> distance in km.
     """
-    lon1, lat1, lon2, lat2 = np.deg2rad([lon1, lat1, lon2, lat2])
+    lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
     # haversine formula 
     dlon = lon2 - lon1 
     dlat = lat2 - lat1 
-    a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
-    c = 2 * np.asin(np.sqrt(a)) 
+    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+    c = 2 * math.asin(math.sqrt(a)) 
     # radius of the Earth in km
     km = EARTH_RADIUS_KM * c
     return km 
 
 
-import math
- 
-def distance(origin, destination):
-    lat1, lon1 = origin
-    lat2, lon2 = destination
-    radius = 6371 # km
- 
-    dlat = math.radians(lat2-lat1)
-    dlon = math.radians(lon2-lon1)
-    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
-        * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    d = radius * c
- 
-    return d
+def get_area_cells(grid, lon, lat):
+    """Calculate the area for each cell in the grid.
+
+    lon/lat are coordinates in decimal degrees.
+
+    Parameters
+    ----------
+    grid : 2d-array
+        A rectangular grid.
+    x, y : 1d-arrays
+        The coordinates of the cells or nodes (edges). If x and y are
+        of the same lengh as grid dimensions, then cell-centered 
+        coordinates are assumed, otherwise edges are assumed.
+
+    Returns
+    -------
+    out : 2d-array
+        Same shape as 'grid' with the values of the area on each cell.
+
+    Notes
+    -----
+    Grid-cell area is in km**2.
+
+    """
+    ny, nx = grid.shape
+    area = np.zeros_like(grid)
+    if len(lon) == nx and len(lat) == ny:
+        lon, lat = cell2node(lon, lat)   # convert cells -> nodes
+    for i in xrange(ny):
+        for j in xrange(nx):
+            a = haversine(lon[j], lat[i], lon[j], lat[i+1]) 
+            b = haversine(lon[j], lat[i], lon[j+1], lat[i])
+            area[i,j] = a * b
+    return area
+
+
+def get_area(arr, x, y, region=None):
+    """Integrates the area of non-null grid cells in 'region'.
+
+    Region bounds are inclusive.
+
+    Parameters
+    ----------
+    arr : 2d-array to subset
+    x, y : 1d arrays with the coordinates of arr
+    region : (left, right, bottom, top), inclusive
+
+    Returns
+    -------
+    area : float, the integrated area
+
+    """
+    if region is not None:
+        arr, x, y = get_subset(region, arr, x, y)
+    #return np.nansum(get_area_cells(arr, x, y))
+    return get_area_cells(arr, x, y)
+
