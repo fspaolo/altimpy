@@ -791,12 +791,12 @@ def cell2node(x, y):
     x/y : 1d-arrays
 
     """
-    _x, _y = x.copy(), y.copy()
-    dx = _x[1] - _x[0]
-    dy = _y[1] - _y[0]
-    _x -= dx / 2.
-    _y -= dy / 2.
-    _x = np.append(_x, _x[-1]+dx)
-    _y = np.append(_y, _y[-1]+dy)
-    return _x, _y
+    x_, y_ = x.copy(), y.copy()
+    dx = x_[1] - x_[0]
+    dy = y_[1] - y_[0]
+    x_ -= dx / 2.
+    y_ -= dy / 2.
+    x_ = np.append(x_, x_[-1]+dx)
+    y_ = np.append(y_, y_[-1]+dy)
+    return x_, y_
 
