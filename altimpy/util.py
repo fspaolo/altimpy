@@ -755,3 +755,41 @@ def haversine(lon1, lat1, lon2, lat2):
     # radius of the Earth in km
     km = EARTH_RADIUS_KM * c
     return km 
+
+
+def get_area_cells(grid, lon, lat):
+    """Calculate the area for each cell in the grid.
+
+    lon/lat are coordinates in decimal degrees.
+
+    Parameters
+    ----------
+    grid : 2d-array
+        A rectangular grid.
+    x, y : 1d-arrays
+        The coordinates of the cells or nodes (edges). If x and y are
+        of the same lengh as grid dimensions, then cell-centered 
+        coordinates are assumed, otherwise edges are assumed.
+
+    Returns
+    -------
+    out : 2d-array
+        Same shape as 'grid' with the values of the area on each cell.
+
+    Notes
+    -----
+    Grid-cell area is in km**2.
+
+    """
+    ny, nx = grid.shape
+    area = np.zeros_like(grid)
+    if len(lon) == nx and len(lat) == ny:
+        lon, lat = cell2node(lon, lat)   # convert cells -> nodes
+    for i in xrange(ny):
+        for j in xrange(nx):
+            a = haversine(lon[j], lat[i], lon[j], lat[i+1]) 
+            b = haversine(lon[j], lat[i], lon[j+1], lat[i])
+            area[i,j] = a * b
+    return area
+
+
