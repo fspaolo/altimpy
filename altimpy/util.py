@@ -730,7 +730,7 @@ def get_subset(region, arr, x, y):
     """
     arr2, x2, y2 = arr.copy(), x.copy(), y.copy()  # important!
     l, r, b, t = region
-    x = lon_180_360(x, region)
+    x2 = lon_180_360(x2, region)
     j, = np.where((l <= x2) & (x2 <= r))
     i, = np.where((b <= y2) & (y2 <= t))
     if len(j) == 0 or len(i) == 0:
