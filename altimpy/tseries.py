@@ -652,7 +652,7 @@ def get_area_cells(grid, x, y):
 
     Notes
     -----
-    If coordinates are lon/lat, then area is given in m**2.
+    The area is given in m**2.
 
     """
     ny, nx = grid.shape
