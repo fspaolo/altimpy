@@ -669,7 +669,7 @@ def get_area_cells(grid, lon, lat):
     return area
 
 
-def area_weighted_mean(X, A):
+def area_weighted_mean(X, area):
     """Compute the area-weighted-average time series from a 3d array.
     
     For each value in the average time series also returns the fraction
@@ -681,7 +681,7 @@ def area_weighted_mean(X, A):
         Array containing one time series per grid-cell, where the
         first dimension (i) is the time, and the second and thrid 
         dimensions (j and k) are the spatial coordinates (x,y).
-    A : 2d-array
+    area : 2d-array
         A grid containing the area of each grid-cell on X, i.e.,
         the spatial coordinates.
 
@@ -708,7 +708,7 @@ def area_weighted_mean(X, A):
     ar = np.zeros(nt, 'f8')  # container for fraction of area covered
     for k in range(nt):      # weight-average each 2d time step
         G = X[k,...]
-        W = A.copy()
+        W = area.copy()
         W[np.isnan(G)] = 0
         s = W.sum()
         if s != 0:
