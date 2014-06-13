@@ -17,6 +17,7 @@ import scipy.spatial as sl
 import scipy.ndimage as ni
 import mpl_toolkits.basemap as bm
 from scipy.interpolate import UnivariateSpline as Spline
+from sklearn.linear_model import LassoCV
 
 from altimpy import ll2xy, lon_180_360, EARTH_RADIUS_KM, cell2node
 
@@ -815,4 +816,20 @@ def get_area(grid, x, y, region=None):
     area = get_area_cells(grid, x, y)
     area[np.isnan(grid)] = np.nan
     return np.nansum(area)
+
+
+def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e4):
+    """Regularized linear regression using LASSO and Cross-validation.
+    
+    Fits the best polynomial selected from a range of degrees up to n=max_deg.
+    "Best" here refers to minimum RMSE fit and simpler model.
+
+    """
+    Xpoly = dmatrix('C(x, Poly)')
+    lasso_model = LassoCV(cv=cv, copy_X=True, normalize=True, 
+                          max_iter=max_iter)
+    lasso_fit = lasso_model.fit(Xpoly[:, 1:max_deg+1], y)
+    lasso_path = lasso_model.score(Xpoly[:, 1:max_deg+1], y)
+    return lasso_fit.predict(Xpoly[:, 1:max_deg+1])[np.argsort(x)]
+
 

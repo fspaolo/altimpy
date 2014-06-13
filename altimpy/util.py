@@ -18,6 +18,7 @@ import scipy.ndimage as ni
 import mpl_toolkits.basemap as bm
 from scipy.interpolate import UnivariateSpline as Spline
 from sklearn.linear_model import LassoCV
+from patsy import dmatrix
 
 from altimpy import ll2xy, lon_180_360, EARTH_RADIUS_KM, cell2node
 
@@ -822,7 +823,7 @@ def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e4):
     """Regularized linear regression using LASSO and Cross-validation.
     
     Fits the best polynomial selected from a range of degrees up to n=max_deg.
-    Best here refers to minimum RMSE fit and simpler model.
+    "Best" here refers to minimum RMSE fit and simpler model.
 
     """
     Xpoly = dmatrix('C(x, Poly)')
