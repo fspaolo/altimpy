@@ -633,8 +633,10 @@ def weighted_average_error(df, df_nobs):
 # Other functionalities
 #----------------------------------------------------------------
 
-def get_area_cells(grid, x, y):
-    """Calculates the area of each grid-cell.
+def get_area_cells(grid, lon, lat):
+    """Calculate the area for each cell in the grid.
+
+    lon/lat are coordinates in decimal degrees.
 
     Parameters
     ----------
@@ -652,25 +654,19 @@ def get_area_cells(grid, x, y):
 
     Notes
     -----
-    The area is given in m**2.
+    Grid-cell area is in km**2.
 
     """
     ny, nx = grid.shape
-    # cells -> nodes
-    if len(x) == nx and len(y) == ny:  
-        dx, dy = x[1] - x[0], y[1] - y[0]
-        x -= dx/2.
-        y -= dy/2.
-        x = np.append(x, x[-1]+dx)
-        y = np.append(y, y[-1]+dy)
-    C = EARTH_RADIUS_M**2 * D2R  # deg -> rad (Earth radius is in meters)
-    A = np.empty_like(grid)
+    area = np.zeros_like(grid)
+    if len(lon) == nx and len(lat) == ny:
+        lon, lat = cell2node(lon, lat)   # convert cells -> nodes
     for i in xrange(ny):
         for j in xrange(nx):
-            lat1, lat2 = y[i] * D2R, y[i+1] * D2R
-            lon1, lon2 = x[j] * D2R, x[j+1] * D2R
-            A[i,j] = C * np.abs(np.sin(lat1)-np.sin(lat2)) * np.abs(lon1-lon2)
-    return A
+            a = haversine(lon[j], lat[i], lon[j], lat[i+1]) 
+            b = haversine(lon[j], lat[i], lon[j+1], lat[i])
+            area[i,j] = a * b
+    return area
 
 
 def area_weighted_mean(X, A):

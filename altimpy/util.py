@@ -18,7 +18,7 @@ import scipy.ndimage as ni
 import mpl_toolkits.basemap as bm
 from scipy.interpolate import UnivariateSpline as Spline
 
-from altimpy import ll2xy, lon_180_360
+from altimpy import ll2xy, lon_180_360, EARTH_RADIUS_KM
 
 
 class CircularList(list):
@@ -738,3 +738,36 @@ def get_subset(region, arr, x, y):
     j1, j2 = j.min(), j.max()
     i1, i2 = i.min(), i.max()
     return arr2[...,i1:i2,j1:j2], x2[j1:j2], y2[i1:i2]
+
+
+def haversine(lon1, lat1, lon2, lat2):
+    """
+    Calculate the great circle distance between two points 
+    on the earth (specified in decimal degrees) -> km.
+    """
+    lon1, lat1, lon2, lat2 = np.deg2rad([lon1, lat1, lon2, lat2])
+    # haversine formula 
+    dlon = lon2 - lon1 
+    dlat = lat2 - lat1 
+    a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
+    c = 2 * np.asin(np.sqrt(a)) 
+    # radius of the Earth in km
+    km = EARTH_RADIUS_KM * c
+    return km 
+
+
+import math
+ 
+def distance(origin, destination):
+    lat1, lon1 = origin
+    lat2, lon2 = destination
+    radius = 6371 # km
+ 
+    dlat = math.radians(lat2-lat1)
+    dlon = math.radians(lon2-lon1)
+    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
+        * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    d = radius * c
+ 
+    return d
