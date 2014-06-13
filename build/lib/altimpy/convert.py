@@ -789,12 +789,14 @@ def cell2node(x, y):
     """Convert cell-centered coordinates to node-centered (the edges).
     
     x/y : 1d-arrays
+
     """
-    dx = x[1] - x[0]
-    dy = y[1] - y[0]
-    x -= dx / 2.
-    y -= dy / 2.
-    x = np.append(x, x[-1]+dx)
-    y = np.append(y, y[-1]+dy)
-    return x, y
+    _x, _y = x.copy(), y.copy()
+    dx = _x[1] - _x[0]
+    dy = _y[1] - _y[0]
+    _x -= dx / 2.
+    _y -= dy / 2.
+    _x = np.append(_x, _x[-1]+dx)
+    _y = np.append(_y, _y[-1]+dy)
+    return _x, _y
 
