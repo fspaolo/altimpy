@@ -793,3 +793,23 @@ def get_area_cells(grid, lon, lat):
     return area
 
 
+def get_area(arr, x, y, region=None):
+    """Integrates the area of non-null grid cells in 'region'.
+
+    Region bounds are inclusive.
+
+    Parameters
+    ----------
+    arr : 2d-array to subset
+    x, y : 1d arrays with the coordinates of arr
+    region : (left, right, bottom, top), inclusive
+
+    Returns
+    -------
+    area : float, the integrated area
+
+    """
+    if region is not None:
+        arr, x, y = get_subset(region, arr, x, y)
+    return np.nansum(get_area_cells(arr, x, y))
+
