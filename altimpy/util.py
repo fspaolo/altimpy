@@ -785,7 +785,7 @@ def get_area_cells(grid, lon, lat):
     """
     ny, nx = grid.shape
     area = np.zeros_like(grid)
-    if len(lon) == nx and len(lat) == ny:
+    if len(lat) == ny:
         lon, lat = cell2node(lon, lat)   # convert cells -> nodes
     for i in xrange(ny):
         for j in xrange(nx):
@@ -809,14 +809,17 @@ def get_area(grid, x, y, region=None):
 
     Returns
     -------
-    area : float, the integrated area
+    sum_area : float, the integrated area
+    num_cells : int, the number of non-null grid cells
 
     """
     if region is not None:
         grid, x, y = get_subset(region, grid, x, y)
     area = get_area_cells(grid, x, y)
     area[np.isnan(grid)] = np.nan
-    return np.nansum(area)
+    sum_area = np.nansum(area)
+    num_cells = len(area[~np.isnan(area)])
+    return sum_area, num_cells
 
 
 def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e4):

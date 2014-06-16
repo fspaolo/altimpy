@@ -799,4 +799,3 @@ def cell2node(x, y):
     x_ = np.append(x_, x_[-1]+dx)
     y_ = np.append(y_, y_[-1]+dy)
     return x_, y_
-
