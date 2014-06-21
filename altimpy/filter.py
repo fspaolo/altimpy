@@ -46,7 +46,7 @@ def med_filt(arr, size=(3,3), min_pixels=3, **kw):
     Supports NaNs.
     Uses a minimum number of non-null pixels.
     """
-    def _median(x, min_pixels=min_pixels):  # not an ordinary median
+    def _median(x, min_pixels=min_pixels):  # not an ordinary median!
         central_pixel = x[(len(x)-1)/2]
         valid_pixels = x[~np.isnan(x)]
         if np.isnan(central_pixel) or len(valid_pixels) < min_pixels:
@@ -108,5 +108,36 @@ def step_filt(x, delta=3, window=7):
         if np.abs(diff) > delta:
             v[i+1:] -= diff
     return v[n:-n], m[n:-n]
- 
+
+
+def _peak_filt(x, y, n_std=3):
+    """Filter spikes in a vector.
+    
+    See peak_filt()
+    """
+    assert not np.isnan(y).all(), 'empty array'
+    y2 = y.copy()
+    i_notnan, = np.where(~np.isnan(y))
+    # detrend
+    p = ap.lasso_cv(x[i_notnan], y[i_notnan], max_deg=3)
+    y2[i_notnan] = y[i_notnan] - p
+    # filter
+    i_peaks, = np.where(np.abs(y2) > n_std * np.nanstd(y2))
+    y[i_peaks] = np.nan
+    return len(i_peaks)
+
+
+def peak_filt(x, y, n_std=3, iterative=True):
+    """Filter spikes in a vector (iteratively).
+
+    Remove values greater than n*std from the trend.
+    """
+    n_peaks = 0
+    if not np.isnan(y).all():
+        n_peaks = _peak_filt(x, y, n_std=n_std)
+        if iterative and n_peaks != 0:
+            while n_peaks != 0 and not np.isnan(y).all():
+                n_peaks = _peak_filt(x, y, n_std=n_std)
+    return y
+
 

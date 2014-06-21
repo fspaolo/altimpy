@@ -810,7 +810,7 @@ def get_area(grid, x, y, region=None):
     Returns
     -------
     sum_area : float, the integrated area
-    num_cells : foat, the number of non-null grid cells
+    num_cells : int, the number of non-null grid cells
 
     """
     if region is not None:

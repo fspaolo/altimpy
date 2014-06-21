@@ -6,10 +6,10 @@ should be reviewed.
 
 """
 # general regions
-ais = antarctica = (0, 360, -90, -60)
-wais = (179, 311.5, -90, -60)
-eais1 = (0, 179, -90, -60)         # lon is 0/360!
-eais2 = (311.5, 360, -90, -60)
+ais = = allantarctica = antarctica = (0, 360, -90, -60)
+wais = westantarctica = (179, 311.5, -90, -60)
+eais1 = eastantarctica1 = (0, 179, -90, -60)         # lon is 0/360!
+eais2 = eastantarctica2 = (311.5, 360, -90, -60)
 eais1_no_rf = (0, 179, -77, -60)   # w/o Ross and Filchner 
 eais2_no_rf = (330, 360, -77, -60)
 queenmaud = qml = (0, 38, -71.5, -68.5)   # revise boundaries!
