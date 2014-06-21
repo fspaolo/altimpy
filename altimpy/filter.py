@@ -12,6 +12,8 @@ import pandas as pd
 import scipy.ndimage as ni
 import statsmodels.api as sm
 
+from altimpy import lasso_cv
+
 
 def std_filt(arr, n=3, per_field=False):
     """Filter out pts greater than n std.
@@ -119,7 +121,7 @@ def _peak_filt(x, y, n_std=3):
     y2 = y.copy()
     i_notnan, = np.where(~np.isnan(y))
     # detrend
-    p = ap.lasso_cv(x[i_notnan], y[i_notnan], max_deg=3)
+    p = lasso_cv(x[i_notnan], y[i_notnan], max_deg=3)
     y2[i_notnan] = y[i_notnan] - p
     # filter
     i_peaks, = np.where(np.abs(y2) > n_std * np.nanstd(y2))
@@ -132,12 +134,10 @@ def peak_filt(x, y, n_std=3, iterative=True):
 
     Remove values greater than n*std from the trend.
     """
-    n_peaks = 0
-    if not np.isnan(y).all():
-        n_peaks = _peak_filt(x, y, n_std=n_std)
-        if iterative and n_peaks != 0:
-            while n_peaks != 0 and not np.isnan(y).all():
-                n_peaks = _peak_filt(x, y, n_std=n_std)
+    n_peaks = _peak_filt(x, y, n_std=n_std)
+    if iterative and n_peaks != 0:
+        while n_peaks != 0 and not np.isnan(y).all():
+            n_peaks = _peak_filt(x, y, n_std=n_std)
     return y
 
 
