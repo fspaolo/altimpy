@@ -6,7 +6,7 @@ should be reviewed.
 
 """
 # general regions
-ais = = allantarctica = antarctica = (0, 360, -90, -60)
+ais = allantarctica = antarctica = (0, 360, -90, -60)
 wais = westantarctica = (179, 311.5, -90, -60)
 eais1 = eastantarctica1 = (0, 179, -90, -60)         # lon is 0/360!
 eais2 = eastantarctica2 = (311.5, 360, -90, -60)
