@@ -474,14 +474,12 @@ def referenced(x, to='first'):
         To reference the series to its 'first' or 'mean'.
     """
     assert to in ['first', 'mean'], "`to` must be 'first' or 'mean'"
-    if (not isinstance(x, np.ndarray)) and (not isinstance(x, pd.Series)):
-        x = np.asarray(x)
-    if np.alltrue(np.isnan(x)):
+    if np.isnan(x).all():
         pass
     elif to == 'first':
         x -= x[first_valid_index(x)]
     else:
-        x -= x[~np.isnan(x)].mean()
+        x -= np.nanmean(x)
     return x
 
 
