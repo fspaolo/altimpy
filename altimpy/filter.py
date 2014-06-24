@@ -42,7 +42,7 @@ def std_filt(arr, n=3, per_field=False):
     return arr
 
 
-def med_filt(arr, size=(3,3), min_pixels=3, **kw):
+def median_filt(arr, size=(3,3), min_pixels=3, **kw):
     """Median filter with constrain for 2d array. 
     
     Supports NaNs.
@@ -84,7 +84,7 @@ def time_filt(t, y, from_time=1991, to_time=2013):
     return t[k], y[k,...]
 
 
-def perc_filt(x, min_perc=0.7):
+def percent_filt(x, min_perc=0.7):
     """Filter vector with a min percentage of non-null entries."""
     if np.isnan(x).all():
         pass 
@@ -141,3 +141,12 @@ def peak_filt(x, y, n_std=3, iterative=True):
     return y
 
 
+def std_series_filt(x, y, max_std=2):
+    """Filter entire vector if the detrended std > max_std."""
+    if not np.isnan(y).all():
+        i_notnan, = np.where(~np.isnan(y))
+        poly = lasso_cv(x[i_notnan], y[i_notnan], max_deg=3)
+        std = np.nanstd(y[i_notnan] - poly) # std of detrended series
+        if std > max_std:
+            y[:] = np.nan
+    return y, std

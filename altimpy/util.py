@@ -473,14 +473,15 @@ def referenced(x, to='first'):
     to : str, default 'first'
         To reference the series to its 'first' or 'mean'.
     """
+    x2 = x.copy()
     assert to in ['first', 'mean'], "`to` must be 'first' or 'mean'"
-    if np.isnan(x).all():
+    if np.isnan(x2).all():
         pass
     elif to == 'first':
-        x -= x[first_valid_index(x)]
+        x2 -= x2[first_valid_index(x2)]
     else:
-        x -= np.nanmean(x)
-    return x
+        x2 -= np.nanmean(x2[:])
+    return x2
 
 
 def referenced2d(arr3d, to='first'):
