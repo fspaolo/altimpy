@@ -86,11 +86,10 @@ def time_filt(t, y, from_time=1991, to_time=2013):
 
 def percent_filt(x, min_perc=0.7):
     """Filter vector with a min percentage of non-null entries."""
-    if np.isnan(x).all():
-        pass 
-    elif ( len(x[~np.isnan(x)]) / float(len(x)) ) < min_perc:
+    percent = len(x[~np.isnan(x)]) / float(len(x))
+    if percent < min_perc:
         x[:] = np.nan
-    return x
+    return x, percent
 
 
 def step_filt(x, delta=3, window=7):
