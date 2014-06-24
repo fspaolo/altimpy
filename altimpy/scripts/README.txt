@@ -33,8 +33,9 @@ Specific processing
 20. merge satellites (serial, extremely fast) [mergesats2.py] code_ok... ok
 21. cross calibration (serial, slow) [xcalib2.py] code_ok... ok
 22. error/nobs propagation (serial, slow) [xcalib3.py] code_ok... ok
-23. joint backscatter correction (serial, slow) [backscatter2.py] code_ok... ok
-24. post processing [postproc.py] code_ok... ok
+23. cross-calibration offset (serial, fast) [getoffset.py] code_ok... ok
+24. joint backscatter correction (serial, slow) [backscatter2.py] code_ok... ok
+25. post processing [postproc.py] code_ok... ok
     - filter out uncomplete ts
     - fill in gaps in time
     - filter out step-changes
