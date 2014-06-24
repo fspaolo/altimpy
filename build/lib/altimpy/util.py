@@ -131,7 +131,7 @@ class Mask(object):
         mask = fin.getNode(mask).read()
         print 'mask loaded from:', fin
         fin.close()
-        if not ism(x): # if km -> m
+        if not is_meter(x): # if km -> m
             x *= 1e3
             y *= 1e3
         self.mask_x = x
@@ -164,7 +164,7 @@ class Mask(object):
         print 'done.'
 
 
-def ism(x):
+def is_meter(x):
     """Check if units are in meters."""
     return True if (int(math.log10(np.max(x)) + 1) > 4) else False
 

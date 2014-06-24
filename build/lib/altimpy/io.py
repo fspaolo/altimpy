@@ -11,7 +11,7 @@ import tables as tb
 import datetime as dt
 import netCDF4 as nc
 
-from altimpy import ism
+from altimpy import is_meter
 
 
 # definition of Table structures for HDF5 files
@@ -226,7 +226,7 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     xmin, ymin = p1(bbox_xy[0], bbox_xy[1], inverse=True)
     xmax, ymax = p1(bbox_xy[2], bbox_xy[3], inverse=True)
     bbox_ll = (xmin, ymin, xmax, ymax)
-    if units == 'km' and ism(x):  # if coords in m, convert to km
+    if units == 'km' and is_meter(x):  # if coords in m, convert to km
         x /= 1e3
         y /= 1e3
     print 'image limits (left/right/bottom/top):'
