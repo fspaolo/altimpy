@@ -143,6 +143,7 @@ def peak_filt(x, y, n_std=3, iterative=True):
 
 def std_series_filt(x, y, max_std=2):
     """Filter entire vector if the detrended std > max_std."""
+    std = None
     if not np.isnan(y).all():
         i_notnan, = np.where(~np.isnan(y))
         poly = lasso_cv(x[i_notnan], y[i_notnan], max_deg=3)
