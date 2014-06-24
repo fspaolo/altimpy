@@ -788,7 +788,8 @@ def date2year(date):
 def cell2node(x, y):
     """Convert cell-centered coordinates to node-centered (the edges).
     
-    x/y : 1d-arrays
+    input <= x/y : 1d-arrays (N)
+    output => x2/y2 : 1d-arrays (N+1)
 
     """
     x_, y_ = x.copy(), y.copy()

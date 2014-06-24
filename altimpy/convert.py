@@ -792,11 +792,11 @@ def cell2node(x, y):
     output => x2/y2 : 1d-arrays (N+1)
 
     """
-    x_, y_ = x.copy(), y.copy()
-    dx = x_[1] - x_[0]
-    dy = y_[1] - y_[0]
-    x_ -= dx / 2.
-    y_ -= dy / 2.
-    x_ = np.append(x_, x_[-1]+dx)
-    y_ = np.append(y_, y_[-1]+dy)
-    return x_, y_
+    x2, y2 = x.copy(), y.copy()
+    dx = x2[1] - x2[0]
+    dy = y2[1] - y2[0]
+    x2 -= dx / 2.
+    y2 -= dy / 2.
+    x2 = np.append(x2, x2[-1]+dx)
+    y2 = np.append(y2, y2[-1]+dy)
+    return x2, y2
