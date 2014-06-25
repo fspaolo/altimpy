@@ -43,6 +43,9 @@ Specific processing
     - regrid 4x
     - apply mask
     - etc.
+26. map area of each grid cell (serial, slow) [areacell.py]
+27. map area of each ice shelf (serial, fast) [areashelf.py]
+28. fit polynomials (serial, ???) [polyfit.py]
 
 Visualization
 -------------
