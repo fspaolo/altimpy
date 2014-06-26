@@ -6,6 +6,7 @@ Notes
 -----
 keep separated files (do no merge) as long as possible.
 The more (and smaller) files the better for parallel (and serial) processing!
+See the README.txt file in the data folders.
 
 General processing
 ------------------
