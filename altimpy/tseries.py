@@ -11,6 +11,11 @@ from scipy.signal import detrend
 from altimpy.const import *
 from altimpy.util import *
 
+from sklearn.linear_model import LassoCV
+
+# DEPRECATED. Use sklearn instead
+from patsy import dmatrix
+
 #----------------------------------------------------------------
 # Backscatter corrections
 #----------------------------------------------------------------
@@ -682,5 +687,91 @@ def area_weighted_mean(X, area):
         ts[k] = np.sum(W*G)  # area-weighted average per time step
         ar[k] =  G.count() / total_area
     return [ts, ar]
+
+
+def kfold(X, K, randomise=True):
+    """Generates K training-testing pairs from the indices in X.
+    
+    Each pair is a partition of the indices in X [0,..,N-1], where testing is
+    an iterable of length len(X)/K. So each training iterable is of length
+    (K-1)*len(X)/K.
+    
+    If randomise is true, the indices of X are shuffled before partitioning,
+    otherwise the order is preserved in training and testing.
+
+    """
+    ind = xrange(len(X))
+    if randomise: 
+        from random import shuffle
+        ind = list(ind)
+        shuffle(ind)
+    for k in xrange(K):
+    	i_training = [i for i in ind if i % K != k]
+    	i_testing = [i for i in ind if i % K == k]
+    	yield i_training, i_testing
+
+
+def polyfit_kfold(x, y, k=10, deg=2, randomise=False):
+    """Perform polyfit on k-fold train data and evaluate on test data.
+
+    Return the average MSE.
+    """
+    mse_ = [] 
+    for i_train, i_test in kfold(x, k, randomise=randomise):
+        p = np.polyfit(x[i_train], y[i_train], deg)
+        y_pred = np.polyval(p, x[i_test])
+        y_true = y[i_test]
+        mse_ = np.append(mse_, mse(y_true, y_pred))
+    return np.mean(mse_)
+
+
+# TODO: extend the way degrees are passed, e.g., (0,3) and [0, 1, 2, 3]
+def polyfit_select(x, y, cv=10, max_deg=3, randomise=False):
+    """Select best polynomial model using cross-validaiton.
+    
+    Return the order of selected model and each model MSE.
+    """
+    model_order = np.arange(1,max_deg+1)
+    model_mse = np.zeros(len(model_order), 'f8')
+    for i, n in enumerate(model_order):
+        model_mse[i] = polyfit_kfold(x, y, k=cv, deg=n, randomise=randomise)
+    return model_order[model_mse.argmin()], model_mse
+
+
+def polyfit_cv(x, y, cv=10, max_deg=3, return_coef=False, randomise=False):
+    """Polynomial regression using LSTSQ and cross-validation.
+
+    The order of the polynomial is selected by CV.
+    
+    Returns
+    -------
+    y_pred : fitted polynomial evaluated on x.
+    a : coefficients of the fitted polynomial.
+    n : order of the fitted polynomial.
+    mse : mean squared error of fitted polynomial.
+    var : variance of the estimated coefficients.
+    """
+    n, mse = polyfit_select(x, y, cv=cv, max_deg=max_deg, randomise=randomise)
+    a = np.polyfit(x, y, n)
+    y_pred = np.polyval(a, x)
+    out = y_pred
+    if return_coef:
+        out = [y_pred, a, n, mse, var]
+    return out
+
+
+def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e4):
+    """Regularized polynomial regression using LASSO and cross-validation.
+    
+    Fits the best polynomial selected from a range of degrees up to n=max_deg.
+    "Best" here refers to minimum RMSE fit and simpler model (less coefs).
+
+    The alpha paramenter (amound of regularization) is selected by CV.
+
+    """
+    Xpoly = dmatrix('C(x, Poly)')
+    lasso = LassoCV(cv=cv, copy_X=True, normalize=True, max_iter=max_iter)
+    lasso = lasso.fit(Xpoly[:, 1:max_deg+1], y)
+    return lasso.predict(Xpoly[:, 1:max_deg+1])[np.argsort(x)]
 
 

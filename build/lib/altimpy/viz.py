@@ -105,7 +105,7 @@ def pv_cmap(fname, cname, cmap):
     Example
     -------
     import altimpy as ap
-    cmap = ap.create_cmap(cmap_lib['wrgb'])
+    cmap = ap.create_cmap(ap.cmap_lib['wrgb'])
     ap.pv_cmap('wrgb.xml', 'wrgb', cmap)
 
     """
