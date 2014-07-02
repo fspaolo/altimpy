@@ -715,6 +715,7 @@ def polyfit_kfold(x, y, k=10, deg=2, weight=None, randomise=False):
     """Perform polyfit on k-fold train data and evaluate on test data.
 
     Return the average MSE.
+    See 'polyfit_cv'.
     """
     mse_ = [] 
     w_train = None
@@ -733,6 +734,7 @@ def polyfit_select(x, y, cv=10, max_deg=3, weight=None, randomise=False):
     """Select best polynomial model using cross-validaiton.
     
     Return the order of selected model and each model MSE.
+    See 'polyfit_cv'.
     """
     model_order = np.arange(1,max_deg+1)
     model_mse = np.zeros(len(model_order), 'f8')
@@ -746,13 +748,22 @@ def polyfit_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
                return_coef=False):
     """Least squares polynomial fit with cross-validation.
 
-    The order of the polynomial is selected by CV.
+    The order of the polynomial is selected by k-fold CV.
+
+    Parameters
+    ----------
+    x, y : feature and target, 1d arrays.
+    cv : number of folds in the cross-validation.
+    max_deg : maximum degree for testing polynomials.
+    weight : weights for the least squares fit.
+    randomise : randomises the data prior applying k-fold CV.
+    return_coef : it returns extra parameters (see below).
     
     Returns
     -------
     y_pred : fitted polynomial evaluated on x.
 
-    if 'return_coef=True', also returns:
+    If 'return_coef=True', also returns:
 
     coef : coefficients of fitted polynomial.
     deg : degree of fitted polynomial.
@@ -775,7 +786,7 @@ def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e4):
     Fits the best polynomial selected from a range of degrees up to n=max_deg.
     "Best" here refers to minimum RMSE fit and simpler model (less coefs).
 
-    The 'alpha' paramenter (amound of regularization) is selected by CV.
+    The 'alpha' paramenter (amound of regularization) is selected by k-fold CV.
 
     """
     # TODO: Instead of 'dmatrix' use sklearn method!
