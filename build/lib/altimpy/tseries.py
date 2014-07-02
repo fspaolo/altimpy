@@ -689,7 +689,7 @@ def area_weighted_mean(X, area):
     return [ts, ar]
 
 
-def kfold(X, K, randomise=True):
+def kfold(X, K, randomise=False):
     """Generates K training-testing pairs from the indices in X.
     
     Each pair is a partition of the indices in X [0,..,N-1], where testing is
@@ -711,14 +711,17 @@ def kfold(X, K, randomise=True):
     	yield i_training, i_testing
 
 
-def polyfit_kfold(x, y, k=10, deg=2, randomise=False):
+def polyfit_kfold(x, y, k=10, deg=2, weight=None, randomise=False):
     """Perform polyfit on k-fold train data and evaluate on test data.
 
     Return the average MSE.
     """
     mse_ = [] 
+    w_train = None
     for i_train, i_test in kfold(x, k, randomise=randomise):
-        p = np.polyfit(x[i_train], y[i_train], deg)
+        if weight is not None:
+            w_train = weight[i_train]
+        p = np.polyfit(x[i_train], y[i_train], deg, w=w_train)
         y_pred = np.polyval(p, x[i_test])
         y_true = y[i_test]
         mse_ = np.append(mse_, mse(y_true, y_pred))
@@ -726,7 +729,7 @@ def polyfit_kfold(x, y, k=10, deg=2, randomise=False):
 
 
 # TODO: extend the way degrees are passed, e.g., (0,3) and [0, 1, 2, 3]
-def polyfit_select(x, y, cv=10, max_deg=3, randomise=False):
+def polyfit_select(x, y, cv=10, max_deg=3, weight=None, randomise=False):
     """Select best polynomial model using cross-validaiton.
     
     Return the order of selected model and each model MSE.
@@ -734,12 +737,14 @@ def polyfit_select(x, y, cv=10, max_deg=3, randomise=False):
     model_order = np.arange(1,max_deg+1)
     model_mse = np.zeros(len(model_order), 'f8')
     for i, n in enumerate(model_order):
-        model_mse[i] = polyfit_kfold(x, y, k=cv, deg=n, randomise=randomise)
+        model_mse[i] = polyfit_kfold(x, y, k=cv, deg=n, weight=weight,
+                                     randomise=randomise)
     return model_order[model_mse.argmin()], model_mse
 
 
-def polyfit_cv(x, y, cv=10, max_deg=3, return_coef=False, randomise=False):
-    """Polynomial regression using LSTSQ and cross-validation.
+def polyfit_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
+               return_coef=False):
+    """Least squares polynomial fit with cross-validation.
 
     The order of the polynomial is selected by CV.
     
@@ -749,27 +754,28 @@ def polyfit_cv(x, y, cv=10, max_deg=3, return_coef=False, randomise=False):
 
     if 'return_coef=True', also returns:
 
-    a : coefficients of the fitted polynomial.
-    n : order of the fitted polynomial.
-    mse : mean squared error of fitted polynomial.
-    var : variance of the estimated coefficients.
+    coef : coefficients of fitted polynomial.
+    deg : degree of fitted polynomial.
+    mse : average MSE across folds (tested polynomials).
+    var : variance estimates of fitted coefficients.
     """
-    deg, mse = polyfit_select(x, y, cv=cv, max_deg=max_deg, randomise=randomise)
-    coef = np.polyfit(x, y, deg)
+    deg, mse = polyfit_select(x, y, cv=cv, max_deg=max_deg, weight=weight,
+                              randomise=randomise)
+    coef, cov = np.polyfit(x, y, deg, w=weight, cov=True)
     y_pred = np.polyval(coef, x)
     out = y_pred
     if return_coef:
-        out = [y_pred, coef, deg, mse, var]
+        out = [y_pred, coef, deg, mse, cov.diagonal()]
     return out
 
 
 def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e4):
-    """Regularized polynomial regression using LASSO and cross-validation.
+    """LASSO polynomial fit with cross-validation.
     
     Fits the best polynomial selected from a range of degrees up to n=max_deg.
     "Best" here refers to minimum RMSE fit and simpler model (less coefs).
 
-    The alpha paramenter (amound of regularization) is selected by CV.
+    The 'alpha' paramenter (amound of regularization) is selected by CV.
 
     """
     # TODO: Instead of 'dmatrix' use sklearn method!
