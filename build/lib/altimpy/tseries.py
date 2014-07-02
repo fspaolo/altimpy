@@ -749,6 +749,7 @@ def polyfit_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
     """Least squares polynomial fit with cross-validation.
 
     The order of the polynomial is selected by k-fold CV.
+    Supports NaNs.
 
     Parameters
     ----------
@@ -768,19 +769,25 @@ def polyfit_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
     coef : coefficients of fitted polynomial.
     deg : degree of fitted polynomial.
     mse : average MSE across folds (tested polynomials).
-    var : variance estimates of fitted coefficients.
+    cov : covariance estimates of fitted coefficients.
+
     """
-    deg, mse = polyfit_select(x, y, cv=cv, max_deg=max_deg, weight=weight,
+    ind, = np.where((~np.isnan(x)) & (~np.isnan(y)))
+    x2, y2 = x[ind], y[ind]
+    weight2 = None
+    if weight is not None:
+        weight2 = weight[ind]
+    deg, mse = polyfit_select(x2, y2, cv=cv, max_deg=max_deg, weight=weight2,
                               randomise=randomise)
-    coef, cov = np.polyfit(x, y, deg, w=weight, cov=True)
-    y_pred = np.polyval(coef, x)
+    coef, cov = np.polyfit(x2, y2, deg, w=weight2, cov=True)
+    y_pred = np.polyval(coef, x)  # predict on full data
     out = y_pred
     if return_coef:
-        out = [y_pred, coef, deg, mse, cov.diagonal()]
+        out = [y_pred, coef, deg, mse, cov]
     return out
 
 
-def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e4):
+def lasso_cv(x_, y_, max_deg=3, cv=10, max_iter=1e4):
     """LASSO polynomial fit with cross-validation.
     
     Fits the best polynomial selected from a range of degrees up to n=max_deg.
@@ -788,8 +795,12 @@ def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e4):
 
     The 'alpha' paramenter (amound of regularization) is selected by k-fold CV.
 
+    Supports NaNs.
+
     """
     # TODO: Instead of 'dmatrix' use sklearn method!
+    ind, = np.where((~np.isnan(x_)) & (~np.isnan(y_)))
+    x, y = x_[ind], y_[ind]
     Xpoly = dmatrix('C(x, Poly)')
     lasso = LassoCV(cv=cv, copy_X=True, normalize=True, max_iter=max_iter)
     lasso = lasso.fit(Xpoly[:, 1:max_deg+1], y)
