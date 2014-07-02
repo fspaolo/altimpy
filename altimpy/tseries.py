@@ -746,17 +746,20 @@ def polyfit_cv(x, y, cv=10, max_deg=3, return_coef=False, randomise=False):
     Returns
     -------
     y_pred : fitted polynomial evaluated on x.
+
+    if 'return_coef=True', also returns:
+
     a : coefficients of the fitted polynomial.
     n : order of the fitted polynomial.
     mse : mean squared error of fitted polynomial.
     var : variance of the estimated coefficients.
     """
-    n, mse = polyfit_select(x, y, cv=cv, max_deg=max_deg, randomise=randomise)
-    a = np.polyfit(x, y, n)
-    y_pred = np.polyval(a, x)
+    deg, mse = polyfit_select(x, y, cv=cv, max_deg=max_deg, randomise=randomise)
+    coef = np.polyfit(x, y, deg)
+    y_pred = np.polyval(coef, x)
     out = y_pred
     if return_coef:
-        out = [y_pred, a, n, mse, var]
+        out = [y_pred, coef, deg, mse, var]
     return out
 
 
@@ -769,6 +772,7 @@ def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e4):
     The alpha paramenter (amound of regularization) is selected by CV.
 
     """
+    # TODO: Instead of 'dmatrix' use sklearn method!
     Xpoly = dmatrix('C(x, Poly)')
     lasso = LassoCV(cv=cv, copy_X=True, normalize=True, max_iter=max_iter)
     lasso = lasso.fit(Xpoly[:, 1:max_deg+1], y)
