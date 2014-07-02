@@ -17,8 +17,6 @@ import scipy.spatial as sl
 import scipy.ndimage as ni
 import mpl_toolkits.basemap as bm
 from scipy.interpolate import UnivariateSpline as Spline
-from sklearn.linear_model import LassoCV
-from patsy import dmatrix
 
 from altimpy import ll2xy, lon_180_360, EARTH_RADIUS_KM, cell2node
 
@@ -821,17 +819,18 @@ def get_area(grid, x, y, region=None):
     return sum_area, num_cells
 
 
-def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e4):
-    """Regularized linear regression using LASSO and cross-validation.
-    
-    Fits the best polynomial selected from a range of degrees up to n=max_deg.
-    "Best" here refers to minimum RMSE fit and simpler model.
+def rss(y_true, y_pred, ax=0):
+    """Residual sum of squares."""
+    return np.nansum((y_true - y_pred)**2, axis=ax)
 
-    """
-    Xpoly = dmatrix('C(x, Poly)')
-    lasso_model = LassoCV(cv=cv, copy_X=True, normalize=True, 
-                          max_iter=max_iter)
-    lasso_fit = lasso_model.fit(Xpoly[:, 1:max_deg+1], y)
-    return lasso_fit.predict(Xpoly[:, 1:max_deg+1])[np.argsort(x)]
+
+def mse(y_true, y_pred, ax=0):
+    """Mean squared error."""
+    return np.nanmean((y_true - y_pred)**2, axis=ax)
+
+
+def rmse(y_true, y_pred, ax=0):
+    """Root mean squared error."""
+    return np.sqrt(mse(y_true, y_pred, ax=ax))
 
 

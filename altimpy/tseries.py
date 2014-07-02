@@ -739,7 +739,7 @@ def polyfit_select(x, y, cv=10, max_deg=3, randomise=False):
 
 
 def polyfit_cv(x, y, cv=10, max_deg=3, return_coef=False, randomise=False):
-    """Polynomial regression using LSTSQ and cross-validation.
+    """Least squares polynomial fit with cross-validation.
 
     The order of the polynomial is selected by CV.
     
@@ -764,12 +764,12 @@ def polyfit_cv(x, y, cv=10, max_deg=3, return_coef=False, randomise=False):
 
 
 def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e4):
-    """Regularized polynomial regression using LASSO and cross-validation.
+    """LASSO polynomial fit with cross-validation.
     
     Fits the best polynomial selected from a range of degrees up to n=max_deg.
     "Best" here refers to minimum RMSE fit and simpler model (less coefs).
 
-    The alpha paramenter (amound of regularization) is selected by CV.
+    The 'alpha' paramenter (amound of regularization) is selected by CV.
 
     """
     # TODO: Instead of 'dmatrix' use sklearn method!
