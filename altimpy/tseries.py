@@ -768,7 +768,7 @@ def polyfit_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
     coef : coefficients of fitted polynomial.
     deg : degree of fitted polynomial.
     mse : average MSE across folds (tested polynomials).
-    var : variance estimates of fitted coefficients.
+    cov : covariance estimates of fitted coefficients.
     """
     deg, mse = polyfit_select(x, y, cv=cv, max_deg=max_deg, weight=weight,
                               randomise=randomise)
@@ -776,7 +776,7 @@ def polyfit_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
     y_pred = np.polyval(coef, x)
     out = y_pred
     if return_coef:
-        out = [y_pred, coef, deg, mse, cov.diagonal()]
+        out = [y_pred, coef, deg, mse, cov]
     return out
 
 
