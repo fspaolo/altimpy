@@ -12,6 +12,12 @@ from altimpy.const import *
 from altimpy.util import *
 
 from sklearn.linear_model import LassoCV
+'''
+try:
+    from sklearn.preprocessing import PolynomialFeatures
+except:
+    raise, 'need scikit-learn version <= 0.15'
+'''
 
 # DEPRECATED. Use sklearn instead
 from patsy import dmatrix
@@ -773,13 +779,13 @@ def polyfit_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
 
     """
     ind, = np.where((~np.isnan(x)) & (~np.isnan(y)))
-    x2, y2 = x[ind], y[ind]
-    weight2 = None
+    x_, y_ = x[ind], y[ind]
+    weight_ = None
     if weight is not None:
-        weight2 = weight[ind]
-    deg, mse = polyfit_select(x2, y2, cv=cv, max_deg=max_deg, weight=weight2,
+        weight_ = weight[ind]
+    deg, mse = polyfit_select(x_, y_, cv=cv, max_deg=max_deg, weight=weight_,
                               randomise=randomise)
-    coef, cov = np.polyfit(x2, y2, deg, w=weight2, cov=True)
+    coef, cov = np.polyfit(x_, y_, deg, w=weight_, cov=True)
     y_pred = np.polyval(coef, x)  # predict on full data
     out = y_pred
     if return_coef:
@@ -787,6 +793,32 @@ def polyfit_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
     return out
 
 
+def polyfit_lasso(x, y, max_deg=3, cv=10, max_iter=1e3, return_model=False):
+    """LASSO polynomial fit with cross-validation.
+    
+    Regularized polynomial regression (by penalized least-squares) from a
+    range of degrees up to n = max_deg. The LASSO regression minimises MSE and
+    penalizes the size of the parameter vector using L1-norm, which leads to
+    fewer coefficients in the fitted model.
+
+    The 'alpha' parameter (amount of regularization) is selected by k-fold CV.
+
+    Supports NaNs.
+
+    """
+    ind, = np.where((~np.isnan(x)) & (~np.isnan(y)))
+    x_, y_ = x[ind], y[ind]
+    X = dmatrix('C(x, Poly)')
+    X_ = dmatrix('C(x_, Poly)')
+    lasso = LassoCV(cv=cv, copy_X=True, normalize=True, max_iter=max_iter)
+    lasso = lasso.fit(X_[:,1:max_deg+1], y_)
+    y_pred = lasso.predict(X[:,1:max_deg+1])
+    if return_model:
+        y_pred = [y_pred, lasso]
+    return y_pred
+
+
+# DEPRECATED
 def lasso_cv(x_, y_, max_deg=3, cv=10, max_iter=1e4):
     """LASSO polynomial fit with cross-validation.
     
@@ -798,12 +830,13 @@ def lasso_cv(x_, y_, max_deg=3, cv=10, max_iter=1e4):
     Supports NaNs.
 
     """
-    # TODO: Instead of 'dmatrix' use sklearn method!
+    # TODO: Instead of patsy.dmatrix use sklearn.preprocessing.PolynomialFeatures!
     ind, = np.where((~np.isnan(x_)) & (~np.isnan(y_)))
     x, y = x_[ind], y_[ind]
     Xpoly = dmatrix('C(x, Poly)')
+    Xpoly_ = dmatrix('C(x_, Poly)')
     lasso = LassoCV(cv=cv, copy_X=True, normalize=True, max_iter=max_iter)
     lasso = lasso.fit(Xpoly[:, 1:max_deg+1], y)
-    return lasso.predict(Xpoly[:, 1:max_deg+1])[np.argsort(x)]
+    return lasso.predict(Xpoly_[:, 1:max_deg+1])
 
 

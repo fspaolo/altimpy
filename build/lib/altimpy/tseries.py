@@ -787,6 +787,36 @@ def polyfit_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
     return out
 
 
+def polyfit_lasso(x, y, max_deg=3, cv=10, max_iter=1e3, return_model=False):
+    """LASSO polynomial fit with cross-validation.
+    
+    Regularized polynomial regression (by penalized least-squares) from a
+    range of degrees up to n = max_deg. The LASSO regression minimises MSE and
+    penalizes the size of the parameter vector using L1-norm, which leads to
+    a few coefficients in the fitted model.
+
+    The 'alpha' parameter (amount of regularization) is selected by k-fold CV.
+
+    Supports NaNs.
+
+    """
+    ind, = np.where((~np.isnan(x)) & (~np.isnan(y)))
+    x_, y_ = x[ind], y[ind]
+    '''
+    X_ = np.vander(x_, max_deg+1)  # Van der Monde matrix w/o NaNs
+    X = np.vander(x, max_deg+1)
+    '''
+    X = dmatrix('C(x, Poly)')
+    X_ = dmatrix('C(x_, Poly)')
+    lasso = LassoCV(cv=cv, copy_X=True, normalize=True, max_iter=max_iter)
+    lasso = lasso.fit(X_[:,1:max_deg+1], y_)
+    y_pred = lasso.predict(X[:,1:max_deg+1])
+    if return_model:
+        y_pred = [y_pred, lasso]
+    return y_pred
+
+
+# DEPRECATED
 def lasso_cv(x_, y_, max_deg=3, cv=10, max_iter=1e4):
     """LASSO polynomial fit with cross-validation.
     
@@ -802,8 +832,9 @@ def lasso_cv(x_, y_, max_deg=3, cv=10, max_iter=1e4):
     ind, = np.where((~np.isnan(x_)) & (~np.isnan(y_)))
     x, y = x_[ind], y_[ind]
     Xpoly = dmatrix('C(x, Poly)')
+    Xpoly_ = dmatrix('C(x_, Poly)')
     lasso = LassoCV(cv=cv, copy_X=True, normalize=True, max_iter=max_iter)
     lasso = lasso.fit(Xpoly[:, 1:max_deg+1], y)
-    return lasso.predict(Xpoly[:, 1:max_deg+1])[np.argsort(x)]
+    return lasso.predict(Xpoly_[:, 1:max_deg+1])
 
 
