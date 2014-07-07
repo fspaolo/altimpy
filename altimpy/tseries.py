@@ -8,6 +8,7 @@ Module with functions to construct and process time series.
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import detrend
+from random import shuffle
 from altimpy.const import *
 from altimpy.util import *
 
@@ -696,7 +697,7 @@ def area_weighted_mean(X, area):
 
 
 def kfold(X, K, randomise=False):
-    """Generates K training-testing pairs from the indices in X.
+    """Generates K training/testing pairs from the indices of X.
     
     Each pair is a partition of the indices in X [0,..,N-1], where testing is
     an iterable of length len(X)/K. So each training iterable is of length
@@ -708,7 +709,6 @@ def kfold(X, K, randomise=False):
     """
     ind = xrange(len(X))
     if randomise: 
-        from random import shuffle
         ind = list(ind)
         shuffle(ind)
     for k in xrange(K):
@@ -804,7 +804,7 @@ def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e3, return_model=False):
     penalizes the size of the parameter vector using L1-norm, which leads to
     fewer coefficients in the fitted model.
 
-    The 'alpha' parameter (amount of regularization) is selected by k-fold CV.
+    The 'alpha' parameter (amount of penalization) is selected by k-fold CV.
 
     Supports NaNs.
 

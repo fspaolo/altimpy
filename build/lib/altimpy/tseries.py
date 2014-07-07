@@ -721,7 +721,7 @@ def polyfit_kfold(x, y, k=10, deg=2, weight=None, randomise=False):
     """Perform polyfit on k-fold train data and evaluate on test data.
 
     Return the average MSE.
-    See 'polyfit_cv'.
+    See 'lstsq_cv'.
     """
     mse_ = [] 
     w_train = None
@@ -737,10 +737,12 @@ def polyfit_kfold(x, y, k=10, deg=2, weight=None, randomise=False):
 
 # TODO: extend the way degrees are passed, e.g., (0,3) and [0, 1, 2, 3]
 def polyfit_select(x, y, cv=10, max_deg=3, weight=None, randomise=False):
-    """Select best polynomial model using cross-validaiton.
+    """Select best polynomial model using cross-validation.
     
     Return the order of selected model and each model MSE.
-    See 'polyfit_cv'.
+
+    See 'lstsq_cv'.
+
     """
     model_order = np.arange(1,max_deg+1)
     model_mse = np.zeros(len(model_order), 'f8')
@@ -750,11 +752,12 @@ def polyfit_select(x, y, cv=10, max_deg=3, weight=None, randomise=False):
     return model_order[model_mse.argmin()], model_mse
 
 
-def polyfit_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
+def lstsq_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
                return_coef=False):
     """Least squares polynomial fit with cross-validation.
 
     The order of the polynomial is selected by k-fold CV.
+
     Supports NaNs.
 
     Parameters
@@ -793,7 +796,7 @@ def polyfit_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
     return out
 
 
-def polyfit_lasso(x, y, max_deg=3, cv=10, max_iter=1e3, return_model=False):
+def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e3, return_model=False):
     """LASSO polynomial fit with cross-validation.
     
     Regularized polynomial regression (by penalized least-squares) from a
@@ -816,27 +819,3 @@ def polyfit_lasso(x, y, max_deg=3, cv=10, max_iter=1e3, return_model=False):
     if return_model:
         y_pred = [y_pred, lasso]
     return y_pred
-
-
-# DEPRECATED
-def lasso_cv(x_, y_, max_deg=3, cv=10, max_iter=1e4):
-    """LASSO polynomial fit with cross-validation.
-    
-    Fits the best polynomial selected from a range of degrees up to n=max_deg.
-    "Best" here refers to minimum RMSE fit and simpler model (less coefs).
-
-    The 'alpha' paramenter (amound of regularization) is selected by k-fold CV.
-
-    Supports NaNs.
-
-    """
-    # TODO: Instead of patsy.dmatrix use sklearn.preprocessing.PolynomialFeatures!
-    ind, = np.where((~np.isnan(x_)) & (~np.isnan(y_)))
-    x, y = x_[ind], y_[ind]
-    Xpoly = dmatrix('C(x, Poly)')
-    Xpoly_ = dmatrix('C(x_, Poly)')
-    lasso = LassoCV(cv=cv, copy_X=True, normalize=True, max_iter=max_iter)
-    lasso = lasso.fit(Xpoly[:, 1:max_deg+1], y)
-    return lasso.predict(Xpoly_[:, 1:max_deg+1])
-
-
