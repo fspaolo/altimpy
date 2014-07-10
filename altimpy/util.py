@@ -820,12 +820,20 @@ def get_area(grid, x, y, region=None):
 
 def rss(y_pred, y_true, ax=0):
     """Residual sum of squares."""
-    return np.nansum((y_pred - y_true)**2, axis=ax)
+    res = np.nan
+    n = len(y_true[~np.isnan(y_true)])
+    if n > 2:
+        res = np.nansum((y_pred - y_true)**2, axis=ax)
+    return res
 
 
 def mse(y_pred, y_true, ax=0):
     """Mean squared error."""
-    return np.nanmean((y_pred - y_true)**2, axis=ax)
+    err = np.nan
+    n = len(y_true[~np.isnan(y_true)])
+    if n > 2:
+        err = np.nanmean((y_pred - y_true)**2, axis=ax)
+    return err
 
 
 def rmse(y_pred, y_true, ax=0):
@@ -843,8 +851,8 @@ def ser(y_pred, y_true, deg, ax=0):
 
 def gse(y_pred, y_true, ax=0):
     """Global standard error."""
-    se = np.nan
+    err = np.nan
     n = len(y_true[~np.isnan(y_true)])
     if n > 2:
-        se = np.sqrt(mse(y_pred, y_true, ax=ax) / n)
-    return se
+        err = np.sqrt(mse(y_pred, y_true, ax=ax) / n)
+    return err
