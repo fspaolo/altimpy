@@ -743,7 +743,7 @@ def haversine(lon1, lat1, lon2, lat2):
     """
     Calculate the great circle distance between two points on the earth.
 
-    Corrdinates in decimal degrees -> distance in km.
+    Coordinates must be in decimal degrees -> distance in km.
     """
     lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
     # haversine formula 
@@ -808,7 +808,6 @@ def get_area(grid, x, y, region=None):
     -------
     sum_area : float, the integrated area
     num_cells : int, the number of non-null grid cells
-
     """
     if region is not None:
         grid, x, y = get_subset(region, grid, x, y)
@@ -819,18 +818,30 @@ def get_area(grid, x, y, region=None):
     return sum_area, num_cells
 
 
-def rss(y_true, y_pred, ax=0):
+def rss(y_pred, y_true, ax=0):
     """Residual sum of squares."""
-    return np.nansum((y_true - y_pred)**2, axis=ax)
+    return np.nansum((y_pred - y_true)**2, axis=ax)
 
 
-def mse(y_true, y_pred, ax=0):
+def mse(y_pred, y_true, ax=0):
     """Mean squared error."""
-    return np.nanmean((y_true - y_pred)**2, axis=ax)
+    return np.nanmean((y_pred - y_true)**2, axis=ax)
 
 
-def rmse(y_true, y_pred, ax=0):
+def rmse(y_pred, y_true, ax=0):
     """Root mean squared error."""
-    return np.sqrt(mse(y_true, y_pred, ax=ax))
+    return np.sqrt(mse(y_pred, y_true, ax=ax))
 
 
+def ser(y_pred, y_true, deg, ax=0):
+    """Standard error of regression."""
+    N = len(y_true[~np.isnan(y_true)])  # num of samples
+    p = deg + 1                         # num of parameters
+    rss = ap.rss(y_pred, y_true, ax=ax)
+    return np.sqrt(rss / (N-p))
+
+
+def gse(y_pred, y_true, ax=0):
+    """Global standard error."""
+    n = len(y_true[~np.isnan(y_true)])
+    return np.sqrt(mse(y_pred, y_true, ax=ax) / n)

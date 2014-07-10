@@ -843,5 +843,8 @@ def ser(y_pred, y_true, deg, ax=0):
 
 def gse(y_pred, y_true, ax=0):
     """Global standard error."""
+    se = np.nan
     n = len(y_true[~np.isnan(y_true)])
-    return np.sqrt(mse(y_pred, y_true, ax=ax) / n)
+    if n > 2:
+        se = np.sqrt(mse(y_pred, y_true, ax=ax) / n)
+    return se
