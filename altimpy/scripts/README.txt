@@ -38,15 +38,14 @@ Specific processing
 24. joint backscatter correction (serial, slow) [backscatter2.py] code_ok... ok
 25. post processing [postproc.py] code_ok... ok
     - filter out uncomplete ts
-    - fill in gaps in time
     - filter out step-changes
-    - median filter in space
-    - regrid 4x
-    - apply mask
-    - etc.
-26. map area of each grid cell (serial, slow) [areacell.py]
+    - filter out peaks
+    - filter out 3*std
+    - ...
+26. map area of each grid cell (serial, slow) [areacell.py] -> only once!
 27. map area of each ice shelf (serial, fast) [areashelf.py]
-28. fit polynomials (serial, ???) [polyfit.py]
+28. fit polynomial-trends (serial, fast) [trendfit.py]
+29. Smooth, interp. and integrate fields (series, ???) [integrate.py]
 
 Visualization
 -------------
