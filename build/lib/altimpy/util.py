@@ -828,7 +828,10 @@ def rss(y_pred, y_true, ax=0):
 
 
 def mse(y_pred, y_true, ax=0):
-    """Mean squared error."""
+    """Mean squared error.
+    
+    MSE = std^2 + bias^2
+    """
     err = np.nan
     n = len(y_true[~np.isnan(y_true)])
     if n > 2:
@@ -837,7 +840,10 @@ def mse(y_pred, y_true, ax=0):
 
 
 def rmse(y_pred, y_true, ax=0):
-    """Root mean squared error."""
+    """Root mean squared error.
+
+    RMSE = SD(residuals) = std + bias = SD(error)
+    """
     return np.sqrt(mse(y_pred, y_true, ax=ax))
 
 
@@ -850,9 +856,12 @@ def ser(y_pred, y_true, deg, ax=0):
 
 
 def gse(y_pred, y_true, ax=0):
-    """Global standard error."""
+    """Global standard error.
+    
+    global SE = RMSE/sqrt(n) = (std + bias)/sqrt(n)
+    """
     err = np.nan
     n = len(y_true[~np.isnan(y_true)])
     if n > 2:
-        err = np.sqrt(mse(y_pred, y_true, ax=ax) / n)
+        err = rmse(y_pred, y_true, ax=ax) / np.sqrt(n)
     return err

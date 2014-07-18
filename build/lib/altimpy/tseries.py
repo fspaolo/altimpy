@@ -675,6 +675,7 @@ def area_weighted_mean(X, area):
     See also
     --------
     get_area_cells
+    area_weighted_mean_err
 
     """
     nt, _, _ = X.shape
@@ -694,6 +695,51 @@ def area_weighted_mean(X, area):
         ts[k] = np.sum(W*G)  # area-weighted average per time step
         ar[k] =  G.count() / total_area
     return [ts, ar]
+
+
+def area_weighted_mean_err(X, area):
+    """Propagate the error for the area-weighted-mean from a 3d array.
+    
+    Parameters
+    ----------
+    X : 3d-array 
+        Array containing one time series per grid-cell, where the
+        first dimension (i) is the time, and the second and thrid 
+        dimensions (j and k) are the spatial coordinates (x,y).
+    area : 2d-array
+        A grid containing the area of each grid-cell on X (the spatial
+        coordinates).
+
+    Returns
+    -------
+    ts : 1d-array
+        The average time series weighted by each grid-cell area.
+
+    Notes
+    -----
+    This function uses numpy 'masked arrays'.
+
+    See also
+    --------
+    get_area_cells
+    area_weighted_mean
+
+    """
+    nt, _, _ = X.shape
+    X = np.ma.masked_invalid(X)
+    total_area = float(X.sum(axis=0).count())
+    ts = np.zeros(nt, 'f8')  # container for output avrg time series
+    for k in range(nt):      # weight-average each 2d time step
+        G = X[k,...]
+        W = area.copy()
+        W[np.isnan(G)] = 0
+        s = W.sum()
+        if s != 0:
+            W /= s           # normalize such that sum(W) == 1
+        else:
+            W[:] = 0 
+        ts[k] = np.sqrt(np.sum(W**2 * G**2))  # error per time step 
+    return ts
 
 
 def kfold(X, K, randomise=False):

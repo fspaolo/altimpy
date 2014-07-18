@@ -10,15 +10,17 @@ ais = allantarctica = antarctica = (0, 360, -90, -60)
 wais = westantarctica = (179, 311.5, -90, -60)
 eais1 = eastantarctica1 = (0, 179, -90, -60)         # lon is 0/360!
 eais2 = eastantarctica2 = (311.5, 360, -90, -60)
-eais1_no_rf = (0, 179, -77, -60)   # w/o Ross and Filchner 
+eais1_no_rf = (0, 179, -77, -60)                     # w/o Ross and Filchner 
 eais2_no_rf = (330, 360, -77, -60)
-queenmaud = qml = (0, 38, -71.5, -68.5)   # revise boundaries!
+queenmaud = qml = (0, 38, -71.5, -68.5)              # FIXME, it's not complete!
 fris = (272, 332, -90, -74.5)
 antpen = ap = (276, 310, -74.5, -64)
-larsen = lis = ape = (294, 302, -74, -64)
+larsen = easternap = lis = (294, 302, -74, -64)
 belling = bellingshausen =  (260.8, 294.4, -74, -69)  # revise boundaries!
 amundsen = (220, 263, -76, -73.1)
-ross = ris = (155, 213.3, -85, -77.3)    # revise boundaries!
+ross = ris = (155, 213.3, -85, -77.3)                 # revise boundaries!
+aws = (62, 106, -74, -63)
+wilkes = (112, 167, -72, -65)
 westshac = (80, 105, -68, -64.5)
 tottmosc = (113, 124, -67.5, -66)
 
