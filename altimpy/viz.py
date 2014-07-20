@@ -22,6 +22,54 @@ from const import *
 
 ### Visualization utilities
 
+class NLCMap(LinearSegmentedColormap):
+    """NLCMap - a nonlinear cmap from specified levels
+
+    Original by Robert Hetland <hetland@tamu.edu>
+    Modified by Fernando Paolo <fspaolo@gmail.com>
+
+    Some hacks added 2012 noted in code (@MRR)
+
+    Example
+    -------
+    y, x = np.mgrid[0.0:3.0:100j, 0.0:5.0:100j]
+    H = 50.0 * np.exp( -(x**2 + y**2) / 4.0 )
+    levels = [0, 1, 2, 3, 6, 9, 20, 50]
+    
+    cmap_lin = plt.cm.jet
+    cmap_nonlin = NLCMap(cmap_lin, levels)
+    
+    plt.subplot(2,1,1)
+    plt.contourf(x, y, H, levels, cmap=cmap_nonlin)
+    plt.colorbar()
+    plt.subplot(2,1,2)
+    plt.contourf(x, y, H, levels, cmap=cmap_lin)
+    plt.colorbar()
+    plt.show()
+
+    """
+    name = 'NLCMap'
+    
+    def __init__(self, cmap, levels):
+        self.cmap = cmap
+        # @MRR: Need to add N for backend
+        self.N = cmap.N
+        self.monochrome = self.cmap.monochrome
+        self.levels = np.asarray(levels, dtype='float64')
+        self._x = self.levels / self.levels.max()
+        self._y = np.linspace(0.0, 1.0, len(self.levels))
+    
+    # @MRR Need to add **kw for 'bytes'
+    def __call__(self, xi, alpha=1.0, **kw):
+        """docstring for fname"""
+        # @MRR: Appears broken? 
+        # It appears something's wrong with the
+        # dimensionality of a calculation intermediate
+        #yi = stineman_interp(xi, self._x, self._y)
+        yi = np.interp(xi, self._x, self._y)
+        return self.cmap(yi, alpha)
+
+
 def create_cmap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True, 
               invert=False):
     """
@@ -434,8 +482,10 @@ def get_cmap(*args, **kwargs):
 
 def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None, 
              ticklabels=None, boxcolor='k', boxalpha=1.0, boxwidth=0.2,
-             **kwargs):
+             shifttitle=1.8, shiftlabel=-0.2, **kwargs):
     """Matplotlib enhanced colorbar.
+
+    **kwargs are passed to the text() command.
     
     Original by Geoffrey Ely.
     Modified by Fernando Paolo.
@@ -451,16 +501,18 @@ def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None,
     ax.axis('off')
     ax.axis('tight')
     ax.axis(axis)
+    title_voffset = shifttitle
+    label_voffset = shiftlabel
     if title:
         x = 0.5 * (clim[0] + clim[1])
-        text(ax, x, 2, title, ha='center', va='baseline', **kwargs)
+        text(ax, x, title_voffset, title, ha='center', va='baseline', **kwargs)
     if ticks is None:
         ticks = clim[0], 0.5 * (clim[0] + clim[1]), clim[1]
     if ticklabels is None:
         ticklabels = ticks
     for i, x in enumerate(ticks):
         s = '%s' % ticklabels[i]
-        text(ax, x, -0.6, s, ha='center', va='top', **kwargs)
+        text(ax, x, label_voffset, s, ha='center', va='top', **kwargs)
     return ax
 
 

@@ -434,8 +434,10 @@ def get_cmap(*args, **kwargs):
 
 def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None, 
              ticklabels=None, boxcolor='k', boxalpha=1.0, boxwidth=0.2,
-             **kwargs):
+             shifttitle=1.8, shiftlabel=-0.2, **kwargs):
     """Matplotlib enhanced colorbar.
+
+    **kwargs are passed to the text() command.
     
     Original by Geoffrey Ely.
     Modified by Fernando Paolo.
@@ -451,16 +453,18 @@ def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None,
     ax.axis('off')
     ax.axis('tight')
     ax.axis(axis)
+    title_voffset = shifttitle
+    label_voffset = shiftlabel
     if title:
         x = 0.5 * (clim[0] + clim[1])
-        text(ax, x, 2, title, ha='center', va='baseline', **kwargs)
+        text(ax, x, title_voffset, title, ha='center', va='baseline', **kwargs)
     if ticks is None:
         ticks = clim[0], 0.5 * (clim[0] + clim[1]), clim[1]
     if ticklabels is None:
         ticklabels = ticks
     for i, x in enumerate(ticks):
         s = '%s' % ticklabels[i]
-        text(ax, x, -0.6, s, ha='center', va='top', **kwargs)
+        text(ax, x, label_voffset, s, ha='center', va='top', **kwargs)
     return ax
 
 
