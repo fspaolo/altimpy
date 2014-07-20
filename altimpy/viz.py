@@ -15,6 +15,7 @@ import os
 import numpy as np
 import subprocess, cStringIO
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 from mpl_toolkits.basemap import Basemap
 import matplotlib.cm as cm
 
@@ -41,9 +42,11 @@ class NLCMap(LinearSegmentedColormap):
     
     plt.subplot(2,1,1)
     plt.contourf(x, y, H, levels, cmap=cmap_nonlin)
+    plt.title('Nonlinear colormap')
     plt.colorbar()
     plt.subplot(2,1,2)
     plt.contourf(x, y, H, levels, cmap=cmap_lin)
+    plt.title('Linear colormap')
     plt.colorbar()
     plt.show()
 
