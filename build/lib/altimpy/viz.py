@@ -12,68 +12,85 @@ https://github.com/gely/coseis
 # December 15, 2011
 
 import os
+import subprocess
+import cStringIO
 import numpy as np
-import subprocess, cStringIO
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
-import matplotlib.cm as cm
 
 from const import *
 
 ### Visualization utilities
 
-class NLCMap(LinearSegmentedColormap):
-    """NLCMap - a nonlinear cmap from specified levels
+def make_cmap(colors, position=None, name='my_cmap', n=256):
+    """Creates a custom colormap for Matplotlib.
 
-    Original by Robert Hetland <hetland@tamu.edu>
-    Modified by Fernando Paolo <fspaolo@gmail.com>
+    Parameters
+    ----------
+    colors : list of tuples
+        Contains RGB values (r, g, b). The RGB values may either be in 8-bit
+        [0 to 255] or arithmetic [0 to 1]. Arrange your tuples so that the
+        first color is the lowest value for the colorbar and the last is the
+        highest.
+    position : list
+        Contains values from 0 to 1 to dictate the location of each color.
+        E.g., useful for nonlinear colormaps.
+    name : string
+        The name of the colormap.
+    n : int
+        The number of intervals in the colormap (e.g. discrete colorbar).
 
-    Some hacks added 2012 noted in code (@MRR)
+    Return
+    ------
+    cmap : a colormap with equally spaced colors.
+
+    Notes
+    -----
+    TODO: add suport for alpha in the tuplues => (r, g, b, a)
+
+    Credits
+    -------
+    Chris Slocum (initial version)
+    Fernando Paolo (several additions/modifications)
 
     Example
     -------
-    y, x = np.mgrid[0.0:3.0:100j, 0.0:5.0:100j]
-    H = 50.0 * np.exp( -(x**2 + y**2) / 4.0 )
-    levels = [0, 1, 2, 3, 6, 9, 20, 50]
-    
-    cmap_lin = plt.cm.jet
-    cmap_nonlin = NLCMap(cmap_lin, levels)
-    
-    plt.subplot(2,1,1)
-    plt.contourf(x, y, H, levels, cmap=cmap_nonlin)
-    plt.colorbar()
-    plt.subplot(2,1,2)
-    plt.contourf(x, y, H, levels, cmap=cmap_lin)
-    plt.colorbar()
-    plt.show()
+    # nonlinear colormap with 20 intervals
+    colors = [(0, 0, 1), (.5, .5, 1), (1, 1, 1)]
+    position = [0, 0.3, 1]
+    cmap = make_cmap(colors, position, name='BlueWhite', n=20)
 
     """
-    name = 'NLCMap'
-    
-    def __init__(self, cmap, levels):
-        self.cmap = cmap
-        # @MRR: Need to add N for backend
-        self.N = cmap.N
-        self.monochrome = self.cmap.monochrome
-        self.levels = np.asarray(levels, dtype='float64')
-        self._x = self.levels / self.levels.max()
-        self._y = np.linspace(0.0, 1.0, len(self.levels))
-    
-    # @MRR Need to add **kw for 'bytes'
-    def __call__(self, xi, alpha=1.0, **kw):
-        """docstring for fname"""
-        # @MRR: Appears broken? 
-        # It appears something's wrong with the
-        # dimensionality of a calculation intermediate
-        #yi = stineman_interp(xi, self._x, self._y)
-        yi = np.interp(xi, self._x, self._y)
-        return self.cmap(yi, alpha)
+    if position == None:
+        position = np.linspace(0, 1, len(colors))
+    else:
+        if len(position) != len(colors):
+            sys.exit("position length must be the same as colors")
+        elif position[0] != 0 or position[-1] != 1:
+            sys.exit("position must start with 0 and end with 1")
+
+    if np.max(colors) > 1:
+        # color range [0,255]
+        bit_rgb = np.linspace(0, 1, 256)
+        for i in range(len(colors)):
+            colors[i] = (bit_rgb[colors[i][0]],
+                         bit_rgb[colors[i][1]],
+                         bit_rgb[colors[i][2]])
+
+    cdict = {'red': [], 'green': [], 'blue': []}
+    for pos, color in zip(position, colors):
+        cdict['red'].append((pos, color[0], color[0]))
+        cdict['green'].append((pos, color[1], color[1]))
+        cdict['blue'].append((pos, color[2], color[2]))
+
+    cmap = mpl.colors.LinearSegmentedColormap(name, cdict, n)
+    return cmap
 
 
 def create_cmap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True, 
               invert=False):
-    """
-    Color map creator.
+    """Color map creator.
 
     Parameters
     ----------
@@ -285,7 +302,6 @@ cmap_lib = {
     ],
 }
 
-
 ### Map projection utilities
 
 def align_data_with_fig(x, y, data):
@@ -470,13 +486,12 @@ def get_cmap(*args, **kwargs):
     
     See 'create_cmap' for details.
     """
-    from matplotlib.colors import LinearSegmentedColormap
     n = kwargs.pop('n', 2001)
     v, r, g, b, a = create_cmap(*args, **kwargs)
-    cmap = {'red': np.c_[v, r, r],
-            'green': np.c_[v, g, g],
-            'blue': np.c_[v, b, b] }
-    cmap = LinearSegmentedColormap('cmap', cmap, n)
+    cdict = {'red': np.c_[v, r, r],
+             'green': np.c_[v, g, g],
+             'blue': np.c_[v, b, b] }
+    cmap = mpl.colors.LinearSegmentedColormap('cmap', cdict, n)
     return cmap
 
 
@@ -489,6 +504,7 @@ def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None,
     
     Original by Geoffrey Ely.
     Modified by Fernando Paolo.
+
     """
     if rect is None:
         rect = 0.25, 0.04, 0.5, 0.02
@@ -948,20 +964,20 @@ def adjust_spines(ax, spines, pad=10):
         ax.xaxis.set_ticks([])
 
 
-def get_limits(x, digits=1):
-    """Get the ceiling and floor limits according number of digits.
+def get_limits(x, decimals=1):
+    """Get the ceiling and floor limits according number of decimals.
     
     Useful to set the y-/x-limits in matplotlib.
 
     """
     mn0 = x.min()
     mx0 = x.max()
-    mn = mn0.round(digits)
-    mx = mx0.round(digits)
+    mn = mn0.round(decimals)
+    mx = mx0.round(decimals)
     if mn > mn0:
-        mn -= 1. / 10**digits
+        mn -= 1. / 10**decimals
     if mx < mx0:
-        mx += 1. / 10**digits
+        mx += 1. / 10**decimals
     return mn, mx
 
 
