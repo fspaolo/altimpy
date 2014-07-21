@@ -319,7 +319,7 @@ def align_data_with_fig(x, y, data):
     return [x, y, data]
 
 
-def plot_moa_subreg(m, x, y, moa, bbox, cmap=cm.gray, **kwargs):
+def plot_moa_subreg(m, x, y, moa, bbox, cmap=plt.cm.gray, **kwargs):
     """Plot MOA image subregion defined by projection 'm'.
     
     m : Basemap projection defining subregion
@@ -440,7 +440,7 @@ def get_gtif_subreg(m, filename, res=1):
     y_sub = y[i[0]:i[-1]]
     # plot mask
     #data_sub = np.ma.masked_values(data_sub, 0)
-    #m.imshow(data_sub, cmap=cm.gray)
+    #m.imshow(data_sub, cmap=plt.cm.gray)
     return [x_sub, y_sub, data_sub]
 
 
@@ -839,7 +839,7 @@ Functions modified from:
 http://rnovitsky.blogspot.com/2010/04/using-hillshade-image-as-intensity.html
 """
 
-def shade(data, intensity=None, cmap=cm.jet, scale=10.0, azdeg=165.0, 
+def shade(data, intensity=None, cmap=plt.cm.jet, scale=10.0, azdeg=165.0, 
           altdeg=45.0):
     '''Sets shading for data array based on intensity layer or the data's value
     itself.
