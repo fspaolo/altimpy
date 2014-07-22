@@ -819,6 +819,34 @@ def hinton(m, maxweight=None):
         plt.ion()
 
 
+def shade(data, cmap=plt.cm.gray, azdeg=165.0, altdeg=45.0, scale=1.0,
+           minsat=1, maxsat=0, minval=0, maxval=1):
+    """Creates shaded relief (hard light approach).
+
+    Convenient wrap around matplotlib.colors.LightSource to facilitate
+    scaling and saturation settings.
+
+    Parameters
+    ----------
+    scale : float, default 1.0
+        Scaling factor for shading. Larger number => larger gradients.
+    minsat, maxsat, minval, maxval: int, default 1, 0, 0, 1
+        Min and max saturation/values (from 0 to 1).
+
+    See docstring of function 'shade2'.
+
+    """
+    # 1. create light source object
+    ls = mpl.colors.LightSource(azdeg=azdeg, altdeg=altdeg)
+    ls.hsv_min_sat = minsat
+    ls.hsv_max_sat = maxsat
+    ls.hsv_min_val = minval
+    ls.hsv_max_val = maxval
+    # 2. convert data to rgb array including shading from light source
+    rgb = ls.shade(data * scale, cmap)
+    return rgb
+
+
 def shade2(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0, 
           altdeg=45.0):
     """Creates shaded relief (soft light approach).
@@ -938,32 +966,6 @@ def hillshade(data, scale=1.0, azdeg=165.0, altdeg=45.0):
     intensity = (intensity - intensity.min()) / \
                 (intensity.max() - intensity.min())
     return intensity
-
-
-def shade(data, cmap=plt.cm.gray, azdeg=165.0, altdeg=45.0, scale=1.0,
-           minsat=1, maxsat=0):
-    """Creates shaded relief (hard light approach).
-
-    Convenient wrap around matplotlib.colors.LightSource to facilitate
-    scaling and saturation settings.
-
-    Parameters
-    ----------
-    scale : float, default 1.0
-        Scaling factor for shading. Larger number => larger gradients.
-    minsat, maxsat : int, default 1 and 0
-        Min and max saturation values (from 0 to 1).
-
-    See docstring of function 'shade2'.
-
-    """
-    # 1. create light source object
-    ls = mpl.colors.LightSource(azdeg=azdeg, altdeg=altdeg)
-    ls.hsv_min_sat = minsat
-    ls.hsv_max_sat = maxsat
-    # 2. convert data to rgb array including shading from light source
-    rgb = ls.shade(data * scale, cmap)
-    return rgb
 
 
 def adjust_spines(ax, spines, pad=10):
