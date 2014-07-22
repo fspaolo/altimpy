@@ -771,8 +771,8 @@ def _blob(x, y, area, colour):
     plt.fill(xcorners, ycorners, colour, edgecolor=colour)
  
 def hinton(m, maxweight=None):
-    """
-    Draws a Hinton diagram for visualizing a weight matrix. 
+    """Draws a Hinton diagram for visualizing a weight matrix. 
+
     Temporarily disables matplotlib interactive mode if it is on, 
     otherwise this takes forever.
 
@@ -819,58 +819,72 @@ def hinton(m, maxweight=None):
         plt.ion()
 
 
-"""
-Matplotlib module enables hillshade method (shade) using a LightSource class
-(v 0.99). The problem is it uses the data itself as intensity and data. It is
-very useful for viewing a DEM but sometimes you would like the DEM as intensity
-underlying some other data. Another problem is that the shade method is
-producing a very light colored image sometimes even white where intensity is
-high.
-
-The difference in the shading colors derived from the method used to produce
-it. While the matplotlib method uses "hard light" method I use a "soft light"
-method. the matplotlib is converting the RGB colors to HSV and then calculate
-the new saturation and value according to the intensity. I use a formula based
-on the description of ImageMagick's pegtop_light.which is much faster as it is
-a single formula. Another advantage is the option to use a separate layer as
-the intensity and another as the data used for colors.
-
-Functions modified from:
-http://rnovitsky.blogspot.com/2010/04/using-hillshade-image-as-intensity.html
-"""
-
-def shade(data, intensity=None, cmap=plt.cm.jet, scale=10.0, azdeg=165.0, 
+def shade(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0, 
           altdeg=45.0):
-    '''Sets shading for data array based on intensity layer or the data's value
+    """Creates shaded relief (soft light).
+    
+    Sets shading for data array based on intensity layer or the data's value
     itself.
 
     Parameters
     ----------
     data : 2d array or masked array
         The grid to shade.
-    intensity : 2d array of same size as data
+    intensity : 2d array of same shape as data
         The intensity layer for shading. If None, the data itself is used after
-        getting the hillshade values (see hillshade for more details).
-    cmap : colormap, default plt.cm.jet
+        getting the hillshade values (see hillshade).
+    cmap : colormap, default plt.cm.gray
         e.g. matplotlib.colors.LinearSegmentedColormap instance.
     scale, azdeg, altdeg : floats, default 10.0, 165.0, 45.0
-        Parameters for hilshade function (see there for more details).
+        Parameters for hillshade function (see hillshade).
 
     Output
     ------
     rgb : rgb set of the 'Pegtop soft light composition' (see Notes) of the
-        data and intensity. It can be used as input for imshow().
+        data and intensity. It should be plotted with imshow().
 
-    Notes
-    -----
+    Credits
+    -------
+    Ran Novitsky Nof (initial version)
+    Fernando Paolo (additions/modifications)
+
     Based on ImageMagick's Pegtop_light:
     http://www.imagemagick.org/Usage/compose/#pegtoplight
 
     See also
     --------
     hillshade
+    shade2
 
-    '''
+    Notes
+    -----
+    Matplotlib module enables hillshade method (shade) using a LightSource
+    class (v 0.99). The problem is it uses the data itself as intensity and
+    data. It is very useful for viewing a DEM but sometimes you would like the
+    DEM as intensity underlying some other data. Another problem is that the
+    shade method is producing a very light colored image sometimes even white
+    where intensity is high.
+
+    The difference in the shading colors is derived from the method used to
+    produce it. While the Matplotlib method uses "hard light" method this
+    function uses a "soft light" method. Matplotlib is converting the RGB
+    colors to HSV and then calculating the new saturation and value according
+    to the intensity. This function uses a formula based on the description of
+    ImageMagick's 'pegtop_light', which is much faster as it is a single
+    formula. Another advantage is the option to use separate layers for
+    intensity and colors.
+
+    Soft light: refers to light that tends to "wrap" around objects, casting
+    diffuse shadows with soft edges. Soft light is when a light source is large
+    relative to the subject.
+
+    Hard light: the shadows produced will have 'harder' edges with less
+    transition between illumination and shadow.
+
+    Functions modified from:
+    http://rnovitsky.blogspot.com/2010/04/using-hillshade-image-as-intensity.html
+
+    """
     if intensity is None:
         # hilshading the data
         intensity = hillshade(data, scale=scale, azdeg=azdeg, altdeg=altdeg)
@@ -887,15 +901,15 @@ def shade(data, intensity=None, cmap=plt.cm.jet, scale=10.0, azdeg=165.0,
     return rgb
 
 
-def hillshade(data, scale=10.0, azdeg=165.0, altdeg=45.0):
-    '''Convert data to hillshade based on matplotlib.colors.LightSource class.
+def hillshade(data, scale=1.0, azdeg=165.0, altdeg=45.0):
+    """Convert data to hillshade.
 
     Parameters
     ----------
     data : 2d array
         The grid to be used as shading.
-    scale : float, default 10.0
-        Scaling value for shading. Higher number = lower gradient.
+    scale : float, default 1.0
+        Scaling factor for shading. Larger number => larger gradients.
     azdeg : float, default 165.0
         Direction where the light comes from: 0=south, 90=east, 180=north,
         270=west.
@@ -911,12 +925,12 @@ def hillshade(data, scale=10.0, azdeg=165.0, altdeg=45.0):
     --------
     shade
 
-    '''
+    """
     # convert alt, az to radians
     az = azdeg * np.pi / 180.0
     alt = altdeg * np.pi / 180.0
     # gradient in x and y directions
-    dx, dy = np.gradient(data/float(scale))
+    dx, dy = np.gradient(data * scale)
     slope = 0.5 * np.pi - np.arctan(np.hypot(dx, dy))
     aspect = np.arctan2(dx, dy)
     intensity = np.sin(alt) * np.sin(slope) + np.cos(alt) * np.cos(slope) * \
@@ -924,6 +938,32 @@ def hillshade(data, scale=10.0, azdeg=165.0, altdeg=45.0):
     intensity = (intensity - intensity.min()) / \
                 (intensity.max() - intensity.min())
     return intensity
+
+
+def shade2(data, cmap=plt.cm.gray, azdeg=165.0, altdeg=45.0, scale=1.0,
+           minsat=1, maxsat=0):
+    """Creates shaded relief (hard light).
+
+    Convenient wrap around matplotlib.colors.LightSource to facilitate
+    scaling and saturation settings.
+
+    Parameters
+    ----------
+    scale : float, default 1.0
+        Scaling factor for shading. Larger number => larger gradients.
+    minsat, maxsat : int, default 1 and 0
+        Min and max saturation values (from 0 to 1).
+
+    See function 'shade' docstring.
+
+    """
+    # 1. create light source object
+    ls = mpl.colors.LightSource(azdeg=azdeg, altdeg=altdeg)
+    ls.hsv_min_sat = minsat
+    ls.hsv_max_sat = maxsat
+    # 2. convert data to rgb array including shading from light source
+    rgb = ls.shade(data * scale, cmap)
+    return rgb
 
 
 def adjust_spines(ax, spines, pad=10):
