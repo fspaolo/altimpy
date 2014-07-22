@@ -45,10 +45,6 @@ def make_cmap(colors, position=None, name='my_cmap', n=256):
     ------
     cmap : a colormap with equally spaced colors.
 
-    Notes
-    -----
-    TODO: add suport for alpha in the tuplues => (r, g, b, a)
-
     Credits
     -------
     Chris Slocum (initial version)
@@ -60,6 +56,10 @@ def make_cmap(colors, position=None, name='my_cmap', n=256):
     colors = [(0, 0, 1), (.5, .5, 1), (1, 1, 1)]
     position = [0, 0.3, 1]
     cmap = make_cmap(colors, position, name='BlueWhite', n=20)
+
+    TODO
+    -----
+    Add support for alpha in the tuples => (r, g, b, a)
 
     """
     if position == None:
@@ -819,9 +819,9 @@ def hinton(m, maxweight=None):
         plt.ion()
 
 
-def shade(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0, 
+def shade2(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0, 
           altdeg=45.0):
-    """Creates shaded relief (soft light).
+    """Creates shaded relief (soft light approach).
     
     Sets shading for data array based on intensity layer or the data's value
     itself.
@@ -854,7 +854,7 @@ def shade(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0,
     See also
     --------
     hillshade
-    shade2
+    shade
 
     Notes
     -----
@@ -902,7 +902,7 @@ def shade(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0,
 
 
 def hillshade(data, scale=1.0, azdeg=165.0, altdeg=45.0):
-    """Convert data to hillshade.
+    """Convert data to hillshade (intensity).
 
     Parameters
     ----------
@@ -923,7 +923,7 @@ def hillshade(data, scale=1.0, azdeg=165.0, altdeg=45.0):
 
     See also
     --------
-    shade
+    shade2
 
     """
     # convert alt, az to radians
@@ -940,9 +940,9 @@ def hillshade(data, scale=1.0, azdeg=165.0, altdeg=45.0):
     return intensity
 
 
-def shade2(data, cmap=plt.cm.gray, azdeg=165.0, altdeg=45.0, scale=1.0,
+def shade(data, cmap=plt.cm.gray, azdeg=165.0, altdeg=45.0, scale=1.0,
            minsat=1, maxsat=0):
-    """Creates shaded relief (hard light).
+    """Creates shaded relief (hard light approach).
 
     Convenient wrap around matplotlib.colors.LightSource to facilitate
     scaling and saturation settings.
@@ -954,7 +954,7 @@ def shade2(data, cmap=plt.cm.gray, azdeg=165.0, altdeg=45.0, scale=1.0,
     minsat, maxsat : int, default 1 and 0
         Min and max saturation values (from 0 to 1).
 
-    See function 'shade' docstring.
+    See docstring of function 'shade2'.
 
     """
     # 1. create light source object
