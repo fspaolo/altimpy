@@ -23,7 +23,7 @@ from const import *
 
 ### Visualization utilities
 
-def make_cmap(colors, position=None, name='my_cmap', n=256):
+def make_cmap(colors, position=None, name='newcmap', n=256):
     """Creates a custom colormap for Matplotlib.
 
     Parameters
@@ -35,7 +35,7 @@ def make_cmap(colors, position=None, name='my_cmap', n=256):
         highest.
     position : list
         Contains values from 0 to 1 to dictate the location of each color.
-        E.g., useful for nonlinear colormaps.
+        Useful for irregular color segments.
     name : string
         The name of the colormap.
     n : int
@@ -45,21 +45,21 @@ def make_cmap(colors, position=None, name='my_cmap', n=256):
     ------
     cmap : a colormap with equally spaced colors.
 
+    Example
+    -------
+    # uneven colormap with 20 intervals
+    colors = [(0, 0, 1), (.5, .5, 1), (1, 1, 1)]
+    position = [0, 0.3, 1]
+    cmap = make_cmap(colors, position, name='BlueWhite', n=20)
+
     Credits
     -------
     Chris Slocum (initial version)
     Fernando Paolo (several additions/modifications)
 
-    Example
-    -------
-    # nonlinear colormap with 20 intervals
-    colors = [(0, 0, 1), (.5, .5, 1), (1, 1, 1)]
-    position = [0, 0.3, 1]
-    cmap = make_cmap(colors, position, name='BlueWhite', n=20)
-
     TODO
     -----
-    Add support for alpha in the tuples => (r, g, b, a)
+    Add support for alpha in the tuples (forth channel) => (r, g, b, a)
 
     """
     if position == None:
@@ -69,23 +69,82 @@ def make_cmap(colors, position=None, name='my_cmap', n=256):
             sys.exit("position length must be the same as colors")
         elif position[0] != 0 or position[-1] != 1:
             sys.exit("position must start with 0 and end with 1")
-
+    # if color in range [0,255]
     if np.max(colors) > 1:
-        # color range [0,255]
         bit_rgb = np.linspace(0, 1, 256)
         for i in range(len(colors)):
             colors[i] = (bit_rgb[colors[i][0]],
                          bit_rgb[colors[i][1]],
-                         bit_rgb[colors[i][2]])
-
+                         bit_rgb[colors[i][2]],
+                         )
     cdict = {'red': [], 'green': [], 'blue': []}
     for pos, color in zip(position, colors):
         cdict['red'].append((pos, color[0], color[0]))
         cdict['green'].append((pos, color[1], color[1]))
         cdict['blue'].append((pos, color[2], color[2]))
+    newcmap = mpl.colors.LinearSegmentedColormap(name, cdict, n)
+    plt.register_cmap(cmap=newcmap)
+    return newcmap
 
-    cmap = mpl.colors.LinearSegmentedColormap(name, cdict, n)
-    return cmap
+
+def shift_cmap(cmap, start=0, midpoint=0.5, stop=1, name='shiftedcmap'):
+    '''Offset the median value of a colormap.
+    
+    And scale the remaining color range. Useful for data with a negative
+    minimum and positive maximum where you want the middle of the colormap's
+    dynamic range to be at zero.
+
+    Input
+    -----
+      cmap : The matplotlib colormap to be altered
+      start : Offset from lowest point in the colormap's range.
+          Defaults to 0.0 (no lower ofset). Should be between
+          0.0 and 0.5; if your dataset mean is negative you should leave 
+          this at 0.0, otherwise to (vmax-abs(vmin))/(2*vmax) 
+      midpoint : The new center of the colormap. Defaults to 
+          0.5 (no shift). Should be between 0.0 and 1.0; usually the
+          optimal value is abs(vmin)/(vmax+abs(vmin)) 
+      stop : Offset from highets point in the colormap's range.
+          Defaults to 1.0 (no upper ofset). Should be between
+          0.5 and 1.0; if your dataset mean is positive you should leave 
+          this at 1.0, otherwise to (abs(vmin)-vmax)/(2*abs(vmin)) 
+
+    Credits
+    -------
+    Paul H (initial version)
+    Horea Christian (additions/modifications)
+    Fernando Paolo (additions/modifications)
+
+    TODO
+    ----
+    Set 'start' and 'stop' dynamically.
+
+    '''
+    # if array given, find optimal value to center new cmap
+    if np.ndim(midpoint) != 0:
+        midpoint = np.asarray(midpoint)[~np.isnan(midpoint)]
+        midpoint = abs(midpoint.min()) / float(abs(midpoint.max()) + \
+                                               abs(midpoint.min())) 
+    # regular index to compute the colors
+    reg_index = np.hstack([
+        np.linspace(start, 0.5, 128, endpoint=False), 
+        np.linspace(0.5, stop, 129, endpoint=True)
+    ])
+    # shifted index to match the midpoint of the data
+    new_index = np.hstack([
+        np.linspace(0.0, midpoint, 128, endpoint=False), 
+        np.linspace(midpoint, 1.0, 129, endpoint=True)
+    ])
+    cdict = {'red': [], 'green': [], 'blue': [], 'alpha': []}
+    for ri, si in zip(reg_index, new_index):
+        r, g, b, a = cmap(ri)
+        cdict['red'].append((si, r, r))
+        cdict['green'].append((si, g, g))
+        cdict['blue'].append((si, b, b))
+        cdict['alpha'].append((si, a, a))
+    newcmap = mpl.colors.LinearSegmentedColormap(name, cdict, 256)
+    plt.register_cmap(cmap=newcmap)
+    return newcmap
 
 
 def create_cmap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True, 
@@ -402,6 +461,7 @@ def plot_grid_proj(m, lon, lat, grid, shift=True, masked=True,
     -------
     out : Basemap object
         The provided map projection object.
+
     """
     if np.ndim(lon) == 1:
         lon, lat = np.meshgrid(lon, lat)
@@ -409,11 +469,11 @@ def plot_grid_proj(m, lon, lat, grid, shift=True, masked=True,
         lon -= (lon[1] - lon[0]) / 2.
         lat -= (lat[1] - lat[0]) / 2.
     # map lon/lat into proj and fig coords.
-    xx, yy = m(lon, lat)    
+    xx, yy = m(lon, lat)
     if masked:
         grid = np.ma.masked_invalid(grid)
     if contourf:
-        m.contourf(xx, yy, grid, 25, **kwargs)
+        m.contourf(xx, yy, grid, **kwargs)
     else:
         m.pcolormesh(xx, yy, grid, **kwargs)
     return m

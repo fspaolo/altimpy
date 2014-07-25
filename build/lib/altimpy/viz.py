@@ -35,7 +35,7 @@ def make_cmap(colors, position=None, name='my_cmap', n=256):
         highest.
     position : list
         Contains values from 0 to 1 to dictate the location of each color.
-        E.g., useful for nonlinear colormaps.
+        Useful for irregular color segments.
     name : string
         The name of the colormap.
     n : int
@@ -44,10 +44,6 @@ def make_cmap(colors, position=None, name='my_cmap', n=256):
     Return
     ------
     cmap : a colormap with equally spaced colors.
-
-    Notes
-    -----
-    TODO: add suport for alpha in the tuplues => (r, g, b, a)
 
     Credits
     -------
@@ -60,6 +56,10 @@ def make_cmap(colors, position=None, name='my_cmap', n=256):
     colors = [(0, 0, 1), (.5, .5, 1), (1, 1, 1)]
     position = [0, 0.3, 1]
     cmap = make_cmap(colors, position, name='BlueWhite', n=20)
+
+    TODO
+    -----
+    Add support for alpha in the tuples => (r, g, b, a)
 
     """
     if position == None:
@@ -402,6 +402,7 @@ def plot_grid_proj(m, lon, lat, grid, shift=True, masked=True,
     -------
     out : Basemap object
         The provided map projection object.
+
     """
     if np.ndim(lon) == 1:
         lon, lat = np.meshgrid(lon, lat)
@@ -413,7 +414,7 @@ def plot_grid_proj(m, lon, lat, grid, shift=True, masked=True,
     if masked:
         grid = np.ma.masked_invalid(grid)
     if contourf:
-        m.contourf(xx, yy, grid, 25, **kwargs)
+        m.contourf(xx, yy, grid, **kwargs)
     else:
         m.pcolormesh(xx, yy, grid, **kwargs)
     return m
@@ -819,9 +820,37 @@ def hinton(m, maxweight=None):
         plt.ion()
 
 
-def shade(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0, 
+def shade(data, cmap=plt.cm.gray, azdeg=165.0, altdeg=45.0, scale=1.0,
+           minsat=1, maxsat=0, minval=0, maxval=1):
+    """Creates shaded relief (hard light approach).
+
+    Convenient wrap around matplotlib.colors.LightSource to facilitate
+    scaling and saturation settings.
+
+    Parameters
+    ----------
+    scale : float, default 1.0
+        Scaling factor for shading. Larger number => larger gradients.
+    minsat, maxsat, minval, maxval: int, default 1, 0, 0, 1
+        Min and max saturation/values (from 0 to 1).
+
+    See docstring of function 'shade2'.
+
+    """
+    # 1. create light source object
+    ls = mpl.colors.LightSource(azdeg=azdeg, altdeg=altdeg)
+    ls.hsv_min_sat = minsat
+    ls.hsv_max_sat = maxsat
+    ls.hsv_min_val = minval
+    ls.hsv_max_val = maxval
+    # 2. convert data to rgb array including shading from light source
+    rgb = ls.shade(data * scale, cmap)
+    return rgb
+
+
+def shade2(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0, 
           altdeg=45.0):
-    """Creates shaded relief (soft light).
+    """Creates shaded relief (soft light approach).
     
     Sets shading for data array based on intensity layer or the data's value
     itself.
@@ -854,7 +883,7 @@ def shade(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0,
     See also
     --------
     hillshade
-    shade2
+    shade
 
     Notes
     -----
@@ -902,7 +931,7 @@ def shade(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0,
 
 
 def hillshade(data, scale=1.0, azdeg=165.0, altdeg=45.0):
-    """Convert data to hillshade.
+    """Convert data to hillshade (intensity).
 
     Parameters
     ----------
@@ -923,7 +952,7 @@ def hillshade(data, scale=1.0, azdeg=165.0, altdeg=45.0):
 
     See also
     --------
-    shade
+    shade2
 
     """
     # convert alt, az to radians
@@ -938,32 +967,6 @@ def hillshade(data, scale=1.0, azdeg=165.0, altdeg=45.0):
     intensity = (intensity - intensity.min()) / \
                 (intensity.max() - intensity.min())
     return intensity
-
-
-def shade2(data, cmap=plt.cm.gray, azdeg=165.0, altdeg=45.0, scale=1.0,
-           minsat=1, maxsat=0):
-    """Creates shaded relief (hard light).
-
-    Convenient wrap around matplotlib.colors.LightSource to facilitate
-    scaling and saturation settings.
-
-    Parameters
-    ----------
-    scale : float, default 1.0
-        Scaling factor for shading. Larger number => larger gradients.
-    minsat, maxsat : int, default 1 and 0
-        Min and max saturation values (from 0 to 1).
-
-    See function 'shade' docstring.
-
-    """
-    # 1. create light source object
-    ls = mpl.colors.LightSource(azdeg=azdeg, altdeg=altdeg)
-    ls.hsv_min_sat = minsat
-    ls.hsv_max_sat = maxsat
-    # 2. convert data to rgb array including shading from light source
-    rgb = ls.shade(data * scale, cmap)
-    return rgb
 
 
 def adjust_spines(ax, spines, pad=10):
