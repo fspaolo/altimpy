@@ -11,6 +11,8 @@ https://github.com/gely/coseis
 # Fernando Paolo <fpaolo@ucsd.edu>
 # December 15, 2011
 
+__author__ = 'Fernando Paolo'
+
 import os
 import subprocess
 import cStringIO
@@ -117,7 +119,7 @@ def shift_cmap(cmap, start=0, midpoint=0.5, stop=1, name='shiftedcmap'):
 
     TODO
     ----
-    Set 'start' and 'stop' dynamically.
+    Set 'start' and 'stop' dynamically when negative/positive bounds.
 
     '''
     # if array given, find optimal value to center new cmap

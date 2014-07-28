@@ -172,17 +172,80 @@ class NetCDF(object):
         self.file.close()
 
 
+def read_gtif(fname, max_dim=1024.):
+    """Read GeoTIFF image into array (RGB or grayscale)."""
+
+    # get nx, ny, nz and geoinfo
+    dataset = gdal.Open(fname) 
+    cols = dataset.RasterXSize
+    rows = dataset.RasterYSize
+    count = dataset.RasterCount
+    geotrans = dataset.GetGeoTransform()
+    projection = dataset.GetProjection()
+
+    # convert format WKT -> Proj4
+    spatialref = osr.SpatialReference()
+    spatialref.ImportFromWkt(projection)
+    spatialproj = spatialref.ExportToProj4()
+
+    # get bands
+    bands = [dataset.GetRasterBand(k) for k in range(1, count+1)]
+    null = bands[0].GetNoDataValue()
+
+    # scale to downsample
+    if max_dim:
+        scale_cols = cols / max_dim
+        scale_rows = rows / max_dim
+        scale_max = max(scale_cols, scale_rows)
+        nx = round(cols / scale_max)
+        ny = round(rows / scale_max)
+    else:
+        nx = cols
+        ny = rows
+
+    # read downsampled arrays
+    image = [b.ReadAsArray(buf_xsize=nx, buf_ysize=ny) for b in bands]
+
+    # rgb or grayscale image
+    if count > 1:
+        image = np.dstack(image)
+    else:
+        image = image[0]
+
+    # resolution, pixel with and height
+    # origin, top left cornner
+    # rotation, 0 if image is "north up"
+    dx = geotrans[1]
+    dy = geotrans[5]
+    xmin = geotrans[0]
+    ymax = geotrans[3]
+    rot1 = geotrans[2]
+    rot2 = geotrans[4]
+
+    # bottom right cornner: http://gdal.org/gdal_datamodel.html
+    xmax = xmin + cols * dx + rows * rot1
+    ymin = ymax + cols * rot2 + rows * dy 
+
+    print "WKT format:\n", spatialref
+    print "Proj4 format:\n", spatialproj
+    print 'res:', dx, dy
+    print 'xlim:', xmin, xmax
+    print 'ylim:', ymin, ymax
+    print 'rot:', rot1, rot2
+    return image, (xmin, xmax, ymin, ymax)
+
+
 def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     """Reads a GeoTIFF image and returns the respective 2d array.
 
-    It assumes polar stereographic proj.
-    If units == 'km', converts x/y from m to km.
+    It assumes polar stereographic projection.
+    If units='km', converts x/y from m to km.
 
     Return
     ------
     x, y : 1d arrays containing the coordinates.
     img : 2d array containing the image.
-    bbox_ll : lon/lat limits (lllon,lllat,urlon,urlat).
+    bbox_ll : lon/lat limits (lllon, lllat, urlon, urlat).
 
     Notes
     -----
@@ -215,12 +278,19 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     # from: http://gdal.org/gdal_datamodel.html
     ymin = ymax + nx * gt[4] + ny * dy 
     xmax = xmin + nx * dx + ny * gt[2] 
+
+    print xmin, xmax
+    print ymin, ymax
+    exit()
+
     # Polar stereo coords x,y
     x = np.arange(xmin, xmax, dx)    
     # in reverse order -> raster origin = urcrn
     y = np.arange(ymax, ymin, dy)  
+
     # bbox of raster img in x,y 
     bbox_xy = (xmin, ymin, xmax, ymax)
+
     # bbox of raster img in lon,lat (to plot proj)
     p1 = pj.Proj(proj='stere', lat_ts=lat_ts, lon_0=lon_0, lat_0=lat_0)
     xmin, ymin = p1(bbox_xy[0], bbox_xy[1], inverse=True)

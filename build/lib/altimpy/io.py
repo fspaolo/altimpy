@@ -175,14 +175,14 @@ class NetCDF(object):
 def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     """Reads a GeoTIFF image and returns the respective 2d array.
 
-    It assumes polar stereographic proj.
-    If units == 'km', converts x/y from m to km.
+    It assumes polar stereographic projection.
+    If units='km', converts x/y from m to km.
 
     Return
     ------
     x, y : 1d arrays containing the coordinates.
     img : 2d array containing the image.
-    bbox_ll : lon/lat limits (lllon,lllat,urlon,urlat).
+    bbox_ll : lon/lat limits (lllon, lllat, urlon, urlat).
 
     Notes
     -----
@@ -215,12 +215,19 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     # from: http://gdal.org/gdal_datamodel.html
     ymin = ymax + nx * gt[4] + ny * dy 
     xmax = xmin + nx * dx + ny * gt[2] 
+
+    print xmin, xmax
+    print ymin, ymax
+    exit()
+
     # Polar stereo coords x,y
     x = np.arange(xmin, xmax, dx)    
     # in reverse order -> raster origin = urcrn
     y = np.arange(ymax, ymin, dy)  
+
     # bbox of raster img in x,y 
     bbox_xy = (xmin, ymin, xmax, ymax)
+
     # bbox of raster img in lon,lat (to plot proj)
     p1 = pj.Proj(proj='stere', lat_ts=lat_ts, lon_0=lon_0, lat_0=lat_0)
     xmin, ymin = p1(bbox_xy[0], bbox_xy[1], inverse=True)
