@@ -365,6 +365,7 @@ cmap_lib = {
 
 ### Map projection utilities
 
+# DEPRECATED - shift/flip x/y/data directly
 def align_data_with_fig(x, y, data):
     """Align map grid with figure frame.
     
@@ -375,50 +376,54 @@ def align_data_with_fig(x, y, data):
     x = np.asarray(x)
     y = np.asarray(y)
     x = x - x.min()             # shift
-    y = y[::-1] - y.min()       # reverse y-dim and shift
-    data = data[::-1,:]         # reverse y-dim
+    y = y - y.min()             # shift
+    #y = y[::-1] - y.min()      # reverse y-dim and shift
+    #data = data[::-1,:]         # reverse y-dim
     return [x, y, data]
 
 
-def plot_moa_subreg(m, x, y, moa, bbox, cmap=plt.cm.gray, **kwargs):
-    """Plot MOA image subregion defined by projection 'm'.
+def plot_img_subreg(m, x, y, img, bbox, cmap=plt.cm.gray, **kwargs):
+    """Plot image subregion defined by projection 'm'.
     
     m : Basemap projection defining subregion
     x, y : 1d arrays of coordinates
-    moa : 2d array with MOA image
+    img : 2d array with image
     bbox : low-left and upp-right lon/lat
+
     """
     bbox_sub = (m.llcrnrlon, m.llcrnrlat, m.urcrnrlon, m.urcrnrlat) 
-    # fig coords
-    x, y, moa = align_data_with_fig(x, y, moa) 
-    # MOA coords m -> km
-    x /= 1e3; y /= 1e3
-    # MOA fig domain
+    # align projection coords with figure frame
+    x = x - x.min()
+    y = y - y.min()
+    # img coords m -> km
+    x /= 1e3
+    y /= 1e3
+    # img fig domain
     m1 = make_proj_stere(bbox)
     # subregion corners in fig coords 
     x0, y0 = m1(bbox_sub[0], bbox_sub[1])
     x1, y1 = m1(bbox_sub[2], bbox_sub[3])
-    # select MOA subregion
+    # select img subregion
     j, = np.where((x0 < x) & (x < x1))
     i, = np.where((y0 < y) & (y < y1))
-    moa2 = moa[i[0]:i[-1], j[0]:j[-1]]
+    img2 = img[i[0]:i[-1], j[0]:j[-1]]
     x2 = x[j[0]:j[-1]]
     y2 = y[i[0]:i[-1]]
-    # plot MOA img
-    m.imshow(moa2, cmap=cmap, **kwargs)
-    return [m, x2, y2, moa2]
+    # plot img
+    m.imshow(img2, cmap=cmap, **kwargs)
+    return [m, x2, y2, img2]
 
 
 def make_proj_stere(bbox, lat_ts=-71, lon_0=0, lat_0=-90):
-    """
-    Make a `basemap` polar stereographic projection.
+    """Make a `basemap` polar stereographic projection.
 
     bbox : is (lon0, lat0, lon1, lat1), the ll and ur corners.
     lat_ts : is standard lat (true scale in the projection).
     lon_0, lat_0 : is the proj center (NOT grid center!).
 
-    Default values are the MOA parameters: 
+    Default values are the MOA/LIMA parameters: 
     http://nsidc.org/data/moa/users_guide.html
+
     """
     # Ellipsoid: http://nsidc.org/data/polar_stereo/ps_grids.html
     a = RE

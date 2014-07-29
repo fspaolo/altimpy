@@ -11,6 +11,14 @@ import tables as tb
 import datetime as dt
 import netCDF4 as nc
 
+try:
+    from osgeo import osr, gdal
+    import pyproj as pj
+except:
+    msg = """one of the following modules are missing: 
+    `osgeo` (GDAL) or `pyproj`"""
+    raise ImportError(msg)
+
 from altimpy import is_meter
 
 
@@ -172,6 +180,75 @@ class NetCDF(object):
         self.file.close()
 
 
+def read_gtif(fname, max_dim=1024.):
+    """Load GeoTIFF image into array (RGB or grayscale).
+    
+    To get GeoTIFF metadata:
+
+        $ gdalinfo file.tif
+    
+    """
+    # get nx, ny, nz and geoinfo
+    dataset = gdal.Open(fname) 
+    cols = dataset.RasterXSize
+    rows = dataset.RasterYSize
+    count = dataset.RasterCount
+    geotrans = dataset.GetGeoTransform()
+    projection = dataset.GetProjection()
+
+    # convert format WKT -> Proj4
+    spatialref = osr.SpatialReference()
+    spatialref.ImportFromWkt(projection)
+    spatialproj = spatialref.ExportToProj4()
+
+    # get bands
+    bands = [dataset.GetRasterBand(k) for k in range(1, count+1)]
+    null = bands[0].GetNoDataValue()
+
+    # scale to downsample
+    if max_dim:
+        scale_cols = cols / max_dim
+        scale_rows = rows / max_dim
+        scale_max = max(scale_cols, scale_rows)
+        nx = round(cols / scale_max)
+        ny = round(rows / scale_max)
+    else:
+        nx = cols
+        ny = rows
+
+    # read downsampled arrays
+    image = [b.ReadAsArray(buf_xsize=nx, buf_ysize=ny) for b in bands]
+
+    # rgb (3d) or grayscale (2d) image
+    if count > 1:
+        image = np.dstack(image)
+    else:
+        image = image[0]
+
+    # resolution, pixel with and height
+    # origin, raster upper left cornner
+    # rotation, 0 if image is "north up"
+    dx = geotrans[1]
+    dy = geotrans[5]
+    x_left = geotrans[0]
+    y_top = geotrans[3]
+    rot1 = geotrans[2]
+    rot2 = geotrans[4]
+
+    # lower right cornner: http://gdal.org/gdal_datamodel.html
+    x_right = x_left + cols * dx + rows * rot1
+    y_bottom = y_top + cols * rot2 + rows * dy 
+
+    print "WKT format:\n", spatialref
+    print "Proj4 format:\n", spatialproj
+    print 'res:', dx, dy
+    print 'xlim:', x_left, x_right
+    print 'ylim:', y_top, y_bottom
+    print 'rot:', rot1, rot2
+    return image, (x_left, y_top, x_right, y_bottom)
+
+
+# DEPRECATED - use read_gtif instead.
 def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     """Reads a GeoTIFF image and returns the respective 2d array.
 
@@ -196,13 +273,6 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
         $ gdalinfo file.tif
     
     """
-    try:
-        from osgeo import osr, gdal
-        import pyproj as pj
-    except:
-        msg = """some of the following modules are missing: 
-        `osgeo` (GDAL) or `pyproj`"""
-        raise ImportError(msg)
     ds = gdal.Open(fname) 
     img = ds.ReadAsArray()       # img -> matrix
     gt = ds.GetGeoTransform()    # coordinates
@@ -215,10 +285,6 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     # from: http://gdal.org/gdal_datamodel.html
     ymin = ymax + nx * gt[4] + ny * dy 
     xmax = xmin + nx * dx + ny * gt[2] 
-
-    print xmin, xmax
-    print ymin, ymax
-    exit()
 
     # Polar stereo coords x,y
     x = np.arange(xmin, xmax, dx)    
@@ -237,6 +303,5 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
         x /= 1e3
         y /= 1e3
     print 'image limits (left/right/bottom/top):'
-    print '(x,y)', bbox_xy[0], bbox_xy[2], bbox_xy[1], bbox_xy[3]
     print '(lon,lat)', bbox_ll[0], bbox_ll[2], bbox_ll[1], bbox_ll[3]
     return [x, y, img, bbox_ll]
