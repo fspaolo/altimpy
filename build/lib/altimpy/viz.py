@@ -365,7 +365,7 @@ cmap_lib = {
 
 ### Map projection utilities
 
-# DEPRECATED - shift/flip x/y/data directly
+# DEPRECATED - do it directly
 def align_data_with_fig(x, y, data):
     """Align map grid with figure frame.
     
@@ -382,7 +382,7 @@ def align_data_with_fig(x, y, data):
     return [x, y, data]
 
 
-def plot_img_subreg(m, x, y, img, bbox, cmap=plt.cm.gray, **kwargs):
+def plot_img_subreg(m, x, y, img, bbox, **kwargs):
     """Plot image subregion defined by projection 'm'.
     
     m : Basemap projection defining subregion
@@ -392,25 +392,25 @@ def plot_img_subreg(m, x, y, img, bbox, cmap=plt.cm.gray, **kwargs):
 
     """
     bbox_sub = (m.llcrnrlon, m.llcrnrlat, m.urcrnrlon, m.urcrnrlat) 
-    # align projection coords with figure frame
+    # shift coords and flip img to align projection and figure
     x = x - x.min()
     y = y - y.min()
     # img coords m -> km
     x /= 1e3
     y /= 1e3
-    # MOA fig domain
+    # img fig domain
     m1 = make_proj_stere(bbox)
     # subregion corners in fig coords 
     x0, y0 = m1(bbox_sub[0], bbox_sub[1])
     x1, y1 = m1(bbox_sub[2], bbox_sub[3])
-    # select MOA subregion
+    # select img subregion
     j, = np.where((x0 < x) & (x < x1))
     i, = np.where((y0 < y) & (y < y1))
     img2 = img[i[0]:i[-1], j[0]:j[-1]]
     x2 = x[j[0]:j[-1]]
     y2 = y[i[0]:i[-1]]
-    # plot MOA img
-    m.imshow(img2, cmap=cmap, **kwargs)
+    # plot img
+    m.imshow(img2, **kwargs)
     return [m, x2, y2, img2]
 
 
