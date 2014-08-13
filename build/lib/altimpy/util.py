@@ -617,7 +617,8 @@ def regrid2d(arr3d, x, y, inc_by=2):
     for k, field in enumerate(arr3d):
         field1 = bm.interp(field, x, y, xx, yy, order=0) # nearest neighb.
         field2 = bm.interp(field, x, y, xx, yy, order=1) # linear
-        ######## soemthing "wierd" when the field is zero ########
+        ##########################################################
+        # soemthing "wierd" when the field is zero
         ind = np.where(field2 == 0) #<<<<< check!
         try:
             field2[ind] = field1[ind]

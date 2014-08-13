@@ -6,7 +6,9 @@ should be reviewed.
 
 """
 
-def get_region_ind(name, lon, lat):
+import numpy as np
+
+def where_isnan(name, lon, lat):
 
     if lon.ndim == 1:
         lon, lat = np.meshgrid(lon, lat)
@@ -14,6 +16,7 @@ def get_region_ind(name, lon, lat):
 
     # regional ice shelves
     #---------------------
+
     reg['ais'] = (lat < -90) | (lat > -60)
 
     reg['wais'] = (lon < 179) | (lon > 313) | (lat < -90) | (lat > -60) | \
@@ -50,6 +53,7 @@ def get_region_ind(name, lon, lat):
 
     # individual ice shelves
     #-----------------------
+
     reg['fimbul'] = (lon > 7.5) & (lon < 357.4) | (lat > -69) | \
             (lat < -71.8)
 
