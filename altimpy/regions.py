@@ -79,9 +79,11 @@ def where_isnan(name, lon, lat):
             (lon < 12.3) | (lon > 16) | (lat < -70.7) | (lat > -69) | \
             (lon < 13) & (lat < -70)
 
-    reg['baudouin'] = (lon < 24) | (lon > 33.3) | (lat > -69) | (lat < -71.2)
+    reg['baudouin'] = reg['Baudouin'] = (lon < 24) | (lon > 33.3) | \
+            (lat > -69) | (lat < -71.2)
 
-    reg['harald'] = (lon < 33.3) | (lon > 37) | (lat > -68.5) | (lat < -70)
+    reg['harald'] = reg['Prince Harald'] = (lon < 33.3) | (lon > 37) | \
+            (lat > -68.5) | (lat < -70)
 
     reg['amery'] = reg['Amery'] = (lon < 66) | (lon > 74.5) | (lat > -68) | \
             (lat < -73.5)
