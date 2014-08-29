@@ -414,7 +414,7 @@ def plot_img_subreg(m, x, y, img, bbox, **kwargs):
     return [m, x2, y2, img2]
 
 
-def make_proj_stere(bbox, lat_ts=-71, lon_0=0, lat_0=-90):
+def make_proj_stere(bbox, ax=None, lat_ts=-71, lon_0=0, lat_0=-90):
     """Make a `basemap` polar stereographic projection.
 
     bbox : is (lon0, lat0, lon1, lat1), the ll and ur corners.
@@ -429,6 +429,7 @@ def make_proj_stere(bbox, lat_ts=-71, lon_0=0, lat_0=-90):
     a = RE
     b = a * np.sqrt(1.0 - E2) 
     m = Basemap(
+        ax=ax,
         projection='stere', 
         lat_ts=lat_ts,         
         lon_0=lon_0, lat_0=lat_0,
@@ -885,8 +886,9 @@ def hinton(m, maxweight=None):
     if reenable:
         plt.ion()
 
+# tools for shaded relief
 
-def shade(data, cmap=plt.cm.gray, azdeg=165.0, altdeg=45.0, scale=1.0,
+def shade(data, cmap=plt.cm.gray, azimute=165.0, altitude=45.0, scale=1.0,
            minsat=1, maxsat=0, minval=0, maxval=1):
     """Creates shaded relief (hard light approach).
 
@@ -903,19 +905,19 @@ def shade(data, cmap=plt.cm.gray, azdeg=165.0, altdeg=45.0, scale=1.0,
     See docstring of function 'shade2'.
 
     """
-    # 1. create light source object
-    ls = mpl.colors.LightSource(azdeg=azdeg, altdeg=altdeg)
+    # 1) create light source object
+    ls = mpl.colors.LightSource(azimute=azimute, altitude=altitude)
     ls.hsv_min_sat = minsat
     ls.hsv_max_sat = maxsat
     ls.hsv_min_val = minval
     ls.hsv_max_val = maxval
-    # 2. convert data to rgb array including shading from light source
+    # 2) convert data to rgb array including shading from light source
     rgb = ls.shade(data * scale, cmap)
     return rgb
 
 
-def shade2(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0, 
-          altdeg=45.0):
+def shade2(data, intensity=None, cmap=plt.cm.gray, azimute=165.0, \
+           altitude=45.0, scale=1.0):
     """Creates shaded relief (soft light approach).
     
     Sets shading for data array based on intensity layer or the data's value
@@ -930,7 +932,7 @@ def shade2(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0,
         getting the hillshade values (see hillshade).
     cmap : colormap, default plt.cm.gray
         e.g. matplotlib.colors.LinearSegmentedColormap instance.
-    scale, azdeg, altdeg : floats, default 10.0, 165.0, 45.0
+    azimute, altitude, scale : floats, default 10.0, 165.0, 45.0
         Parameters for hillshade function (see hillshade).
 
     Output
@@ -982,7 +984,7 @@ def shade2(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0,
     """
     if intensity is None:
         # hilshading the data
-        intensity = hillshade(data, scale=scale, azdeg=azdeg, altdeg=altdeg)
+        intensity = hillshade(data, azimute=azimute, altitude=altitude, scale=scale)
     else:
         # or normalize the intensity
         intensity = (intensity - intensity.min()) / \
@@ -996,20 +998,20 @@ def shade2(data, intensity=None, cmap=plt.cm.gray, scale=1.0, azdeg=165.0,
     return rgb
 
 
-def hillshade(data, scale=1.0, azdeg=165.0, altdeg=45.0):
+def hillshade(data, azimute=165.0, altitude=45.0, scale=1.0):
     """Convert data to hillshade (intensity).
 
     Parameters
     ----------
     data : 2d array
         The grid to be used as shading.
-    scale : float, default 1.0
-        Scaling factor for shading. Larger number => larger gradients.
-    azdeg : float, default 165.0
+    azimute : float, default 165.0
         Direction where the light comes from: 0=south, 90=east, 180=north,
         270=west.
-    altdeg : float, default 45.0
+    altitude : float, default 45.0
         Altitude where the light comes from: 0=horison, 90=zenith.
+    scale : float, default 1.0
+        Z scaling factor for shading. Larger number => larger gradients.
 
     Output
     ------
@@ -1021,9 +1023,9 @@ def hillshade(data, scale=1.0, azdeg=165.0, altdeg=45.0):
     shade2
 
     """
-    # convert alt, az to radians
-    az = azdeg * np.pi / 180.0
-    alt = altdeg * np.pi / 180.0
+    # deg -> radians
+    az = np.deg2rad(azimute)
+    alt = np.deg2rad(altitude)
     # gradient in x and y directions
     dx, dy = np.gradient(data * scale)
     slope = 0.5 * np.pi - np.arctan(np.hypot(dx, dy))
@@ -1034,6 +1036,7 @@ def hillshade(data, scale=1.0, azdeg=165.0, altdeg=45.0):
                 (intensity.max() - intensity.min())
     return intensity
 
+#---------------------------------------------------------------
 
 def adjust_spines(ax, spines, pad=10):
     """Adjust the axis of a plot.
