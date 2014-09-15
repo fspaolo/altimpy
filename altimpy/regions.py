@@ -26,13 +26,19 @@ def where_isnan(name, lon, lat):
     reg['wvl'] = reg['Wilkes-Victoria'] = \
             (lon < 80) | (lon > 174) | (lat < -76) | (lat > -64)
 
-    reg['ris'] = reg['Ross'] = \
+    reg['wilkes'] = reg['Wilkes'] = \
+            (lon < 80) | (lon > 174) | (lat < -71.7) | (lat > -64)
+
+    reg['ris'] = reg['Ross Ice Shelf'] = \
             (lon < 156) | (lon > 215) | (lat < -85.8) | (lat > -77) | \
             (lon > 190) & (lat > -77.7) | \
             (lon > 208) & (lat > -78.5)
 
+    reg['ross'] = reg['Ross'] = \
+            (lon < 156) | (lon > 222) | (lat < -85.8) | (lat > -71.8)
+
     reg['as'] = reg['Amundsen'] = \
-            (lon < 202) | (lon > 262.5) | (lat < -78) | (lat > -73.2)
+            (lon < 224) | (lon > 262.5) | (lat < -75.8) | (lat > -73.2)
 
     reg['bs'] = reg['Bellingshausen'] = \
             (lon < 256) | (lon > 295) | (lat < -74) | (lat > -69.5) | \
@@ -151,7 +157,7 @@ def where_isnan(name, lon, lat):
     reg['cosgrove'] = reg['Cosgrove'] = (lon < 257) | (lon > 262) | \
             (lat < -74) | (lat > -73.2)
 
-    reg['abbot'] = reg['Abbot'] = (lon < 256.2) | (lon > 269) | \
+    reg['abbot'] = reg['Abbot'] = (lon < 256.2) | (lon > 271.2) | \
             (lat < -73.5) | (lat > -72) | (lon < 261) & (lat < -73.3)
 
     reg['venable'] = reg['Venable'] = (lon < 271.2) | (lon > 275) | \

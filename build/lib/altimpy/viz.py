@@ -1093,6 +1093,36 @@ def get_limits(x, decimals=1):
     return mn, mx
 
 
+def meridians(start=0, stop=360, y0=-90, yn=90, spacing=10, npts=1000):
+    """Draw meridians (arcs) from y0 to yn spaced by 'spacing' from 'start' to
+    'stop' longitudes.
+    """
+    x, y = [], []
+    lats = np.linspace(y0, yn, npts)  # single meridian (an arc)
+    if np.ndim(spacing) == 0:
+        spacing = np.arange(start, stop+spacing, spacing)
+    for lon in spacing:
+        lons = np.repeat([lon], lats.shape[0])
+        x = np.hstack((x, lons))
+        y = np.hstack((y, lats))
+    return x, y
+
+
+def parallels(start=-90, stop=90, x0=0, xn=360, spacing=10, npts=1000):
+    """Draw parallels (circles) from x0 to xn spaced by 'spacing' from 'start'
+    to 'stop' latitudes.
+    """
+    x, y = [], []
+    lons = np.linspace(x0, xn, npts)  # single parallel (a circle)
+    if np.ndim(spacing) == 0:
+        spacing = np.arange(start, stop+spacing, spacing)
+    for lat in spacing:
+        lats = np.repeat([lat], lons.shape[0])
+        x = np.hstack((x, lons))
+        y = np.hstack((y, lats))
+    return x, y
+
+
 def rcparams():
     """Set optimal figure layout parameters."""
     plt.rcParams['font.family'] = 'arial'
