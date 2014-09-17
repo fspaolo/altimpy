@@ -133,6 +133,9 @@ def where_isnan(name, lon, lat):
     reg['rossw'] = reg['Ross WAIS'] = (lon < 179) | (lon > 215) | \
             (lat < -85.8) | (lat > -77.7) | (lon > 208) & (lat > -78.5)
 
+    reg['withrow'] = reg['Withrow'] = \
+            (lon < 201) | (lon > 204) | (lat < -77.5) | (lat > -76.8)
+
     reg['sulzberger'] = reg['Sulzberger'] = (lon < 207.5) | (lon > 215) | \
             (lat < -78) | (lat > -76.3) | (lon > 211.2) & (lat > -76.4)
 

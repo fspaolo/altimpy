@@ -167,7 +167,7 @@ def create_cmap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True,
         cmap = cmap_lib[cmap]
     cmap = np.array(cmap, 'f')
     if invert:
-        cmap = cmap[:,::-1]
+        cmap[1:,:] = cmap[1:,::-1]  # only invert the color rows
     cmap[1:] /= max(1.0, cmap[1:].max())
     v, r, g, b, a = cmap
     v /= v[-1]
