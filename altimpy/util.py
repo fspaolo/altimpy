@@ -866,3 +866,14 @@ def gse(y_pred, y_true, ax=0):
     if n > 2:
         err = rmse(y_pred, y_true, ax=ax) / np.sqrt(n)
     return err
+
+
+def roundup_half(x):
+    """Round up to next half-integer."""
+    return 0.5 * np.ceil(2.0 * x)
+
+
+def roundup(x, decimals=1):
+    """Round up to next decimal digit."""
+    return np.ceil(x * 10 * decimals) / (10. * decimals)
+
