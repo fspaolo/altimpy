@@ -181,11 +181,14 @@ def where_isnan(name, lon, lat):
     reg['larsenb'] = reg['Larsen B'] = (lon < 297.5) | (lon > 300) | \
             (lat < -66.1) | (lat > -65.3)
 
-    reg['larsenc'] = reg['Larsen C'] = (lon < 294) | (lon > 300.5) | \
+    reg['larsenc_full'] = reg['Larsen C full'] = (lon < 294) | (lon > 300.5) | \
             (lat < -69.5) | (lat > -66.1)
 
-    reg['larsend'] = reg['Larsen D'] = (lon < 297) | (lon > 300.5) | \
-            (lat < -73) | (lat > -69.5)
+    reg['larsenc'] = reg['Larsen C'] = (lon < 294) | (lon > 300.5) | \
+            (lat < -69.5) | (lat > -66.1) | (lon > 296) & (lat < -68.3)
+
+    reg['larsend'] = reg['Larsen D'] = (lon < 296.5) | (lon > 300.5) | \
+            (lat < -73) | (lat > -68.3)
 
     reg['ronne'] = reg['Ronne'] = (lon < 275) | (lon > 313) | (lat < -84) | \
             (lat > -74.7) | (lon > 306) & (lat < -80.6) | \

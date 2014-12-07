@@ -25,7 +25,7 @@ from const import *
 
 ### Visualization utilities
 
-def make_cmap(colors, position=None, name='newcmap', n=256):
+def make_cmap(colors, position=None, name='newcmap', n=None):
     """Creates a custom colormap for Matplotlib.
 
     Parameters
@@ -35,13 +35,15 @@ def make_cmap(colors, position=None, name='newcmap', n=256):
         [0 to 255] or arithmetic [0 to 1]. Arrange your tuples so that the
         first color is the lowest value for the colorbar and the last is the
         highest.
-    position : list
+    position : list, optional
         Contains values from 0 to 1 to dictate the location of each color.
-        Useful for irregular color segments.
-    name : string
+        Useful for irregular color segments. Default is
+        np.linspace(0, 1, len(colors)).
+    name : string, optional
         The name of the colormap.
-    n : int
+    n : int, optional
         The number of intervals in the colormap (e.g. discrete colorbar).
+        Default is len(colors).
 
     Return
     ------
@@ -64,7 +66,9 @@ def make_cmap(colors, position=None, name='newcmap', n=256):
     Add support for alpha in the tuples (forth channel) => (r, g, b, a)
 
     """
-    if position == None:
+    if n is None:
+        n = len(colors)
+    if position is None:
         position = np.linspace(0, 1, len(colors))
     else:
         if len(position) != len(colors):
@@ -354,6 +358,13 @@ cmap_lib = {
         (2,  0,  0,  0),
         (2,  2,  2,  2),
     ],
+    'y2r': [
+        (0,  2,  4),
+        (2,  2,  1),
+        (2,  0,  0),
+        (0,  0,  0),
+        (2,  2,  2),
+    ],
     'w2b': [
         (0,  1,  3,  4),
         (2,  0,  0,  0),
@@ -362,6 +373,32 @@ cmap_lib = {
         (2,  2,  2,  2),
     ],
 }
+
+# These are the "Tableau 20" colors as RGB.  
+tab20 = tab20_colors = tableau20_colors = np.array([
+    (31, 119, 180), 
+    (255, 127, 14), 
+    (44, 160, 44), 
+    (214, 39, 40), 
+    (148, 103, 189), 
+    (140, 86, 75), 
+    (227, 119, 194), 
+    (127, 127, 127), 
+    (188, 189, 34), 
+    (23, 190, 207), 
+    (174, 199, 232), 
+    (255, 187, 120),  
+    (152, 223, 138), 
+    (255, 152, 150),  
+    (197, 176, 213), 
+    (196, 156, 148),  
+    (247, 182, 210), 
+    (199, 199, 199),  
+    (219, 219, 141), 
+    (158, 218, 229)
+    ]) / 255.
+
+tab20_cmap = tableau20_cmap = make_cmap(tab20_colors, name='Tableau')
 
 ### Map projection utilities
 
@@ -857,7 +894,7 @@ def hinton(m, maxweight=None):
     if plt.isinteractive():
         plt.ioff()
     
-    plt.clf()
+    #plt.clf()
     height, width = W.shape
     if not maxweight:
         maxweight = 2**np.ceil(np.log(np.max(np.abs(W)))/np.log(2))
