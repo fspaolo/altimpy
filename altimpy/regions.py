@@ -154,8 +154,8 @@ def where_isnan(name, lon, lat):
     reg['thwaites'] = reg['Thwaites'] = (lon < 251.3) | (lon > 257) | \
             (lat < -75.5) | (lat > -74.5)
 
-    reg['pig'] = reg['Pine Island'] = (lon < 257) | (lon > 262.5) | \
-            (lat < -75.8) | (lat > -74)
+    reg['pig'] = reg['Pine Island'] = (lon < 257) | (lon > 259.5) | \
+            (lat < -75.8) | (lat > -74.7)
 
     reg['cosgrove'] = reg['Cosgrove'] = (lon < 257) | (lon > 262) | \
             (lat < -74) | (lat > -73.2)

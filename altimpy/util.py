@@ -870,6 +870,7 @@ def gse(y_pred, y_true, ax=0):
 
 _all_positive = lambda x: [np.abs(x), np.where(x < 0)]
 _roundup_half = lambda x: 0.5 * np.ceil(2.0 * x)
+_roundup_deci = lambda x, deci: np.ceil(x * 10 * deci) / (10. * deci)
 
 def roundup_half(x, negative_down=False):
     """Round up to next half-integer."""
@@ -882,21 +883,13 @@ def roundup_half(x, negative_down=False):
         x = _roundup_half(x)
     return x
 
-
 def roundup(x, decimals=1, negative_down=False):
     """Round up to next decimal digit."""
-    print 'FIXME: x -> review the strategy!!!'
     x = np.asarray(x)
     if negative_down and np.ndim(x) > 0:
-        x_ = np.copy(x)
-        ind = np.where(x_ < 0)
-        x_[ind] *= -1
-        rounded = np.ceil(x_ * 10 * decimals) / (10. * decimals)
-        rounded[ind] *= -1
-    elif negative_down and np.ndim(x) == 0 and x < 0:
-        x *= -1
-        rounded = np.ceil(x * 10 * decimals) / (10. * decimals)
-        rounded *= -1
+        x, i = _all_positive(x)
+        x = _roundup_deci(x, decimals)
+        x[i] *= -1
     else:
-        rounded = np.ceil(x * 10 * decimals) / (10. * decimals)
-    return rounded
+        x = _roundup_deci(x, decimals)
+    return x
