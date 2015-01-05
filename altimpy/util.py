@@ -819,6 +819,7 @@ def get_area(grid, x, y, region=None):
     return sum_area, num_cells
 
 
+# TODO add pandas support?
 def rss(y_pred, y_true, ax=0):
     """Residual sum of squares."""
     res = np.nan
@@ -828,6 +829,7 @@ def rss(y_pred, y_true, ax=0):
     return res
 
 
+# TODO add pandas support?
 def mse(y_pred, y_true, ax=0):
     """Mean squared error.
     
@@ -840,6 +842,7 @@ def mse(y_pred, y_true, ax=0):
     return err
 
 
+# TODO add pandas support?
 def rmse(y_pred, y_true, ax=0):
     """Root mean squared error.
 
@@ -853,6 +856,10 @@ def ser(y_pred, y_true, deg, ax=0):
     N = len(y_true[~np.isnan(y_true)])  # num of samples
     p = deg + 1                         # num of parameters
     rss_ = rss(y_pred, y_true, ax=ax)
+    try:
+        err = pd.Series(err, index=y_pred.columns)  # for pandas DF
+    except:
+        pass
     return np.sqrt(rss_ / (N-p))
 
 
@@ -865,6 +872,10 @@ def gse(y_pred, y_true, ax=0):
     n = len(y_true[~np.isnan(y_true)])
     if n > 2:
         err = rmse(y_pred, y_true, ax=ax) / np.sqrt(n)
+    try:
+        err = pd.Series(err, index=y_pred.columns)  # for pandas DF
+    except:
+        pass
     return err
 
 
