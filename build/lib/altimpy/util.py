@@ -471,6 +471,10 @@ def referenced(x, to='first'):
     to : str, default 'first'
         To reference the series to its 'first' or 'mean'.
     """
+    try:
+        x = x.values
+    except:
+        pass
     x2 = x.copy()
     assert to in ['first', 'mean'], "`to` must be 'first' or 'mean'"
     if np.isnan(x2).all():
