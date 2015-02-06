@@ -798,7 +798,7 @@ def polyfit_select(x, y, cv=10, max_deg=3, weight=None, randomise=False):
     return model_order[model_mse.argmin()], model_mse
 
 
-def lstsq_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
+def lstsq_cv(x, y, cv=10, x_pred=None, max_deg=3, weight=None, randomise=False,
                return_coef=False):
     """Least squares polynomial fit with cross-validation.
 
@@ -830,19 +830,21 @@ def lstsq_cv(x, y, cv=10, max_deg=3, weight=None, randomise=False,
     ind, = np.where((~np.isnan(x)) & (~np.isnan(y)))
     x_, y_ = x[ind], y[ind]
     weight_ = None
+    if x_pred is None:
+        x_pred = x
     if weight is not None:
         weight_ = weight[ind]
     deg, mse = polyfit_select(x_, y_, cv=cv, max_deg=max_deg, weight=weight_,
                               randomise=randomise)
     coef, cov = np.polyfit(x_, y_, deg, w=weight_, cov=True)
-    y_pred = np.polyval(coef, x)  # predict on full data
+    y_pred = np.polyval(coef, x_pred)  # predict on full data
     out = y_pred
     if return_coef:
         out = [y_pred, coef, deg, mse, cov]
     return out
 
 
-def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e3, return_model=False):
+def lasso_cv(x, y, x_pred=None, max_deg=3, cv=10, max_iter=1e3, return_model=False):
     """LASSO polynomial fit with cross-validation.
     
     Regularized polynomial regression (by penalized least-squares) from a
@@ -850,15 +852,18 @@ def lasso_cv(x, y, max_deg=3, cv=10, max_iter=1e3, return_model=False):
     penalizes the size of the parameter vector using L1-norm, which leads to
     fewer coefficients in the fitted model.
 
-    The 'alpha' parameter (amount of penalization) is selected by k-fold CV.
-
-    Supports NaNs.
+    - The 'alpha' parameter (amount of penalization) is selected by k-fold CV.
+    - Predicts fitted model on given values 'x_pred' (default use 'x').
+    - Supports NaNs.
 
     """
     ind, = np.where((~np.isnan(x)) & (~np.isnan(y)))
     x_, y_ = x[ind], y[ind]
     X_ = dmatrix('C(x_, Poly)')
-    X = dmatrix('C(x, Poly)')
+    if x_pred is None:
+        X = dmatrix('C(x, Poly)')      # predict on original values
+    else:
+        X = dmatrix('C(x_pred, Poly)') # predict on given values
     lasso = LassoCV(cv=cv, copy_X=True, normalize=True, max_iter=max_iter)
     lasso = lasso.fit(X_[:,1:max_deg+1], y_)
     y_pred = lasso.predict(X[:,1:max_deg+1])
