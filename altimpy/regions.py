@@ -26,7 +26,7 @@ def where_isnan(name, lon, lat):
     reg['wvl'] = reg['Wilkes-Victoria'] = \
             (lon < 80) | (lon > 174) | (lat < -76) | (lat > -64)
 
-    reg['wilkes'] = reg['Wilkes'] = \
+    reg['wil'] = reg['wilkes'] = reg['Wilkes'] = \
             (lon < 80) | (lon > 174) | (lat < -71.7) | (lat > -64)
 
     reg['ris'] = reg['Ross Ice Shelf'] = \
@@ -34,17 +34,17 @@ def where_isnan(name, lon, lat):
             (lon > 190) & (lat > -77.7) | \
             (lon > 208) & (lat > -78.5)
 
-    reg['ross'] = reg['Ross'] = \
+    reg['ros'] = reg['ross'] = reg['Ross'] = \
             (lon < 156) | (lon > 222) | (lat < -85.8) | (lat > -71.8)
 
-    reg['as'] = reg['Amundsen'] = \
+    reg['amu'] = reg['as'] = reg['Amundsen'] = \
             (lon < 224) | (lon > 262.5) | (lat < -75.8) | (lat > -73.2)
 
-    reg['bs'] = reg['Bellingshausen'] = \
+    reg['bel'] = reg['bs'] = reg['Bellingshausen'] = \
             (lon < 256) | (lon > 295) | (lat < -74) | (lat > -69.5) | \
             (lon < 262) & (lat < -73.2)
 
-    reg['lis'] = reg['Larsen'] = \
+    reg['lar'] = reg['lis'] = reg['Larsen'] = \
             (lon < 294) | (lon > 300.5) | (lat < -73.2) | (lat > -65.3)
 
     reg['ap'] = reg['Antarctic Peninsula'] = \
@@ -71,130 +71,130 @@ def where_isnan(name, lon, lat):
     # individual ice shelves
     #-----------------------
 
-    reg['brunt'] = reg['Brunt'] = \
+    reg['bru'] = reg['brunt'] = reg['Brunt'] = \
             (lon < 332) | (lon > 342.5) | (lat < -76.2) | (lat > -74) | \
             (lat > -74.5) & (lon > 339.5)
 
-    reg['riiser'] = reg['Riiser'] = \
+    reg['rii'] = reg['riiser'] = reg['Riiser'] = \
             (lon < 339.5) | (lon > 349) | (lat > -71.6) | (lat < -74.5)
 
-    reg['fimbul'] = reg['Fimbul'] = \
+    reg['fim'] = reg['fimbul'] = reg['Fimbul'] = \
             (lon > 7.5) & (lon < 357.4) | (lat > -69) | (lat < -71.8)
 
-    reg['lazarev'] = reg['Lazarev'] = \
+    reg['laz'] = reg['lazarev'] = reg['Lazarev'] = \
             (lon < 12.3) | (lon > 16) | (lat < -70.7) | (lat > -69) | \
             (lon < 13) & (lat < -70)
 
-    reg['baudouin'] = reg['Baudouin'] = (lon < 24) | (lon > 33.3) | \
+    reg['bau'] = reg['baudouin'] = reg['Baudouin'] = (lon < 24) | (lon > 33.3) | \
             (lat > -69) | (lat < -71.2)
 
-    reg['harald'] = reg['Prince Harald'] = (lon < 33.3) | (lon > 37) | \
+    reg['har'] = reg['harald'] = reg['Prince Harald'] = (lon < 33.3) | (lon > 37) | \
             (lat > -68.5) | (lat < -70)
 
-    reg['amery'] = reg['Amery'] = (lon < 66) | (lon > 74.5) | (lat > -68) | \
+    reg['ame'] = reg['amery'] = reg['Amery'] = (lon < 66) | (lon > 74.5) | (lat > -68) | \
             (lat < -73.5)
 
-    reg['west'] = reg['West'] = \
+    reg['wes'] = reg['west'] = reg['West'] = \
             (lon < 81) | (lon > 89.5) | (lat < -68) | (lat > -66)
 
-    reg['shackleton'] = reg['Shackleton'] = \
+    reg['sha'] = reg['shackleton'] = reg['Shackleton'] = \
             (lon < 94.8) | (lon > 103) | (lat < -67) | (lat > -64.8)
 
-    reg['totten'] = reg['Totten'] = (lon < 113.5) | (lon > 118) | \
+    reg['tot'] = reg['totten'] = reg['Totten'] = (lon < 113.5) | (lon > 118) | \
             (lat < -67.6) | (lat > -66.3)
 
-    reg['moscow'] = reg['Moscow'] = (lon < 118.5) | (lon > 123) | \
+    reg['mos'] = reg['moscow'] = reg['Moscow'] = (lon < 118.5) | (lon > 123) | \
             (lat < -67.5) | (lat > -66.3)
 
-    reg['holmes'] = reg['Holmes'] = (lon < 126.3) | (lon > 128) | \
+    reg['hol'] = reg['holmes'] = reg['Holmes'] = (lon < 126.3) | (lon > 128) | \
             (lat < -67.2) | (lat > -66.3)
 
-    reg['dibble'] = reg['Dibble'] = (lon < 133.5) | (lon > 135.5) | \
+    reg['dib'] = reg['dibble'] = reg['Dibble'] = (lon < 133.5) | (lon > 135.5) | \
             (lat < -66.6) | (lat > -65.8)
 
-    reg['mertz'] = reg['Mertz'] = (lon < 143) | (lon > 147) | \
+    reg['mer'] = reg['mertz'] = reg['Mertz'] = (lon < 143) | (lon > 147) | \
             (lat < -68.3) | (lat > -66.5)
 
-    reg['cook'] = reg['Cook'] = (lon < 151) | (lon > 154) | \
+    reg['coo'] = reg['cook'] = reg['Cook'] = (lon < 151) | (lon > 154) | \
             (lat < -69) | (lat > -68)
 
-    reg['rennick'] = reg['Rennick'] = (lon < 160.7) | (lon > 162.7) | \
+    reg['ren'] = reg['rennick'] = reg['Rennick'] = (lon < 160.7) | (lon > 162.7) | \
             (lat < -71.3) | (lat > -70)
 
-    reg['drygalski'] = reg['Drygalski'] = (lon < 160) | (lon > 166) | \
+    reg['dry'] = reg['drygalski'] = reg['Drygalski'] = (lon < 160) | (lon > 166) | \
             (lat < -75.8) | (lat > -75.2)
 
-    reg['mariner'] = reg['Mariner'] = (lon < 166) | (lon > 170) | \
+    reg['mar'] = reg['mariner'] = reg['Mariner'] = (lon < 166) | (lon > 170) | \
             (lat < -73.7) | (lat > -72.8)
 
-    reg['rosse'] = reg['Ross EAIS'] = (lon < 156) | (lon > 179) | \
+    reg['roe'] = reg['rosse'] = reg['Ross EAIS'] = (lon < 156) | (lon > 179) | \
             (lat < -85.8) | (lat > -77.1)
 
-    reg['rossw'] = reg['Ross WAIS'] = (lon < 179) | (lon > 215) | \
+    reg['row'] = reg['rossw'] = reg['Ross WAIS'] = (lon < 179) | (lon > 215) | \
             (lat < -85.8) | (lat > -77.7) | (lon > 208) & (lat > -78.5)
 
-    reg['withrow'] = reg['Withrow'] = \
+    reg['wit'] = reg['withrow'] = reg['Withrow'] = \
             (lon < 201) | (lon > 204) | (lat < -77.5) | (lat > -76.8)
 
-    reg['sulzberger'] = reg['Sulzberger'] = (lon < 207.5) | (lon > 215) | \
+    reg['sul'] = reg['sulzberger'] = reg['Sulzberger'] = (lon < 207.5) | (lon > 215) | \
             (lat < -78) | (lat > -76.3) | (lon > 211.2) & (lat > -76.4)
 
-    reg['nickerson'] = reg['Nickerson'] = (lon < 210.5) | (lon > 218) | \
+    reg['nic'] = reg['nickerson'] = reg['Nickerson'] = (lon < 210.5) | (lon > 218) | \
             (lat < -76.4) | (lat > -75.2)
 
-    reg['getz'] = reg['Getz'] = (lon < 225) | (lon > 245.5) | \
+    reg['get'] = reg['getz'] = reg['Getz'] = (lon < 225) | (lon > 245.5) | \
             (lat < -75.3) | (lat > -73.2)
 
-    reg['dotson'] = reg['Dotson'] = (lon < 245.2) | (lon > 248.7) | \
+    reg['dot'] = reg['dotson'] = reg['Dotson'] = (lon < 245.2) | (lon > 248.7) | \
             (lat < -75.3) | (lat > -73.7) | (lon > 247.5) & (lat < -75)
 
-    reg['crosson'] = reg['Crosson'] = (lon < 249.3) | (lon > 251) | \
+    reg['cro'] = reg['crosson'] = reg['Crosson'] = (lon < 249.3) | (lon > 251) | \
             (lat < -75.5) | (lat > -74.5) | (lon < 249) & (lat > -75)
 
-    reg['thwaites'] = reg['Thwaites'] = (lon < 251.3) | (lon > 257) | \
+    reg['thw'] = reg['thwaites'] = reg['Thwaites'] = (lon < 251.3) | (lon > 257) | \
             (lat < -75.5) | (lat > -74.5)
 
-    reg['pig'] = reg['Pine Island'] = (lon < 257) | (lon > 259.5) | \
+    reg['pin'] = reg['pig'] = reg['Pine Island'] = (lon < 257) | (lon > 259.5) | \
             (lat < -75.8) | (lat > -74.7)
 
-    reg['cosgrove'] = reg['Cosgrove'] = (lon < 257) | (lon > 262) | \
+    reg['cos'] = reg['cosgrove'] = reg['Cosgrove'] = (lon < 257) | (lon > 262) | \
             (lat < -74) | (lat > -73.2)
 
-    reg['abbot'] = reg['Abbot'] = (lon < 256.2) | (lon > 271.2) | \
+    reg['abb'] = reg['abbot'] = reg['Abbot'] = (lon < 256.2) | (lon > 271.2) | \
             (lat < -73.5) | (lat > -72) | (lon < 261) & (lat < -73.3)
 
-    reg['venable'] = reg['Venable'] = (lon < 271.2) | (lon > 275) | \
+    reg['ven'] = reg['venable'] = reg['Venable'] = (lon < 271.2) | (lon > 275) | \
             (lat < -73.5) | (lat > -72.7)
 
-    reg['stange'] = reg['Stange'] = (lon < 281) | (lon > 285) | \
+    reg['sta'] = reg['stange'] = reg['Stange'] = (lon < 281) | (lon > 285) | \
             (lat < -74) | (lat > -72.5)
 
-    reg['bach'] = reg['Bach'] = (lon < 286) | (lon > 290) | \
+    reg['bac'] = reg['bach'] = reg['Bach'] = (lon < 286) | (lon > 290) | \
             (lat < -72.5) | (lat > -71.6)
 
-    reg['wilkins'] = reg['Wilkins'] = (lon < 285) | (lon > 291) | \
+    reg['wil'] = reg['wilkins'] = reg['Wilkins'] = (lon < 285) | (lon > 291) | \
             (lat < -71.5) | (lat > -69.5) | (lon > 290) & (lat > -70.5)
 
-    reg['georgevi'] = reg['George VI'] = (lon < 285.5) | (lon > 293.8) | \
+    reg['geo'] = reg['georgevi'] = reg['George VI'] = (lon < 285.5) | (lon > 293.8) | \
             (lat < -73.8) | (lat > -70) | (lon < 290.7) & (lat > -72.5)
 
-    reg['larsenb'] = reg['Larsen B'] = (lon < 297.5) | (lon > 300) | \
+    reg['lab'] = reg['larsenb'] = reg['Larsen B'] = (lon < 297.5) | (lon > 300) | \
             (lat < -66.1) | (lat > -65.3)
 
-    reg['larsenc_full'] = reg['Larsen C full'] = (lon < 294) | (lon > 300.5) | \
+    reg['lcf'] = reg['larsenc_full'] = reg['Larsen C full'] = (lon < 294) | (lon > 300.5) | \
             (lat < -69.5) | (lat > -66.1)
 
-    reg['larsenc'] = reg['Larsen C'] = (lon < 294) | (lon > 300.5) | \
+    reg['lac'] = reg['larsenc'] = reg['Larsen C'] = (lon < 294) | (lon > 300.5) | \
             (lat < -69.5) | (lat > -66.1) | (lon > 296) & (lat < -68.3)
 
-    reg['larsend'] = reg['Larsen D'] = (lon < 296.5) | (lon > 300.5) | \
+    reg['lad'] = reg['larsend'] = reg['Larsen D'] = (lon < 296.5) | (lon > 300.5) | \
             (lat < -73) | (lat > -68.3)
 
-    reg['ronne'] = reg['Ronne'] = (lon < 275) | (lon > 313) | (lat < -84) | \
+    reg['ron'] = reg['ronne'] = reg['Ronne'] = (lon < 275) | (lon > 313) | (lat < -84) | \
             (lat > -74.7) | (lon > 306) & (lat < -80.6) | \
             (lon > 304) & (lat < -81.5)
 
-    reg['filchner'] = reg['Filchner'] = (lon < 300) | (lon > 338) | \
+    reg['fil'] = reg['filchner'] = reg['Filchner'] = (lon < 300) | (lon > 338) | \
             (lat < -84) | (lat > -78) | (lon < 313.5) & (lat > -80.6) | \
             (lon < 307) & (lat > -80.7) | \
             (lon < 306) & (lat > -81.5) | \

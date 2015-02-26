@@ -415,13 +415,39 @@ def select_ref(df, dynamic=True):
     return col, df[col]
 
 
+def select_ref_row(mat, dynamic=True):
+    """Select the row with [max] non-null entries of a matrix."""
+    if dynamic:
+        # get index of row with max non-null entries 
+        i_ref = np.argmax([np.count_nonzero(~np.isnan(row)) for row in mat])
+    else:
+        # get index of first row with non-null entries
+        i_ref = np.nonzero([np.count_nonzero(~np.isnan(row)) for row in mat])[0].min()
+    return i_ref
+
+
+def reference_ts_matrix(data, i_ref):
+    """Reference all rows with respect to the reference row."""
+    nrow, ncols = data.shape
+    row_ref = data[i_ref]
+    for i in xrange(data.shape[0]):
+        row = data[i]
+        if i != i_ref and not np.isnan(row).all():
+            idx = np.where(~np.isnan(row) & ~np.isnan(row_ref))[0][0] # first elem
+            offset = row[idx] - row_ref[idx]
+            data[i] -= offset
+            #print i, idx, offset
+    return data
+
+
 def find_non_overlap(df, col_ref):
     """Find the columns with < 2 overlapping values to the reference."""
-    ts_ref = df[col_ref]
+    ts_ref = df[col_ref].values
     cols = []
     for c, ts in df.iteritems():
         if c == col_ref: continue  # skip the ref column !!!
-        ind, = np.where(ts_ref.notnull() & ts.notnull())
+        #ind, = np.where(ts_ref.notnull() & ts.notnull())
+        ind, = np.where(~np.isnan(ts_ref) & ~np.isnan(ts))
         if len(ind) < 2:
             cols.append(c)
     return cols
@@ -455,14 +481,14 @@ def ref_by_offset(df, col_ref):
     prop_obs_by_first
 
     """
-    ts_ref = df[col_ref]
+    ts_ref = df[col_ref].values
     for c, ts in df.iteritems():
         # find the non-null overlapping values
-        ind, = np.where(ts_ref.notnull() & ts.notnull())
+        ind, = np.where(~np.isnan(ts_ref) & ~np.isnan(ts))
         if len(ind) == 0: continue
         # compute offset with respect to the reference, and add the
         # 'offset' to entire ts (column)
-        offset = np.mean(ts_ref - ts)  
+        offset = np.mean(ts_ref - ts.values)  
         df[c] += offset
 
 
@@ -490,7 +516,7 @@ def ref_by_first(df, col_ref):
     prop_obs_by_first
 
     """
-    ts_ref = df[col_ref]
+    ts_ref = df[col_ref].values
     for c, hi in zip(df.columns, ts_ref):
         # if not the ref column add the element 'hi' to entire ts (column)
         if c != col_ref:
@@ -541,18 +567,63 @@ def prop_err_by_offset(df, col_ref):
     prop_obs_by_first
 
     """
-    ts_ref = df[col_ref]
+    ts_ref = df[col_ref].values
     for c, ts in df.iteritems():
         if c == col_ref: continue  # skip the ref column!!!
         # find the non-null overlapping values
-        ind, = np.where(ts_ref.notnull() & ts.notnull())
+        ind, = np.where(~np.isnan(ts_ref) & ~np.isnan(ts))
         if len(ind) == 0: continue
         # sum in quadrature, calculate offset error and propagate
-        e2_ref_sum = np.sum(ts_ref[ind]**2)  # e**2 = variance
-        e2_ts_sum = np.sum(ts[ind]**2)
+        e2_ref_sum = np.sum(ts_ref[ind].values**2)  # e**2 = variance
+        e2_ts_sum = np.sum(ts[ind].values**2)
         e_offset = np.sqrt(e2_ref_sum + e2_ts_sum) / len(ind)
-        df[c] = np.sqrt(ts**2 + e_offset**2) # add to each element
+        df[c] = np.sqrt(ts.values**2 + e_offset**2) # add to each element
 
+
+def prop_err_by_first(df, col_ref):
+    """
+    Propagate the error due to the referencing procedure.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Pandas DataFrame containing all multi-reference time series, i.e.,
+        the matrix representation of all forward [and backward] combinations.
+    col_ref : key
+        The column to be used as the reference time series.
+
+    Notes
+    -----
+    reference one ts to another:
+        x(t) = x1, x2, ..., xn
+        y(t) = y1, y2, ..., yn
+    error for differences: 
+        d1 = x1 - y1 
+        e_d1 = sqrt(e_x1**2 + e_y1**2)
+    error for offset: 
+        D = (d1 + d2 + ... + dn) / n
+        e_D = sqrt(e_d1**2 + e_d2**2 + ... + e_dn**2) / n
+            = sqrt(e_x1**2 + e_y1**2 + ... + e_xn**2 + e_yn**2) / n
+    error for referenced h:
+        h1' = h1 + D
+        e_h1' = sqrt(e_h1**2 + e_D**2)
+
+    See also
+    --------
+    ref_by_offset
+    ref_by_first
+    prop_err_by_first
+    prop_obs_by_offset
+    prop_obs_by_first
+
+    """
+    error_ref = df[col_ref][1:].values      # all elems but first one
+    cols = df.columns[df.columns!=col_ref]  # all TS but TS_ref
+    for c, e in zip(cols, error_ref):
+        try:
+            df[c] = np.sqrt(e**2 + df[c].values**2)
+        except:
+            pass
 
 def prop_obs_by_offset(df, col_ref):
     """
@@ -588,17 +659,57 @@ def prop_obs_by_offset(df, col_ref):
     prop_obs_by_first
 
     """
-    ts_ref = df[col_ref]
+    ts_ref = df[col_ref].values
     for c, ts in df.iteritems():
         if c == col_ref: continue  # skip the ref column!!!
         # find the non-null overlapping values
-        ind, = np.where(ts_ref.notnull() & ts.notnull())
+        ind, = np.where(~np.isnan(ts_ref) & ~np.isnan(ts))
         if len(ind) == 0: continue
         # obs per difference = average pairs of obs between 'ref' and 'ts'
         n_diff = (ts_ref[ind] + ts[ind]) / 2.
         # obs per offset = average of number of obs per difference
         n_offset = np.sum(n_diff) / len(ind)
         df[c] += round(n_offset)
+
+
+def prop_obs_by_first(df, col_ref):
+    """
+    Propagate the number of observations due to the referencing procedure.
+
+    The #obs propagation takes into account (1) the average of the differences to
+    calculate the offset (n_offset), and (2) the addition of this offset to each
+    element in the time series being referenced.
+
+    For each time series there is one 'offset' and, consequently, one 'n_offset'
+    associated to it.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Pandas DataFrame containing all multi-reference time series, i.e.,
+        the matrix representation of all forward [and backward] combinations.
+    col_ref : key
+        The column to be used as the reference time series.
+
+    Notes
+    -----
+    1) #obs per difference = average *pairs* of obs between the 'ref' and 'ts'
+    2) #obs per offset = average of #obs per difference
+    3) #obs per referenced value = #obs value + #obs offset
+
+    See also
+    --------
+    ref_by_offset
+    ref_by_first
+    prop_err_by_first
+    prop_err_by_offset
+    prop_obs_by_first
+
+    """
+    obs_ref = df[col_ref][1:].values        # all elems but first one
+    cols = df.columns[df.columns!=col_ref]  # all TS but TS_ref
+    for c, n in zip(cols, obs_ref):
+        df[c] += n                      # don't like this way of C.Davis !!!
 
 
 def weighted_average(df, df_nobs):
@@ -630,7 +741,7 @@ def weighted_average_error(df, df_nobs):
     se_mean = sqrt(w1**2 * se1**2 + w2**2 * se2**2 + ...)
 
     """
-    if np.alltrue(np.isnan(df.values)):
+    if np.alltrue(np.isnan(df.values.astype(float))):  # astype is needed (bug in pandas)!!!
         ts_mean = df.sum(axis=1)           # if nothing, colapse matrix -> series
     else:
         # weights for averaging

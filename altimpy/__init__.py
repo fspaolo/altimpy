@@ -7,3 +7,4 @@ from util import *
 from viz import *
 from regions import *
 from filter import *
+from bootstrap import *

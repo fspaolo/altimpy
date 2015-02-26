@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import scipy.ndimage as ni
 import statsmodels.api as sm
+import matplotlib.pyplot as plt
 
 from altimpy import lasso_cv
 
@@ -108,11 +109,14 @@ def step_filt(x, delta=3, window=7):
     for i in range(len(m)-1):
         diff = m[i+1] - m[i]
         if np.abs(diff) > delta:
+            #plt.plot(v)
             v[i+1:] -= diff
+            #plt.plot(v)
+            #plt.show()
     return v[n:-n], m[n:-n]
 
 
-def _peak_filt(x, y, n_std=3):
+def _peak_filt(x, y, n_std=3, max_deg=3):
     """Filter spikes in a vector.
     
     See peak_filt()
@@ -121,7 +125,7 @@ def _peak_filt(x, y, n_std=3):
     y2 = y.copy()
     i_notnan, = np.where(~np.isnan(y))
     # detrend
-    poly = lasso_cv(x[i_notnan], y[i_notnan], max_deg=3)
+    poly = lasso_cv(x[i_notnan], y[i_notnan], max_deg=max_deg)
     y2[i_notnan] = y[i_notnan] - poly
     # filter
     i_peaks, = np.where(np.abs(y2) > n_std * np.nanstd(y2))
@@ -129,24 +133,24 @@ def _peak_filt(x, y, n_std=3):
     return len(i_peaks)
 
 
-def peak_filt(x, y, n_std=3, iterative=True):
+def peak_filt(x, y, n_std=3, iterative=True, max_deg=3):
     """Filter spikes in a vector (iteratively).
 
     Remove values greater than n*std from the trend.
     """
-    n_peaks = _peak_filt(x, y, n_std=n_std)
+    n_peaks = _peak_filt(x, y, n_std=n_std, max_deg=3)
     if iterative and n_peaks != 0:
         while n_peaks != 0 and not np.isnan(y).all():
             n_peaks = _peak_filt(x, y, n_std=n_std)
     return y
 
 
-def std_series_filt(x, y, max_std=2):
+def std_series_filt(x, y, max_std=2, max_deg=3):
     """Filter entire vector if the detrended std > max_std."""
     std = None
     if not np.isnan(y).all():
         i_notnan, = np.where(~np.isnan(y))
-        poly = lasso_cv(x[i_notnan], y[i_notnan], max_deg=3)
+        poly = lasso_cv(x[i_notnan], y[i_notnan], max_deg=max_deg)
         std = np.nanstd(y[i_notnan] - poly) # std of detrended series
         if std > max_std:
             y[:] = np.nan
