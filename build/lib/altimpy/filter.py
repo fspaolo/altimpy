@@ -1,5 +1,5 @@
 """
-Module with some high level filtering functions.
+Module with some high level filter functions.
 
 """
 # Fernando Paolo <fpaolo@ucsd.edu>

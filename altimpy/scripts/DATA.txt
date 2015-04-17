@@ -1,0 +1,13 @@
+old data
+--------
+- mode: ice
+- resolution: 1.0 x 0.4 (lon x lat)
+- matrix: one-sided
+- filter: iterateive 3 sigma
+
+new data
+--------
+- mode: ice + oce
+- resolution: 0.75 x 0.25 (lon x lat)
+- matrix: two-sided 
+- filter: one-time 3 sigma

@@ -19,7 +19,10 @@ Functionalities are divided into the following modules:
 * ``const.py`` - definition of constants
 * ``convert.py`` - time/coordinates/etc. conversion functions
 * ``tseries.py`` - crossover time series construction
-* ``interp.py`` - wrapper for kriging and other interp. routines
+* ``interp.py`` - wrapper for kriging and other interpolation routines
+* ``filter.py`` - high-level time-series filtering functions
+* ``bootstrap.py`` - bootstrap methods for uncertanty estimation
+* ``regions.py`` - definition of "boxes" for Antarctic ice shelves
 * ``util.py`` - miscellaneous utility functions
 * ``viz.py`` - plotting functionalities
 * ``mpi.py`` - simple parallelization functions (MPI)
@@ -33,4 +36,6 @@ Download and install the library
     cd altimpy 
     python setup.py install --user 
 
-More coming soon...
+More coming soon...  
+
+(some day I'll organize this library)

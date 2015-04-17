@@ -1,0 +1,97 @@
+=======================================================
+Processing scheme for time series of height differences
+=======================================================
+
+Notes
+-----
+keep separated files (do no merge) as long as possible.
+The more (and smaller) files the better for parallel (and serial) processing!
+See the README.txt file in the data folders.
+
+General processing
+------------------
+1. read raw IDR/WDR (parallel)... ok
+2. convert to HDF5 (parallel)... ok
+3. apply mask (parallel)... ok
+4. sepparate tracks by flags (parallel)... ok
+5. separate time: years, seasons, months... ok
+6. separate in sectors w/overlap in lon (fast operation)... ok
+
+Specific processing
+-------------------
+9.  filter data: shelf/land/ocean/buff & GLA specific [filtflags.py, filtgla.py]... ok
+10. merge times (check if it's too much data) [mpi_merge.py]... ok
+11. separate asc/des FLAGS in different files for 'x2sys' (much faster!) [filttracks.py]... ok
+12. HDF5 to BIN for 'x2sys' (fast operation)... ok
+13. find crossovers [mpi_ntasks.py, mpi_x2sys.py]. Warning: lon -/+180 is changed to 0/360!... ok
+14. predict tides: OTPSm, check struct idr/gla! (on Triton)... ok
+15. merge ad/da crossovers [mpi_merge.py, mpi_merge2.py] code_ok... ok
+16. average bins (and remove sector overlaps): xovers -> grid (read code header) [x2grid.py], [1] code_ok... ok
+17. join all subgrids in time/space (serial, slow) [gridjoin.py] code_ok... ok
+[apply ICESat biases here!]
+18. average time series: grid-cells (serial, very slow; read code header) [averagets2.py] code_ok... ok
+19. independent backscatter correction (serial, fast) [backscatter3.py] code_ok... ok
+20. merge satellites (serial, extremely fast) [mergesats2.py] code_ok... ok
+21. cross calibration (serial, slow) [xcalib2.py] code_ok... ok
+22. error/nobs propagation (serial, slow) [xcalib3.py] code_ok... ok
+23. cross-calibration offset (serial, fast) [getoffset.py] code_ok... ok
+24. joint backscatter correction (serial, slow) [backscatter2.py] code_ok... ok  #TODO: NOT NEEDED FOR NOW
+25. post processing [postproc.py] code_ok... ok
+    - cleanup bad ts
+    - filter out step-changes
+    - filter out peaks (3 std from the trend)
+    - filter out uncomplete ts
+26. add backscatter error to 2d tseries error [bs_error.py] (serial, fast)
+27. map area of each grid cell (serial, slow) [areacell.py] -> only once!
+30. map area of each ice shelf (serial, fast) [areashelf.py] -> only once!
+31. map density/thickness/Z-H of each grid cell (serial, medium) [icedensity.py] -> only once!
+32. fit polynomial trends (serial, fast) [trendfit.py] -> dh/dt map
+33. apply corrections to 2d field: SL and IB (serial, fast) [trendcorr.py] -> dh/dt map
+34. apply corrections to 2d series: SL and IB (serial, fast) [trendcorr3.py] -> 2d tseries 
+35. calculate bootstrap errors for 2d fields and series (serial, very slow) [bootstrap_errors2.py] -> 2d tseries and map
+36. interpolate and integrate values for each ice shelf [integrate_const2.py] -> table
+37. generate corrections for full-ice-shelf ts: SL and IB (serial, fast) [trendcorr2.py] -> table
+38. calculate full-ice-shelf time series (serial, slow) [tseries_shelves.py] -> 1d tseries
+39. calculate bootstrap errors for full-ice-shelf ts (serial, medium) [bootstrap_errors.py] -> table
+40. fit polynomial trends (serial, fast) [trendfit3.py] -> table
+41. calculate average rate and accel. for 1990s and 2000s (series, fast) [average_rate_accel_boot.py] -> table
+
+Visualization
+-------------
+1. create file with multiple layers (2d arrays, for time dimension) [postproc.py] (for XDMF)
+2. create XDMF for data/error/coord to visualize in ParaView [writexdmf.py]
+3. map dh/dt and error [mapdhdt.py, maperr.py]
+4. map values to a bar chart [chart.py]
+5. plot time series [tsshelves.py, tsregions.py]
+
+
+[1] do not apply 'iterative' std to any satellite!
+
+
+Criteria for data rejection
+---------------------------
+
+Raw elevations:
+
+1. return waveform without leading edge
+2. waveform with specular shape
+3. any geophysical correction missing
+4. less then 3 km from any boundary
+
+Crossovers on each bin:
+
+5. absolute value greater than 15 m
+6. absolute value greater than 3 standard deviations
+
+Data points in the time series:
+
+7. any point that is a step change greater than 3m
+8. any point that is greater than 3 standard deviations from the trend
+
+Time series as a whole:
+
+9. time series with cross-calibration offset greater than 1.5 m 
+10. time series with standard deviation greater than 2 m
+11. time series with less than 70% of its data points (for 18-years)
+12. time series "obviously wrong" by visual inspection
+
