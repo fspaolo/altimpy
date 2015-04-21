@@ -1,4 +1,6 @@
 """
+Bootstraping methods (extended for time-dependent data).
+
 From: https://github.com/cgevans/scikits-bootstrap
 
 Plus added functions (see below).

@@ -305,3 +305,12 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     print 'image limits (left/right/bottom/top):'
     print '(lon,lat)', bbox_ll[0], bbox_ll[2], bbox_ll[1], bbox_ll[3]
     return [x, y, img, bbox_ll]
+
+
+def write_slabs(fid, name, data, group=None):
+    """Save 3d array into several slabs (in the 0-axis) for XDMF."""
+    if group is None:
+        group = 'data'
+    g = fid.create_group('/', group)
+    for i, d in enumerate(data):
+        fid.create_array(g, name +'_%02d' % i, d)
