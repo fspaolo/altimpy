@@ -40,14 +40,17 @@ def where_isnan(name, lon, lat):
     reg['amu'] = reg['as'] = reg['Amundsen'] = \
             (lon < 224) | (lon > 262.5) | (lat < -75.8) | (lat > -73.2)
 
-    reg['bel'] = reg['bs'] = reg['Bellingshausen'] = \
+    reg['amu2'] = reg['as2'] = reg['Amundsen2'] = \
+            (lon < 224) | (lon > 275) | (lat < -76) | (lat > -70)
+
+    reg['bel'] = reg['belling'] = reg['bs'] = reg['Bellingshausen'] = \
             (lon < 256) | (lon > 295) | (lat < -74) | (lat > -69.5) | \
             (lon < 262) & (lat < -73.2)
 
     reg['lar'] = reg['lis'] = reg['Larsen'] = \
             (lon < 294) | (lon > 300.5) | (lat < -73.2) | (lat > -65.3)
 
-    reg['ap'] = reg['Antarctic Peninsula'] = \
+    reg['ap'] = reg['antpen'] = reg['Antarctic Peninsula'] = \
             (lon < 280) | (lon > 305) | (lat < -74.5) | (lat > -64) | \
             (lon > 295) & (lat < -73)
 

@@ -313,4 +313,4 @@ def write_slabs(fid, name, data, group=None):
         group = 'data'
     g = fid.create_group('/', group)
     for i, d in enumerate(data):
-        fid.create_array(g, var_name +'_%02d' % i, d)
+        fid.create_array(g, name +'_%02d' % i, d)
