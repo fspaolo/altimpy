@@ -657,17 +657,6 @@ def human_order(text):
     return [atoi(c) for c in re.split('(\d+)', text)]
 
 
-def read_climate_index(fname, from_year=1992, to_year=2012, missing_val=-9999,
-                       comments='#'):
-    """Load ascii climate-index table into a time series y(x) -> [x,y]."""
-    table = np.loadtxt(fname, comments=comments)
-    table[table==missing_val] = np.nan
-    x = np.arange(table[0,0], table[-1,0]+1, 1/12.) 
-    y = table[:,1:].flatten()
-    ind, = np.where((x >= from_year) & (x <= to_year))
-    return [x[ind], y[ind]]
-
-
 def upp2low(m, k=0, mult=1):
     """Coppy the upper triangle into the lower triangle.
 

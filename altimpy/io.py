@@ -8,6 +8,7 @@ import re
 import numpy as np
 import scipy as sp
 import tables as tb
+import pandas as pd
 import datetime as dt
 import netCDF4 as nc
 
@@ -307,8 +308,26 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     return [x, y, img, bbox_ll]
 
 
+def read_climate_index(fname, from_year=1992, to_year=2012, 
+                       missing_value=-9999, comments='#', pandas=False):
+    """Read ascii climate-index table into a time series
+    
+    If 'pandas=False' (defaul) returns a numpy array [t,y], if 'True' returns a
+    pandas Series.
+    """
+    table = np.loadtxt(fname, comments=comments)
+    table[table==missing_value] = np.nan
+    t = np.arange(table[0,0], table[-1,0]+1, 1/12.) 
+    y = table[:,1:].flatten()
+    ind, = np.where((t >= from_year) & (t <= to_year))
+    s = [t[ind], y[ind]]
+    if pandas:
+        s = pd.Series(s[:,1], index=s[:,0])
+    return s
+
+
 def write_slabs(fid, name, data, group=None):
-    """Save 3d array into several slabs (in the 0-axis) for XDMF."""
+    """Save 3d array (to HDF5) into several slabs (in the 0-axis) for XDMF."""
     if group is None:
         group = 'data'
     g = fid.create_group('/', group)
