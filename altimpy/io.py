@@ -315,7 +315,7 @@ def read_cindex(fname, from_year=1992, to_year=2012, missing_value=-999,
     pandas=False - (defaul) returns a list with arrays [t,y]
     pandas=True - returns a pandas Series
     name - pandas Series name (column in DataFrame)
-    round_index - reound to n decimals the Series index
+    round_index - round to n decimals the Series index
     """
     table = np.loadtxt(fname, comments=comments)
     table[table==missing_value] = np.nan

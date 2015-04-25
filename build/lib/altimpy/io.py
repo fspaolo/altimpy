@@ -309,12 +309,13 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
 
 
 def read_cindex(fname, from_year=1992, to_year=2012, missing_value=-999,
-                comments='#', pandas=False, name=None):
+                comments='#', pandas=False, name=None, round_index=6):
     """Read ascii climate-index table into a time series.
     
     pandas=False - (defaul) returns a list with arrays [t,y]
     pandas=True - returns a pandas Series
     name - pandas Series name (column in DataFrame)
+    round_index - reound to n decimals the Series index
     """
     table = np.loadtxt(fname, comments=comments)
     table[table==missing_value] = np.nan
@@ -323,7 +324,7 @@ def read_cindex(fname, from_year=1992, to_year=2012, missing_value=-999,
     ind, = np.where((t >= from_year) & (t <= to_year))
     s = [t[ind], y[ind]]
     if pandas:
-        s = pd.Series(s[1], index=s[0], name=name)
+        s = pd.Series(s[1], index=np.round(s[0], round_index), name=name)
     return s
 
 
