@@ -2,7 +2,6 @@
 Module with input/output functions.
 
 """
-
 import os
 import re
 import numpy as np
@@ -11,6 +10,8 @@ import tables as tb
 import pandas as pd
 import datetime as dt
 import netCDF4 as nc
+import urllib2
+from StringIO import StringIO
 
 try:
     from osgeo import osr, gdal
@@ -308,24 +309,47 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     return [x, y, img, bbox_ll]
 
 
-def read_cindex(fname, from_year=1992, to_year=2012, missing_value=-999,
-                comments='#', pandas=False, name=None, round_index=6):
-    """Read ascii climate-index table into a time series.
+def read_cindex(string, from_year=1992, to_year=2012, pandas=False, name=None,
+                decimals=3):
+    """Reads NOAA's climate-index table (from file or url).
     
+    Reads the NOAA's "Climate Indices: Monthly Atmospheric and Ocean Time
+    Series" and transforms the table format into a time series y(t).
+
+    For information and data format see:
+    http://www.esrl.noaa.gov/psd/data/climateindices/list/
+
+    string - file or url to read the data
     pandas=False - (defaul) returns a list with arrays [t,y]
     pandas=True - returns a pandas Series
     name - pandas Series name (column in DataFrame)
-    round_index - reound to n decimals the Series index
+    decimals - rounds to n decimals the values 
+
     """
-    table = np.loadtxt(fname, comments=comments)
-    table[table==missing_value] = np.nan
+    table = _get_table(string)
     t = np.arange(table[0,0], table[-1,0]+1, 1/12.) 
     y = table[:,1:].flatten()
     ind, = np.where((t >= from_year) & (t <= to_year))
-    s = [t[ind], y[ind]]
+    s = [t[ind].round(decimals), y[ind]]
     if pandas:
-        s = pd.Series(s[1], index=np.round(s[0], round_index), name=name)
+        s = pd.Series(s[1], index=s[0], name=name)
     return s
+
+
+def _get_table(string):
+    """Get climate-index table from file or url."""
+    try:
+        f = open(string)
+    except:
+        f = StringIO(urllib2.urlopen(string).read())  # str as file
+    y1, y2 = [int(y) for y in f.readline().split()]   # read first line
+    nrows = y2 - y1 + 1                           
+    table = np.zeros((nrows, 13), 'f4')               # time + 12 months
+    for l in xrange(nrows):                           # read main data
+        table[l] = [float(n) for n in f.readline().split()]
+    missing = float(f.readline())                     # read missing val
+    table[table==missing] = np.nan
+    return table
 
 
 def write_slabs(fid, name, data, group=None):
