@@ -309,7 +309,7 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     return [x, y, img, bbox_ll]
 
 
-def read_cindex(string, from_year=None, to_year=None, pandas=False, name=None,
+def read_cindex(string, from_year=0, to_year=1e4, pandas=False, name=None,
                 decimals=3):
     """Reads NOAA's climate-index table (from file or url).
     
