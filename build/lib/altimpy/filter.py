@@ -60,10 +60,12 @@ def median_filt(arr, size=(3,3), min_pixels=3, **kw):
     return ni.generic_filter(arr, _median, size=size, **kw)
 
 
-def hp_filt(y, lamb=7, nan=False):
+def hp_filt(y, lamb=7, nan=False, return_series='trend'):
     """Hodrick-Prescott filter for 1d array.
     
-    Supports NaNs, nan=True.
+    lamb - smoothing paramenter (e.g., 1600 for trend in quarterly data)
+    nan=True - supports NaNs.
+    return_series='trend'|'cycle'|'both' - returns the trend and/or cycle.
     Assumes an evenly spaced array.
     """
     if nan:
@@ -72,11 +74,18 @@ def hp_filt(y, lamb=7, nan=False):
         i_notnan, = np.where(~np.isnan(y))
         x = np.arange(len(y))
         y2[i_isnan] = np.interp(i_isnan, x[i_notnan], y[i_notnan])
-        y2 = sm.tsa.filters.hpfilter(y2, lamb=lamb)[1]
+        c2, y2 = sm.tsa.filters.hpfilter(y2, lamb=lamb)  # cycle and trend
         y2[i_isnan] = np.nan
+        c2[i_isnan] = np.nan
     else:
-        y2 = sm.tsa.filters.hpfilter(y, lamb=lamb)[1]
-    return y2
+        c2, y2 = sm.tsa.filters.hpfilter(y, lamb=lamb)   # cycle and trend
+    if return_series == 'trend':
+        res = y2
+    elif return_series == 'cycle':
+        res = c2
+    else:
+        res = [y2, c2]  # trend and cycle
+    return res
 
 
 def time_filt(t, y, from_time=1991, to_time=2013):
