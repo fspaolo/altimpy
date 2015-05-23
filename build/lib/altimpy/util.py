@@ -180,9 +180,31 @@ def digitize(lon, lat, x_range, y_range, dx, dy):
     return (lon_d, lat_d, j_bins, i_bins, x_edges, y_edges, nx, ny)
 
 
+#DEPRECATED. Use the above function
 def linear_fit(x, y, return_coef=False, npts=None):
     """
     Fit a straight-line by Ordinary Least Squares.
+
+    If `return_coef=True` returns the slope (m) and intercept (c).
+    """
+    ind, = np.where((~np.isnan(x)) & (~np.isnan(y)))
+    if len(ind) < 2: 
+        return [np.nan, np.nan]
+    x, y = x[ind], y[ind]
+    A = np.ones((len(x), 2))
+    A[:,0] = x
+    m, c = np.linalg.lstsq(A, y)[0]
+    if return_coef:
+        return (m, c)
+    else:
+        if npts is not None:
+            x = np.linspace(x.min(), x.max(), npts)
+        y_fit = m * x + c
+        return (x, y_fit)
+
+
+def line_fit(x, y, return_coef=False, npts=None):
+    """Fit a straight-line by Ordinary Least Squares.
 
     If `return_coef=True` returns the slope (m) and intercept (c).
     """
