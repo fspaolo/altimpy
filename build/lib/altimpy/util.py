@@ -385,7 +385,7 @@ def _get_season(year, month, return_month=2):
 
 
 def get_box(region, npts=None):
-    """Generate a box given the region coords: (L,R,T,B)."""
+    """Generate a box given the region coords: (L,R,B,T)."""
     west, east, south, north = region
     if npts:
         n = int(npts/4.)
