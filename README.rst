@@ -9,7 +9,7 @@ backscatter).
 The package provides routines to read the raw data from the binary
 format Ice Data Records (IDRs), and write/read the processed results 
 to the high-performance file format HDF5; as well as processing 
-algorithms for filtering, crossover finding, griding, uncertainty
+algorithms for filtering, crossover finding, gridding, uncertainty
 estimation, time-series construction, parallelization, visualization, 
 etc.
 
