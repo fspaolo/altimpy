@@ -228,6 +228,8 @@ def linear_fit_robust(x, y, return_coef=False):
     """
     Fit a straight-line by robust regression (M-estimate).
 
+    M-stimator = HuberT (Huber, 1981)
+
     If `return_coef=True` returns the slope (m) and intercept (c).
     """
     import statsmodels.api as sm
