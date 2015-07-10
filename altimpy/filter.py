@@ -67,6 +67,33 @@ def hp_filt(y, lamb=7, nan=False, return_series='trend'):
     nan=True - supports NaNs.
     return_series='trend'|'cycle'|'both' - returns the trend and/or cycle.
     Assumes an evenly spaced array.
+
+    Detrend with HP-filter
+    ----------------------
+    
+    Rule of thumb is (empirical)[1]: 
+    
+    Lambda = 100 * (number of periods in a year)**2
+    
+    Annual data = 100*1**2 = 100
+    Quarterly data = 100*4**2 = 1,600
+    Monthly data = 100*12**2 = 14,400
+    Weekly data = 100*52**2 = 270,400
+    
+    There is additional research that suggests using a power of 4 instead
+    of 2. See Ravn and Uhlig (2002)[2]
+    
+    Harvey and Trimbur (2008) explain the risk in using a too-small smoothing
+    parameter (lambda), though I have yet to find research explaining the risk
+    of using too-large of a smooth parameter, other than the trend becomes
+    increasingly linear and less sensitive to recent data[2]
+    
+    [1] http://forums.eviews.com/viewtopic.php?f=4&t=870
+    
+    [2] https://ideas.repec.org/a/tpr/restat/v84y2002i2p371-375.html
+    
+    [3] http://www.terrapub.co.jp/journals/jjss/pdf/3801/38010041.pdf
+        
     """
     if nan:
         y2 = y.copy()

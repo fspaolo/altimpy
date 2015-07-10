@@ -1,6 +1,8 @@
 """
 Module with definition of ice-shelf "boxes" and other regions.
 
+The boundaries were defined for a grid with resolution of 0.75 x 0.25.
+
 WARNING: if a different grid with more cells is used, the boundaries
 should be reviewed.
 
