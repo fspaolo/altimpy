@@ -1,6 +1,6 @@
 New BSD License
 
-Copyright (c) 2014 Fernando Paolo.
+Copyright (c) 2014-2015 Fernando S. Paolo.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -13,7 +13,7 @@ modification, are permitted provided that the following conditions are met:
      notice, this list of conditions and the following disclaimer in the
      documentation and/or other materials provided with the distribution.
 
-  c. Neither the name of the Scikit-learn Developers  nor the names of
+  c. Neither the name of the developers  nor the names of
      its contributors may be used to endorse or promote products
      derived from this software without specific prior written
      permission. 

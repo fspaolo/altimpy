@@ -1,5 +1,10 @@
 from distutils.core import setup
 
+# install_requires
+# PyTables >= 2.3.1
+# basemap >= 1.0.7
+# netcdf4 >= 1.0.8
+
 setup(
     name='altimpy',
     version='0.1.0',
@@ -13,9 +18,4 @@ setup(
     license='LICENSE.txt',
     description='Set of tools for processing satellite altimetry data',
     long_description=open('README.rst').read(),
-    install_requires=[
-        "PyTables >= 2.3.1",
-        "basemap >= 1.0.7",
-        "netcdf4 >= 1.0.8",
-    ],
 )

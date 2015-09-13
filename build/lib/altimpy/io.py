@@ -14,12 +14,17 @@ import urllib2
 from StringIO import StringIO
 
 try:
-    from osgeo import osr, gdal
     import pyproj as pj
 except:
-    msg = """one of the following modules are missing: 
-    `osgeo` (GDAL) or `pyproj`"""
-    raise ImportError(msg)
+    raise ImportError('The following module is missing: `pyproj')
+
+try:
+    from osgeo import osr, gdal
+except:
+    #raise ImportError('The following module is missing: `osgeo` (GDAL)')
+    print 'The following module is missing: `osgeo` (GDAL)'
+    print 'Proceeding without it!!!'
+    pass
 
 from altimpy import is_meter
 
