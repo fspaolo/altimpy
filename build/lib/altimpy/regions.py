@@ -162,6 +162,21 @@ def where_isnan(name, lon, lat):
     reg['pin'] = reg['pig'] = reg['Pine Island'] = (lon < 257) | (lon > 259.5) | \
             (lat < -75.8) | (lat > -74.7)
 
+
+
+
+
+
+
+    reg['pn2'] = reg['pg2'] = reg['Pine Island All'] = (lon < 257) | (lon > 260) | \
+            (lat < -76) | (lat > -74)
+
+
+
+
+
+
+
     reg['cos'] = reg['cosgrove'] = reg['Cosgrove'] = (lon < 257) | (lon > 262) | \
             (lat < -74) | (lat > -73.2)
 
