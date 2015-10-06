@@ -1114,21 +1114,18 @@ def adjust_spines(ax, spines, pad=10):
 
 
 def get_limits(x, decimals=1):
-    """Get the ceiling and floor (integers) limits given number of decimals.
+    """Get the ceiling and floor limits for the decimal digits. 
     
     Useful to set the y-/x-limits in matplotlib with integer numbers at the
     end of the axis.
 
     """
-    mn0 = x.min()
-    mx0 = x.max()
-    mn = np.round(mn0, decimals)
-    mx = np.round(mn0, decimals)
-    if mn > mn0:
-        mn -= 1. / 10**decimals
-    if mx < mx0:
-        mx += 1. / 10**decimals
-    return mn, mx
+    deci = 10**decimals
+    minimum = x.min() * deci
+    maximum = x.max() * deci
+    minimum = np.floor(minimum) / deci
+    maximum = np.ceil(maximum) / deci
+    return minimum, maximum
 
 
 def meridians(start=0, stop=360, y0=-90, yn=90, spacing=10, npts=1000):
