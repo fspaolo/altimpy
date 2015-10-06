@@ -1121,8 +1121,8 @@ def get_limits(x, decimals=1):
     """
     mn0 = x.min()
     mx0 = x.max()
-    mn = mn0.round(decimals)
-    mx = mx0.round(decimals)
+    mn = np.round(mn0, decimals)
+    mx = np.round(mn0, decimals)
     if mn > mn0:
         mn -= 1. / 10**decimals
     if mx < mx0:
