@@ -1116,8 +1116,8 @@ def adjust_spines(ax, spines, pad=10):
 def get_limits(x, decimals=1):
     """Get the ceiling and floor limits for the decimal digits. 
     
-    Useful to set the y-/x-limits in matplotlib with integer numbers at the
-    end of the axis.
+    Useful to set the y-/x-limits in matplotlib ensuring the end points of
+    the axis coincide with the large tick marks.
 
     """
     deci = 10**decimals
