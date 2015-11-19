@@ -204,11 +204,11 @@ def create_cmap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True,
     return np.array([v, r, g, b, a])
 
 
-def gmt_cmap(*args, **kwargs):
+def gmt_cmap(*args, **kw):
     """
     GMT style colormap (cpt). See `create_cmap` for details.
     """
-    v, r, g, b, a = create_cmap(*args, **kwargs)
+    v, r, g, b, a = create_cmap(*args, **kw)
     cmap = ''
     fmt = '%-10r %3.0f %3.0f %3.0f     %-10r %3.0f %3.0f %3.0f\n'
     for i in range(len(v) - 1):
@@ -249,11 +249,11 @@ def pv_cmap(fname, cname, cmap):
     f.close()
 
 
-def mayavi_cmap(*args, **kwargs):
+def mayavi_cmap(*args, **kw):
     """
     Mayavi colormap. See 'viz.cmap' for details.
     """
-    cmap = create_cmap(*args, **kwargs)
+    cmap = create_cmap(*args, **kw)
     v, r, g, b, a = cmap
     if len(v) < 1001:
         vi = np.linspace(v[0], v[-1], 2001)
@@ -419,7 +419,7 @@ def align_data_with_fig(x, y, data):
     return [x, y, data]
 
 
-def plot_img_subreg(m, x, y, img, bbox, **kwargs):
+def plot_img_subreg(m, x, y, img, bbox, **kw):
     """Plot image subregion defined by projection 'm'.
     
     m : Basemap projection defining subregion
@@ -447,7 +447,7 @@ def plot_img_subreg(m, x, y, img, bbox, **kwargs):
     x2 = x[j[0]:j[-1]]
     y2 = y[i[0]:i[-1]]
     # plot img
-    m.imshow(img2, **kwargs)
+    m.imshow(img2, **kw)
     return [m, x2, y2, img2]
 
 
@@ -484,7 +484,7 @@ def make_proj_stere(bbox, ax=None, lat_ts=-71, lon_0=0, lat_0=-90):
 
 
 def plot_grid_proj(m, lon, lat, grid, shift=True, masked=True, 
-                   contourf=False, **kwargs):
+                   contourf=False, **kw):
     """Plot a rectangular grid on a given map projection.
 
     Parameters
@@ -518,9 +518,9 @@ def plot_grid_proj(m, lon, lat, grid, shift=True, masked=True,
     if masked:
         grid = np.ma.masked_invalid(grid)
     if contourf:
-        m.contourf(xx, yy, grid, **kwargs)
+        m.contourf(xx, yy, grid, **kw)
     else:
-        m.pcolormesh(xx, yy, grid, **kwargs)
+        m.pcolormesh(xx, yy, grid, **kw)
     return m
 
 
@@ -552,19 +552,19 @@ def get_gtif_subreg(m, filename, res=1):
 ### Matplotlib utilities
 
 def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, 
-         npmb=16, **kwargs):
+         npmb=16, **kw):
     """Matplotlib text command augmented with poor man's bold.
 
     See plt.text() doctring for complete documentation.
 
     """
-    h = [ax.text(x, y, s, **kwargs)]
+    h = [ax.text(x, y, s, **kw)]
     h[0].zorder += 1
     if edgecolor is not None:
-        if 'bbox' in kwargs:
-            del(kwargs['bbox'])
-        kwargs['color'] = edgecolor
-        kwargs['alpha'] = edgealpha
+        if 'bbox' in kw:
+            del(kw['bbox'])
+        kw['color'] = edgecolor
+        kw['alpha'] = edgealpha
         aspect = ax.get_aspect()
         dx, dy = ax.get_position().size * ax.figure.get_size_inches() * 72.0
         x1, x2 = ax.get_xbound()
@@ -582,17 +582,17 @@ def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75,
             y_ = y + dy * np.sin(phi)
             #x_ = x + dx * np.maximum(-m, np.minimum(m, np.cos(phi)))
             #y_ = y + dy * np.maximum(-m, np.minimum(m, np.sin(phi)))
-            h += [ax.text(x_, y_, s, **kwargs)]
+            h += [ax.text(x_, y_, s, **kw)]
     return h
 
 
-def get_cmap(*args, **kwargs):
+def get_cmap(*args, **kw):
     """Matplotlib enhanced colormap. 
     
     See 'create_cmap' for details.
     """
-    n = kwargs.pop('n', 2001)
-    v, r, g, b, a = create_cmap(*args, **kwargs)
+    n = kw.pop('n', 2001)
+    v, r, g, b, a = create_cmap(*args, **kw)
     cdict = {'red': np.c_[v, r, r],
              'green': np.c_[v, g, g],
              'blue': np.c_[v, b, b] }
@@ -602,10 +602,10 @@ def get_cmap(*args, **kwargs):
 
 def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None, 
              ticklabels=None, boxcolor='k', boxalpha=1.0, boxwidth=0.2,
-             shifttitle=1.8, shiftlabel=-0.2, **kwargs):
+             shifttitle=1.8, shiftlabel=-0.2, **kw):
     """Matplotlib enhanced colorbar.
 
-    **kwargs are passed to the text() command.
+    **kw are passed to the text() command.
     
     Original by Geoffrey Ely.
     Modified by Fernando Paolo.
@@ -626,19 +626,19 @@ def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None,
     label_voffset = shiftlabel
     if title:
         x = 0.5 * (clim[0] + clim[1])
-        text(ax, x, title_voffset, title, ha='center', va='baseline', **kwargs)
+        text(ax, x, title_voffset, title, ha='center', va='baseline', **kw)
     if ticks is None:
         ticks = clim[0], 0.5 * (clim[0] + clim[1]), clim[1]
     if ticklabels is None:
         ticklabels = ticks
     for i, x in enumerate(ticks):
         s = '%s' % ticklabels[i]
-        text(ax, x, label_voffset, s, ha='center', va='top', **kwargs)
+        text(ax, x, label_voffset, s, ha='center', va='top', **kw)
     return ax
 
 
 def length_scale(ax, x, y, w=None, label='%s', style='k-', linewidth=1, 
-                color='k', **kwargs):
+                color='k', **kw):
     """Draw a length scale bar between the points (x[0], y[0]) and (x[1], 
     y[1]).
 
@@ -670,19 +670,19 @@ def length_scale(ax, x, y, w=None, label='%s', style='k-', linewidth=1,
     theta = np.arctan2(dy, dx) * 180.0 / np.pi
     h1 = ax.plot(x0 + x, y0 + y, style, clip_on=False, lw=linewidth, c=color)
     h2 = text(ax, x0, y0, label, ha='center', va='center', rotation=theta, 
-              color=color, **kwargs)
+              color=color, **kw)
     return h1, h2
 
 
-def compass_rose(ax, x, y, r, style='k-', **kwargs):
+def compass_rose(ax, x, y, r, style='k-', **kw):
     """
     Original by Geoffrey Ely.
     Modified by Fernando Paolo.
     """
     theta = 0.0
-    if 'rotation' in kwargs:
-        theta = kwargs['rotation']
-    kwargs.update(rotation_mode='anchor')
+    if 'rotation' in kw:
+        theta = kw['rotation']
+    kw.update(rotation_mode='anchor')
     c  = np.cos(theta / 180.0 * np.pi)
     s  = np.sin(theta / 180.0 * np.pi)
     x_ = x + r * np.array([(c,  s), (-c, -s)])
@@ -690,14 +690,14 @@ def compass_rose(ax, x, y, r, style='k-', **kwargs):
     h  = [ax.plot(x_, y_, style, clip_on=False)]
     x_ = x + r * np.array([(c, -c), (s, -s)]) * 1.3
     y_ = y + r * np.array([(s, -s), (-c,  c)]) * 1.3
-    h += [text(ax, x_[0,0], y_[0,0], 'E', ha='left', va='center', **kwargs),
-          text(ax, x_[0,1], y_[0,1], 'W', ha='right', va='center', **kwargs),
-          text(ax, x_[1,0], y_[1,0], 'S', ha='center', va='top', **kwargs),
-          text(ax, x_[1,1], y_[1,1], 'N', ha='center', va='bottom', **kwargs),]
+    h += [text(ax, x_[0,0], y_[0,0], 'E', ha='left', va='center', **kw),
+          text(ax, x_[0,1], y_[0,1], 'W', ha='right', va='center', **kw),
+          text(ax, x_[1,0], y_[1,0], 'S', ha='center', va='top', **kw),
+          text(ax, x_[1,1], y_[1,1], 'N', ha='center', va='bottom', **kw),]
     return h
 
 
-def savefig(fig, fh=None, format=None, distill=False, **kwargs):
+def savefig(fig, fh=None, format=None, distill=False, **kw):
     """
     Enhanced version of Matplotlib savefig command.
 
@@ -715,18 +715,18 @@ def savefig(fig, fh=None, format=None, distill=False, **kwargs):
             format = 'array'
     out = cStringIO.StringIO()
     if format == 'array':
-        if 'dpi' not in kwargs:
-            kwargs['dpi'] = fig.dpi
-        dpi = kwargs['dpi']
+        if 'dpi' not in kw:
+            kw['dpi'] = fig.dpi
+        dpi = kw['dpi']
         n = fig.get_size_inches()
         n = int(n[1] * dpi), int(n[0] * dpi), 4
-        fig.savefig(out, format='raw', **kwargs)
+        fig.savefig(out, format='raw', **kw)
         out = np.fromstring(out.getvalue(), 'u1').reshape(n)
     elif distill and format == 'pdf':
-        fig.savefig(out, format='eps', **kwargs)
+        fig.savefig(out, format='eps', **kw)
         out = distill_eps(out)
     else:
-        fig.savefig(out, format=format, **kwargs)
+        fig.savefig(out, format=format, **kw)
         out.reset()
     if fh is None:
         return(out)
@@ -789,7 +789,7 @@ def digitize2(img, xlim=(-1, 1), ylim=(-1, 1), color='r'):
     return xr, yr
 
 
-def contour(*args, **kwargs):
+def contour(*args, **kw):
     """
     Extract contour polygons using matplotlib.
     """
@@ -798,7 +798,7 @@ def contour(*args, **kwargs):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     if concat:
-        for cc in ax.contour(*args, **kwargs).collections:
+        for cc in ax.contour(*args, **kw).collections:
             p = []
             for c in cc.get_paths():
                 p += c.to_polygons() + [[[np.nan, np.nan]]]
@@ -808,7 +808,7 @@ def contour(*args, **kwargs):
             else:
                 pp += [None]
     else:
-        for cc in ax.contour(*args, **kwargs).collections:
+        for cc in ax.contour(*args, **kw).collections:
             p = []
             for c in cc.get_paths():
                 p += c.to_polygons()
@@ -818,7 +818,7 @@ def contour(*args, **kwargs):
 
 
 def intitle(title='', loc=1, size=None, pad=0., borderpad=0.5, borderwidth=4,
-            borderalpha=1, ax=None, **kwargs):
+            borderalpha=1, ax=None, **kw):
     """Add title inside the figure. Same locations as 'label'.
 
     Examples
@@ -843,7 +843,7 @@ def intitle(title='', loc=1, size=None, pad=0., borderpad=0.5, borderwidth=4,
     if ax is None:
         ax = plt.subplot(111)
     at = AnchoredText(title, loc=loc, prop=size, pad=pad, 
-                      borderpad=borderpad, frameon=False, **kwargs)
+                      borderpad=borderpad, frameon=False, **kw)
     ax.add_artist(at)
     at.txt._text.set_path_effects([withStroke(foreground="w",
                                               linewidth=borderwidth,
@@ -1116,8 +1116,8 @@ def adjust_spines(ax, spines, pad=10):
 def get_limits(x, decimals=1):
     """Get the ceiling and floor limits for the decimal digits. 
     
-    Useful to set the y-/x-limits in matplotlib with integer numbers at the
-    end of the axis.
+    Useful to set the y-/x-limits in matplotlib ensuring the end points of
+    the axis coincide with the large tick marks.
 
     """
     deci = 10**decimals
