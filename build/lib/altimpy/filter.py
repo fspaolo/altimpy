@@ -63,22 +63,23 @@ def median_filt(arr, size=(3,3), min_pixels=3, **kw):
 def hp_filt(y, lamb=7, nan=False, return_series='trend'):
     """Hodrick-Prescott filter for 1d array.
     
-    lamb - smoothing paramenter (e.g., 1600 for trend in quarterly data)
-    nan=True - supports NaNs.
-    return_series='trend'|'cycle'|'both' - returns the trend and/or cycle.
+    lamb : smoothing paramenter (e.g., 1600 for trend in quarterly data)
+    nan=True|False : supports NaNs.
+    return_series='trend'|'cycle'|'both' : returns the trend and/or cycle.
+
     Assumes an evenly spaced array.
 
     Detrend with HP-filter
     ----------------------
     
-    Rule of thumb is (empirical)[1]: 
+    Rule of thumb for smoothing is (empirical)[1]: 
     
-    Lambda = 100 * (number of periods in a year)**2
+    Lambda = 100 * (number of periods in a year)^2
     
-    Annual data = 100*1**2 = 100
-    Quarterly data = 100*4**2 = 1,600
-    Monthly data = 100*12**2 = 14,400
-    Weekly data = 100*52**2 = 270,400
+    Annual data = 100*1^2 = 100
+    Quarterly data = 100*4^2 = 1,600
+    Monthly data = 100*12^2 = 14,400
+    Weekly data = 100*52^2 = 270,400
     
     There is additional research that suggests using a power of 4 instead
     of 2. See Ravn and Uhlig (2002)[2]
@@ -86,12 +87,10 @@ def hp_filt(y, lamb=7, nan=False, return_series='trend'):
     Harvey and Trimbur (2008) explain the risk in using a too-small smoothing
     parameter (lambda), though I have yet to find research explaining the risk
     of using too-large of a smooth parameter, other than the trend becomes
-    increasingly linear and less sensitive to recent data[2]
+    increasingly linear and less sensitive to recent data[3]
     
     [1] http://forums.eviews.com/viewtopic.php?f=4&t=870
-    
     [2] https://ideas.repec.org/a/tpr/restat/v84y2002i2p371-375.html
-    
     [3] http://www.terrapub.co.jp/journals/jjss/pdf/3801/38010041.pdf
         
     """

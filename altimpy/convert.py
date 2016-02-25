@@ -788,15 +788,23 @@ def date2year(date):
 def cell2node(x, y):
     """Convert cell-centered coordinates to node-centered (the edges).
     
-    input <= x/y : 1d-arrays (N)
-    output => x2/y2 : 1d-arrays (N+1)
+    input <= x/y : 1d or 2d-arrays (N) or (N,M)
+    output => x2/y2 : 1d or 2d-arrays (N+1) or (N+1,M+1)
+
+    NOTE: It accepts rectangular irregular (in x and y) grids.
 
     """
-    x2, y2 = x.copy(), y.copy()
-    dx = x2[1] - x2[0]
-    dy = y2[1] - y2[0]
-    x2 -= dx / 2.
-    y2 -= dy / 2.
-    x2 = np.append(x2, x2[-1]+dx)
-    y2 = np.append(y2, y2[-1]+dy)
+    ndim = np.ndim(x)
+    if ndim == 2:
+          x2, y2 = x[0,:], y[:,0]
+    else:
+        x2, y2 = x.copy(), y.copy()
+    dx = np.diff(x2)/2. # N-1
+    dy = np.diff(y2)/2.
+    x2 -= np.r_[dx[0], dx] # N
+    y2 -= np.r_[dy[0], dy]
+    x2 = np.r_[x2, x2[-1]+dx[-1]] # N+1
+    y2 = np.r_[y2, y2[-1]+dy[-1]]
+    if ndim == 2:
+        x2, y2 = np.meshgrid(x2, y2)
     return x2, y2

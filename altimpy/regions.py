@@ -11,7 +11,13 @@ should be reviewed.
 import numpy as np
 
 def where_isnan(name, lon, lat):
+    """
+    Return indices of grid cells that should be NaN (out of region).
+    
+    name - string with region name as defined in ap.regions
+    lon, lat - 1d or 2d arrays with lon/lat coordinates
 
+    """
     if lon.ndim == 1:
         lon, lat = np.meshgrid(lon, lat)
     reg = {}
@@ -209,6 +215,19 @@ def where_isnan(name, lon, lat):
             (lon < 304.5) & (lat > -82)
 
     return np.where(reg[name])
+
+
+def mask_region(grid, lon, lat, region): 
+    """ 
+    Return the original 2d array with the region masked in. 
+ 
+    grid - 2d array with region to mask 
+    x, y - 1d or 2d arrays with lon/lat coordinates 
+    region - string with region name, as defined in ap.regions 
+    """ 
+    ij = where_isnan(region, lon, lat) 
+    grid[ij] = np.nan 
+    return grid 
 
 
 # DEPRECATED Use conditions instead
