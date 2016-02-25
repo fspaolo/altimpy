@@ -38,4 +38,4 @@ Download and install the library
     cd altimpy 
     python setup.py install --user 
 
-Some day I'll organize this library...
+Some day I will organize and document this library... ;)
