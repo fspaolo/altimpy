@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from altimpy import lasso_cv
 
 
-def std_filt(arr, n=3, per_field=False):
+def std_filter(arr, n=3, per_field=False):
     """Filter out pts greater than n std.
 
     Parameters
@@ -43,7 +43,7 @@ def std_filt(arr, n=3, per_field=False):
     return arr
 
 
-def median_filt(arr, size=(3,3), min_pixels=3, **kw):
+def median_filter(arr, size=(3,3), min_pixels=3, **kw):
     """Median filter with constrain for 2d array. 
     
     Supports NaNs.
@@ -57,15 +57,15 @@ def median_filt(arr, size=(3,3), min_pixels=3, **kw):
         else:
             m = np.median(valid_pixels)
         return m
-    return ni.generic_filter(arr, _median, size=size, **kw)
+    return ni.generic_filterer(arr, _median, size=size, **kw)
 
 
-def hp_filt(y, lamb=7, nan=False, return_series='trend'):
+def hp_filter(y, lamb=7, nan=False, return_series='trend'):
     """Hodrick-Prescott filter for 1d array.
     
-    lamb : smoothing paramenter (e.g., 1600 for trend in quarterly data)
-    nan=True|False : supports NaNs.
-    return_series='trend'|'cycle'|'both' : returns the trend and/or cycle.
+    lamb (int): smoothing paramenter (e.g., 1600 for trend in quarterly data)
+    nan=True|False: supports NaNs.
+    return_series='trend'|'cycle'|'both': returns the trend and/or cycle.
 
     Assumes an evenly spaced array.
 
@@ -114,13 +114,13 @@ def hp_filt(y, lamb=7, nan=False, return_series='trend'):
     return res
 
 
-def time_filt(t, y, from_time=1991, to_time=2013):
+def time_filter(t, y, from_time=1991, to_time=2013):
     """Filter an array based on time interval."""
     k, = np.where((t > from_time) & (t < to_time))
     return t[k], y[k,...]
 
 
-def percent_filt(y, min_perc=0.7):
+def percent_filter(y, min_perc=0.7):
     """Filter vector with a min percentage of non-null entries."""
     y2 = y.copy()
     percent = len(y2[~np.isnan(y2)]) / float(len(y2))
@@ -129,7 +129,7 @@ def percent_filt(y, min_perc=0.7):
     return y2, percent
 
 
-def step_filt(x, delta=3, window=7):
+def step_filter(x, delta=3, window=7):
     """Filter step-changes in a verctor.
     
     Detects level-shifts in a time series and corrects them by levelling both
@@ -151,10 +151,10 @@ def step_filt(x, delta=3, window=7):
     return v[n:-n], m[n:-n]
 
 
-def _peak_filt(x, y, n_std=3, max_deg=3):
+def _peak_filter(x, y, n_std=3, max_deg=3):
     """Filter spikes in a vector.
     
-    See peak_filt()
+    See peak_filter()
     """
     assert not np.isnan(y).all(), 'empty array'
     y2 = y.copy()
@@ -168,19 +168,19 @@ def _peak_filt(x, y, n_std=3, max_deg=3):
     return len(i_peaks)
 
 
-def peak_filt(x, y, n_std=3, iterative=True, max_deg=3):
+def peak_filter(x, y, n_std=3, iterative=True, max_deg=3):
     """Filter spikes in a vector (iteratively).
 
     Remove values greater than n*std from the trend.
     """
-    n_peaks = _peak_filt(x, y, n_std=n_std, max_deg=3)
+    n_peaks = _peak_filter(x, y, n_std=n_std, max_deg=3)
     if iterative and n_peaks != 0:
         while n_peaks != 0 and not np.isnan(y).all():
-            n_peaks = _peak_filt(x, y, n_std=n_std)
+            n_peaks = _peak_filter(x, y, n_std=n_std)
     return y
 
 
-def std_series_filt(x, y, max_std=2, max_deg=3):
+def std_series_filter(x, y, max_std=2, max_deg=3):
     """Filter entire vector if the detrended std > max_std."""
     std = None
     if not np.isnan(y).all():
