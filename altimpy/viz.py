@@ -819,21 +819,21 @@ def contour(*args, **kw):
 
 def intitle(title='', loc=1, size=None, pad=0., borderpad=0.5, borderwidth=4,
             borderalpha=1, ax=None, **kw):
-    """Add title inside the figure. Same locations as 'label'.
+    """Add title inside the figure, at same locations as 'label'.
 
     Examples
     --------
     # with pyplot single
     plt.figure()
-    intitle('inner title', 3)
+    intitle('Inner title', 3)
 
     # with pyplot subplot
     ax = plt.subplot(211)
-    intitle('inner title', 3, ax=ax)
+    intitle('Inner title', 3, ax=ax)
 
     # with pandas
     ax = df.plot()
-    intitle('inner title', 3, ax=ax)
+    intitle('Inner title', 3, ax=ax)
 
     """
     from matplotlib.offsetbox import AnchoredText
