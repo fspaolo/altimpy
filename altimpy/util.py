@@ -927,7 +927,7 @@ def roundup(x, decimals=1, negative_down=False):
     return x
 
 
-def wind_stress(u, v, rho_air=1.22, Cd=None):
+def wind_stress(u, v, rho_air=1.22, cd=None):
     """Convert wind speed (u,v) to wind stress (Tx,Ty).
 
     It uses either wind-dependent or constant drag.
@@ -935,11 +935,11 @@ def wind_stress(u, v, rho_air=1.22, Cd=None):
     Args:
         u, v: Wind vector components (m/s), 2d or 3d (for time series).
         rho_air: Density of air (1.22 kg/m^3).
-        Cd: Non-dimensional drag (wind-speed dependent).
-            For constant drag use Cd=1.5e-3.
+        cd: Non-dimensional drag (wind-speed dependent).
+            For constant drag use cd=1.5e-3.
     Notes:
         Function to compute wind stress from wind field data is based on Gill,
-        (1982)[1]. Formula and a non-linear drag coefficient (Cd) based on
+        (1982)[1]. Formula and a non-linear drag coefficient (cd) based on
         Large and Pond (1981)[2], modified for low wind speeds (Trenberth et
         al., 1990)[3]
 
@@ -956,20 +956,20 @@ def wind_stress(u, v, rho_air=1.22, Cd=None):
     """
     w = np.sqrt(u**2 + v**2) # wind speed (m/s) 
 
-    if not Cd:
+    if not cd:
         # wind-dependent drag
         cond1 = (w<=1)
         cond2 = (w>1) & (w<=3)
         cond3 = (w>3) & (w<10)
         cond4 = (w>=10)
-        Cd = np.zeros_like(w)
-        Cd[cond1] = 2.18e-3 
-        Cd[cond2] = (0.62 + 1.56/w[cond2]) * 1e-3
-        Cd[cond3] = 1.14e-3
-        Cd[cond4] = (0.49 + 0.065*w[cond4]) * 1e-3
+        cd = np.zeros_like(w)
+        cd[cond1] = 2.18e-3 
+        cd[cond2] = (0.62 + 1.56/w[cond2]) * 1e-3
+        cd[cond3] = 1.14e-3
+        cd[cond4] = (0.49 + 0.065*w[cond4]) * 1e-3
 
-    Tx = rho_air * Cd * w * u # zonal wind stress (N/m^2)
-    Ty = rho_air * Cd * w * v # meridional wind stress (N/m^2)
+    Tx = rho_air * cd * w * u # zonal wind stress (N/m^2)
+    Ty = rho_air * cd * w * v # meridional wind stress (N/m^2)
     return [Tx, Ty]
 
 
