@@ -847,7 +847,7 @@ def intitle(title='', loc=1, size=None, pad=0., borderpad=0.5, borderwidth=4,
     ax.add_artist(at)
     at.txt._text.set_path_effects([withStroke(foreground="w",
                                               linewidth=borderwidth,
-                                              alpha=borderalpha,zorder=10)])
+                                              alpha=borderalpha)])
     return ax
 
 
