@@ -108,7 +108,7 @@ class SecsToDateTime(object):
 
 
 def lon_180_360(lon, region=None, inverse=False):
-    """longitude -/+180 -> 0/360 (or vice-versa). 
+    """convert longitude between -/+180 <-> 0/360 (back and forth).
     
     Converts according `region` if given, otherwise converts
     from 180 to 360 if `inverse` is `False` or from 360 to 180 
@@ -144,7 +144,7 @@ def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
     slat : float
         Standard latitude (e.g., 71 S), see Notes.
     slon : float
-        Standard longitude (e.g., -70), see Notes.
+      Standard longitude (e.g., -70), see Notes.
     hemi : string
         Hemisphere: 'n' or 's' (not case-sensitive).
     units : string
