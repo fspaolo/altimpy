@@ -976,14 +976,13 @@ def wind_stress(u, v, rho_air=1.22, cd=None):
 def wind_curl(u, v, x, y, ydim=0, xdim=1, tdim=2):
     """Calculate the curl of the wind vector. 
     
-    Curl(u,v) = dv/dx - du/dy
-    Units of frequency (1/s).
-
     Args:
         u, v: Wind vector components (m/s), 2d or 3d (for time series).
         x, y: Coordinates in lon/lat (degrees), 2d.
 
     Notes:
+        Curl(u,v) = dv/dx - du/dy
+        Units of frequency (1/s).
         The different constants come from oblateness of the ellipsoid.
 
     """
@@ -1006,13 +1005,12 @@ def wind_curl(u, v, x, y, ydim=0, xdim=1, tdim=2):
 def wind_stress_curl(Tx, Ty, x, y, ydim=0, xdim=1, tdim=2):
     """Calculate the curl of wind stress (Tx, Ty).
 
-    Curl(Tx,Ty) = dTy/dx - dTx/dy
-
     Args:
-        Tx, Ty : Wind stress components (N/m^2), 2d or 3d (for time series)
-        x, y : Coordinates in lon/lat (degrees), 2d.
+        Tx, Ty: Wind stress components (N/m^2), 2d or 3d (for time series)
+        x, y: Coordinates in lon/lat (degrees), 2d.
 
     Notes:
+        Curl(Tx,Ty) = dTy/dx - dTx/dy
         The different constants come from oblateness of the ellipsoid.
 
     """
@@ -1035,25 +1033,70 @@ def wind_stress_curl(Tx, Ty, x, y, ydim=0, xdim=1, tdim=2):
 def ekman_pumping(curl_tau, y, rho_water=1028., tdim=2):
     """Calculate Ekman pumping from wind-stress curl.
 
-    We = Curl(tau)/rho*f (vertical velocity in m/s).
-    f = Coriolis frequency (rad/s), latitude dependent.
-    rho = Ocean water density (1028 kg/m^3).
-
     Args:
         curl_tau: Wind stress curl (N/m^3), 2d or 3d (for time series).
         y: Latitude grid (degrees), 2d.
+
+    Notes:
+        We = Curl(tau)/rho*f (vertical velocity in m/s).
+        f = Coriolis frequency (rad/s), latitude dependent.
+        rho = Ocean water density (1028 kg/m^3).
 
     """
     # Coriolis frequency
     omega = 7.292115e-5 # rotation rate of the Earth (rad/s)
     f = 2 * omega * np.sin(y * np.pi/180) # (rad/s)
 
-    # expand dimension for broadcasting (2d -> 3d)
+    # Expand dimension for broadcasting (2d -> 3d)
     if f.shape != curl_tau.shape:
         f = np.expand_dims(f, tdim)
 
     # Ekman pumping
     We = curl_tau / (rho_water * f) # vertical velocity (m/s)
     return We
+
+
+def rotate_wind(u, v, x, y=None, to='ps', slon=0):
+    """Rotate the wind vector.
+    
+    Converts winds between Polar Stereo grid and East/North components.
+
+    Args:
+        u, v: Velocity components (m/s)
+        x, y: Longitude|East and Latitude|North (degree|km)
+        to (str): 'ps'|'en', to polar stereo coords | to east/north comps.
+        slon: Standard longitude (e.g., -70).
+        
+    Return:
+        ur, vr: Grids containing rotated (u,v).
+
+    Notes:
+        The y-coord (latitude) is not needed.
+
+        Original Matlab version by Laurie Padman <ESR: padman@esr.org>.
+        Written in 2011-09-02, and modified in 2011-11-08.
+
+        Translated to Python and modified by Fernando Paolo <fpaolo@ucsd.edu>.
+        Apr 10, 2016.
+
+        For additional info see docstring of 'll2xy' and 'xy2ll'.
+
+    """
+    phi = (-x+slon+90) / 180*np.pi
+    if to.lower() == 'ps': 
+        # Convert east/north to Polar Stereo grid
+        u_new = u*np.sin(phi) + v*np.cos(phi)
+        v_new = v*np.sin(phi) - u*np.cos(phi)
+        u = u_new
+        v = v_new
+    elif to.lower() == 'en': 
+        # Convert Polar Stereo coords to east/north
+        u_new = u*np.sin(-phi) + v*np.cos(-phi)
+        v_new = v*np.sin(-phi) - u*np.cos(-phi)
+        u = -u_new
+        v = -v_new
+    else:
+        raise ValueError('"to=" must be "ps" or "en"')
+    return [u, v]
 
 

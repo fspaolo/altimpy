@@ -1056,7 +1056,7 @@ def ekman_pumping(curl_tau, y, rho_water=1028., tdim=2):
     return We
 
 
-def rotate_wind(u, v, x, y=None, slat=71, slon=0, hemi='s', to='ps'):
+def rotate_wind(u, v, x, y=None, to='ps', slon=0):
     """Rotate the wind vector.
     
     Converts winds between Polar Stereo grid and East/North components.
@@ -1065,9 +1065,7 @@ def rotate_wind(u, v, x, y=None, slat=71, slon=0, hemi='s', to='ps'):
         u, v: Velocity components (m/s)
         x, y: Longitude|East and Latitude|North (degree|km)
         to (str): 'ps'|'en', to polar stereo coords | to east/north comps.
-        slat: Standard latitude (e.g., 71 S), see Notes.
-        slon: Standard longitude (e.g., -70), see Notes.
-        hemi: Hemisphere: 'n' or 's' (not case-sensitive).
+        slon: Standard longitude (e.g., -70).
         
     Return:
         ur, vr: Grids containing rotated (u,v).
@@ -1079,7 +1077,7 @@ def rotate_wind(u, v, x, y=None, slat=71, slon=0, hemi='s', to='ps'):
         Written in 2011-09-02, and modified in 2011-11-08.
 
         Translated to Python and modified by Fernando Paolo <fpaolo@ucsd.edu>.
-        Apr 10, 2016
+        Apr 10, 2016.
 
         For additional info see docstring of 'll2xy' and 'xy2ll'.
 
