@@ -57,7 +57,7 @@ def median_filter(arr, size=(3,3), min_pixels=3, **kw):
         else:
             m = np.median(valid_pixels)
         return m
-    return ni.generic_filterer(arr, _median, size=size, **kw)
+    return ni.generic_filter(arr, _median, size=size, **kw)
 
 
 def hp_filter(y, lamb=7, nan=False, return_series='trend'):

@@ -989,7 +989,7 @@ def wind_curl(u, v, x, y, ydim=0, xdim=1, tdim=2):
     dy = np.abs(y[1,0] - y[0,0]) # scalar in deg
     dx = np.abs(x[0,1] - x[0,0]) 
     dy *= 110575. # scalar in m
-    dx *= 111303. * np.cos(y * np.pi/180) # array in m (varies w/lat)
+    dx *= 111303. * np.cos(y * np.pi/180) # array in m (varies w/lat)  # FIXME?
 
     # extend dimension for broadcasting (2d -> 3d)
     if u.ndim == 3:
@@ -1062,12 +1062,12 @@ def rotate_wind(u, v, x, y=None, to='ps', slon=0):
     Converts winds between Polar Stereo grid and East/North components.
 
     Args:
-        u, v: Velocity components (m/s)
-        x, y: Longitude|East and Latitude|North (degree|km)
-        to (str): 'ps'|'en', to polar stereo coords | to east/north comps.
+        u, v: Velocity components (m/s).
+        x, y: Coords in lon/lat or east/north (degree or km).
+        to (str): 'ps' or 'en', 'to polar stereo' or 'to east/north'.
         slon: Standard longitude (e.g., -70).
         
-    Return:
+    Returns:
         ur, vr: Grids containing rotated (u,v).
 
     Notes:
