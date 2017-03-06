@@ -334,7 +334,7 @@ def read_cindex(fname, from_year=0, to_year=1e4, decimals=3,
                         delimiter=delimiter,
                         skipinitialspace=skipinitialspace,
                         header=header, **kw).values
-    t = np.arange(table[0,0], table[-1,0]+1, 1/12.) 
+    t = np.arange(table[0,0], table[-1,0]+1, 1/12.) - 1/24. 
     y = table[:,1:].flatten()
     idx, = np.where((t >= from_year) & (t <= to_year))
     return [t[idx].round(decimals), y[idx]]
