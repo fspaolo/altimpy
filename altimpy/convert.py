@@ -127,7 +127,7 @@ def lon_180_360(lon, region=None, inverse=False):
     return lon
 
 
-def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
+def ll2xy(lon, lat, slat=70, slon=0, hemi='s', units='km'):
     """ Spherical lon/lat -> Polar Steregraphic x/y.
  
     This function converts from geodetic latitude and longitude to
@@ -142,9 +142,9 @@ def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
     lon, lat : array-like (1d or 2d) or float 
         Geodetic longitude and latitude (degrees, -/+180 or 0/360 and -/+90).
     slat : float
-        Standard latitude (e.g., 71 S), see Notes.
+        Standard latitude (e.g., 70 S), see Notes.
     slon : float
-      Standard longitude (e.g., -70), see Notes.
+      Standard longitude (e.g., 0), see Notes.
     hemi : string
         Hemisphere: 'n' or 's' (not case-sensitive).
     units : string
@@ -263,7 +263,7 @@ def ll2xy(lon, lat, slat=71, slon=0, hemi='s', units='km'):
     return [x, y]
 
  
-def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
+def xy2ll(x, y, slat=70, slon=0, hemi='s', units='km'):
     """Polar Stereographic x/y -> Spherical lon/lat.
  
     This subroutine converts from Polar Stereographic 'x,y' coordinates 
@@ -278,9 +278,9 @@ def xy2ll(x, y, slat=71, slon=0, hemi='s', units='km'):
     x, y : array-like (1d or 2d) or float
         Polar stereographic x and y coordinates (in 'm' or 'km').
     slat : float
-        Standard latitude (e.g., 71 S), see Notes.
+        Standard latitude (e.g., 70 S), see Notes.
     slon : float
-        Standard longitude (e.g., -70), see Notes.
+        Standard longitude (e.g., 0), see Notes.
     hemi : string
         Hemisphere: 'n' or 's' (not case-sensitive).
     units : string

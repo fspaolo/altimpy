@@ -4,7 +4,7 @@ Processing scheme for time series of height differences
 
 Notes
 -----
-keep separated files (do no merge) as long as possible.
+keep separated files (do not merge) as long as possible.
 The more (and smaller) files the better for parallel (and serial) processing!
 See the README.txt file in the data folders.
 
@@ -13,7 +13,7 @@ General processing
 1. read raw IDR/WDR (parallel)... ok
 2. convert to HDF5 (parallel)... ok
 3. apply mask (parallel)... ok
-4. sepparate tracks by flags (parallel)... ok
+4. sepparate tracks: index a flag (parallel)... ok
 5. separate time: years, seasons, months... ok
 6. separate in sectors w/overlap in lon (fast operation)... ok
 

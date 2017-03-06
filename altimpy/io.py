@@ -314,9 +314,36 @@ def get_gtif(fname, lat_ts=-71, lon_0=0, lat_0=-90, units='m'):
     return [x, y, img, bbox_ll]
 
 
-def read_cindex(string, from_year=0, to_year=1e4, pandas=False, name=None,
-                decimals=3):
-    """Reads NOAA's climate-index table (from file or url).
+def read_cindex(fname, from_year=0, to_year=1e4, decimals=3,
+                comment='#', header=None, delimiter=' ',
+                skipinitialspace=True, **kw):
+    """
+    General reader for climate-index in table format.
+    
+    Reads "Climate Indices: Monthly Atmospheric and Ocean Time
+    Series" and transforms the table format into a time series y(t).
+
+    For information and data format see, for example:
+    http://www.esrl.noaa.gov/psd/data/climateindices/list/
+
+    fname - ASCII file to read the data from.
+    decimals - Rounds to n decimals the values .
+
+    """
+    table = pd.read_csv(fname, comment=comment,
+                        delimiter=delimiter,
+                        skipinitialspace=skipinitialspace,
+                        header=header, **kw).values
+    t = np.arange(table[0,0], table[-1,0]+1, 1/12.) 
+    y = table[:,1:].flatten()
+    idx, = np.where((t >= from_year) & (t <= to_year))
+    return [t[idx].round(decimals), y[idx]]
+
+
+def read_cindex_noaa(string, from_year=0, to_year=1e4, pandas=False,
+                     name=None, decimals=3):
+    """
+    Reads NOAA's climate-index table (from file or url).
     
     Reads the NOAA's "Climate Indices: Monthly Atmospheric and Ocean Time
     Series" and transforms the table format into a time series y(t).

@@ -45,11 +45,17 @@ def where_isnan(name, lon, lat):
     reg['ros'] = reg['ross'] = reg['Ross'] = \
             (lon < 156) | (lon > 222) | (lat < -85.8) | (lat > -71.8)
 
+    # AS = Getz to Cosgrove
     reg['amu'] = reg['as'] = reg['Amundsen'] = \
             (lon < 224) | (lon > 262.5) | (lat < -75.8) | (lat > -73.2)
 
+    # AS + Abbot + Venable
     reg['amu2'] = reg['as2'] = reg['Amundsen2'] = \
             (lon < 224) | (lon > 275) | (lat < -76) | (lat > -70)
+
+    # AS + Sulzberger + Nickerson
+    reg['amu3'] = reg['as3'] = reg['Amundsen3'] = \
+            (lon < 205) | (lon > 262.5) | (lat < -78) | (lat > -73.2)
 
     reg['bel'] = reg['belling'] = reg['bs'] = reg['Bellingshausen'] = \
             (lon < 256) | (lon > 295) | (lat < -74) | (lat > -69.5) | \
